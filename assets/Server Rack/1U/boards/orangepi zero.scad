@@ -1,16 +1,16 @@
-include <battery charger dimensions.scad>
+include <orangepi zero dimensions.scad>
 use <../parts/feet.scad>
 use <../parts/bracket.scad>
 use <../parts/drilling templates.scad>
 
-battery_charger_feet();
-battery_charger_bracket();
+orangepi_zero_feet();
+orangepi_zero_bracket();
 
-module battery_charger_feet() {
+module orangepi_zero_feet() {
     feet_feet(feet,holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
-module battery_charger_bracket() {
+module orangepi_zero_bracket() {
     translate(size) translate(size) bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
 }
     

@@ -1,16 +1,16 @@
-include <battery charger dimensions.scad>
+include <PWM to V dimensions.scad>
 use <../parts/feet.scad>
 use <../parts/bracket.scad>
 use <../parts/drilling templates.scad>
+ 
+PWM_to_V_feet();
+PWM_to_V_bracket();
 
-battery_charger_feet();
-battery_charger_bracket();
-
-module battery_charger_feet() {
+module PWM_to_V_feet() {
     feet_feet(feet,holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
-module battery_charger_bracket() {
+module PWM_to_V_bracket() {
     translate(size) translate(size) bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
 }
     

@@ -1,0 +1,9 @@
+feet = [[0,0,0], [42.11,0,0], [0,40.11,0], [42.11,40.11,0]];
+size = [48, 46, 2];
+holeSize = 3;
+baseSize = 9;
+footSize = 5;
+baseHeight = 3;
+totalHeight = 7;
+linkThickness = 3;
+linkHeight = 2;

@@ -1,16 +1,16 @@
-include <battery charger dimensions.scad>
+include <3V buckdown converter dimensions.scad>
 use <../parts/feet.scad>
 use <../parts/bracket.scad>
 use <../parts/drilling templates.scad>
 
-battery_charger_feet();
-battery_charger_bracket();
+3V_buckdown_converter_feet();
+3V_buckdown_converter_bracket();
 
-module battery_charger_feet() {
+module 3V_buckdown_converter_feet() {
     feet_feet(feet,holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
-module battery_charger_bracket() {
+module 3V_buckdown_converter_bracket() {
     translate(size) translate(size) bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
 }
     
