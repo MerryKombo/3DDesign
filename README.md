@@ -8,3 +8,4 @@ For the time being, we have only designed :
  - some kind of [brackets](https://cad.onshape.com/documents/de92b111aa7f5849203ae715/w/e26b7d6164ce3681e73079b7/e/8660cfd245f799d101ddc51e) to insulate the PWM to V converter from the metal bottom of the box.
  - a few bits and [bobs](https://cad.onshape.com/documents/670c0dcb20e9d88e955e134f/w/1035a103bbd1c8f163666206/e/51936ffd82cb6a0b55d4049d) for an [Odroid](https://www.armbian.com/odroid-hc1/) [MC1](https://www.hardkernel.com/shop/odroid-mc1-solo/).
  - a CameraSlider reworked by Technoo'
+ - a 1U rack server [solution](https://github.com/MerryKombo/3DDesign/tree/master/assets/Server%20Rack/1U) for various SBCs.
