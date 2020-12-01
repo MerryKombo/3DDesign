@@ -7,3 +7,7 @@ baseHeight = 3;
 totalHeight = 7;
 linkThickness = 3;
 linkHeight = 2;
+
+verifierPlateThickness = 0.4;
+drillTemplateThickness = 1;
+drillTemplateGuideHeight = 20;

@@ -15,6 +15,8 @@ surroundingDiameter = 2;
 rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
 rodEarDistanceFromSide = rodSurroundingDiameter + surroundingDiameter;
+drillTemplateThickness = 1;
+drillTemplateGuideHeight = 20;
 
 points = [ [0,0,0], [42.11,0,0], [0,40.11,0], [42.11,40.11,0] ];
 
@@ -22,7 +24,7 @@ points = [ [0,0,0], [42.11,0,0], [0,40.11,0], [42.11,40.11,0] ];
 color("red") plate(points, 5, 2, 3);
 color("blue") bar(20, 5, 2, 3);*/
 
-drillTemplate(points, 3, 1, 20);
+drillTemplate(points, 3, drillTemplateThickness, drillTemplateGuideHeight);
 
 
 module rounded_box(points, radius, height){
