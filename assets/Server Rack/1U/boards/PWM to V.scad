@@ -1,7 +1,7 @@
 include <PWM to V dimensions.scad>
 use <../parts/feet.scad>
-use <../parts/bracket.scad>
-use <../parts/drilling templates.scad>
+use <../parts/generic bracket.scad>
+use <../parts/generic drilling templates.scad>
 use <../parts/dimensions verifier.scad>
  
 PWM_to_V_feet();

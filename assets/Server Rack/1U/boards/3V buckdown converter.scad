@@ -1,7 +1,7 @@
 include <3V buckdown converter dimensions.scad>
 use <../parts/feet.scad>
-use <../parts/bracket.scad>
-use <../parts/drilling templates.scad>
+use <../parts/generic bracket.scad>
+use <../parts/generic drilling templates.scad>
 use <../parts/dimensions verifier.scad>
 
 3V_buckdown_converter_feet();
