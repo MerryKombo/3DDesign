@@ -22,8 +22,10 @@ positionTopBoard(0, [10,10], feet, feet2);
 positionTopBoard(1, [0,0], feet, feet2);
 positionTopBoard(2, [0,0], feet, feet2);
 positionTopBoard(3, [0,0], feet, feet2);
-positionTopBoard(4, [0,0], feet, feet2);
-draw_mesh(boards);
+centeredTopBoard = positionTopBoard(4, [0,0], feet, feet2);
+centeredBoards = [centeredTopBoard, feet2];
+getNearestPoints(getAllPoints(centeredTopBoard, feet2));
+draw_mesh(centeredBoards);
 
 module draw_mesh(boards) {
     union() {
@@ -103,8 +105,8 @@ module base_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
      // original
      atan = atan(firstSide/secondSide);
      union() {
-        color("LightSteelBlue") translate([0,0,height*2]) rotate([270,0,-atan]) translate([0,0, holeSize/2]) cylinder(h=length, r=thickness/2, center=false, $fn=100);
-        color("OliveDrab") translate([firstSide + gap,0,height*2]) rotate([270,0,atan]) translate([0,0, holeSize/2]) cylinder(h=length, r=thickness/2, center=false, $fn=100);
+        color("LightSteelBlue") translate([points[0].x,points[0].y,height*2]) rotate([270,0,-atan]) translate([0,0, holeSize/2]) cylinder(h=length, r=thickness/2, center=false, $fn=100);
+        color("OliveDrab") translate([points[0].x + firstSide + gap,points[0].y,height*2]) rotate([270,0,atan]) translate([0,0, holeSize/2]) cylinder(h=length, r=thickness/2, center=false, $fn=100);
      }
  }
  
