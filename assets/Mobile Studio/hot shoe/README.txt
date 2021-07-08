@@ -1,0 +1,1 @@
+Camera hot shoe adapter base / cover by Amatulic on Thingiverse: https://www.thingiverse.com/thing:4832722
