@@ -29,6 +29,7 @@ module getNearestPoints(points, numberOfNearestPoints = 2) {
             echo("Points are: ", [points[0], points[1]]);
             echo("Distance from ", points[0], "to", points[1], " is ", getDistance([points[0], points[1]]));
             sortedDistances = getAllDistancesSorted(points[0], selectVector, selector);
+            echo("Point #", idx, sortedDistances);
             isIn = search(points[idx], sortedDistances);
             echo("Found ", isIn, " as the ", points[idx] , " (current point) in the resulting list");
             mostNearestPointsSelector = range2vector([0:numberOfNearestPoints-1]);
@@ -37,7 +38,7 @@ module getNearestPoints(points, numberOfNearestPoints = 2) {
             distancesToKeep = select(sortedDistances, mostNearestPointsSelector);
             echo("Point distances: ", sortedDistances, ", we'll only keep ", distancesToKeep);
             pointsKept = keepPoints(distancesToKeep, points);
-            echo("We kept the points", pointsKept);
+            echo("We kept the points", pointsKept, " for point #0");
         } else if (idx == len(points)-1) {
             selector = range2vector([0:len(points)-2]);
             selectVector = select(points, selector);
@@ -69,6 +70,49 @@ module getNearestPoints(points, numberOfNearestPoints = 2) {
         }
     }
 }
+
+function getNearestPoints(points, numberOfNearestPoints = 2) = [for (idx = [0 : len(points) - 1]) idx == 0?
+    let
+    (
+        selector = range2vector([1:len(points)-1]),
+        selectVector = select(points, selector),
+        sortedDistances = getAllDistancesSorted(points[0], selectVector, selector),
+        isIn = search(points[idx], sortedDistances),
+        mostNearestPointsSelector = range2vector([0:numberOfNearestPoints-1]),
+            // il faut enlever le point qui a les mêmes coordonnées, sous peine de se retrouver avec un lien de longueur 0
+            // il faudra travailler sur le range, ajouter 1 à droite et à gauche, donc on passe par exemple de 0-1 à 1-2
+        distancesToKeep = select(sortedDistances, mostNearestPointsSelector),
+        pointsKept = keepPoints(distancesToKeep, points)
+    )
+    pointsKept
+    : idx == len(points)-1?
+    let
+    (
+        selector = range2vector([0:len(points)-2]),
+        selectVector = select(points, selector),
+        sortedDistances = getAllDistancesSorted(points[idx], selectVector, selector),
+        isIn = search(points[idx], sortedDistances),
+        mostNearestPointsSelector = range2vector([0:numberOfNearestPoints-1]),
+            // il faut enlever le point qui a les mêmes coordonnées, sous peine de se retrouver avec un lien de longueur 0
+            // il faudra travailler sur le range, ajouter 1 à droite et à gauche, donc on passe par exemple de 0-1 à 1-2
+        distancesToKeep = select(sortedDistances, mostNearestPointsSelector),
+        pointsKept = keepPoints(distancesToKeep, points)
+    )
+    pointsKept
+    :
+    let
+    (
+        selector = concat(range2vector([0:idx - 1]),range2vector([idx + 1:len(points) - 1])),
+        selectVector = select(points, selector),
+        sortedDistances = getAllDistancesSorted(points[idx], selectVector, selector),
+        isIn = search(points[idx], sortedDistances),
+        mostNearestPointsSelector = range2vector([0:numberOfNearestPoints-1]),
+            // il faut enlever le point qui a les mêmes coordonnées, sous peine de se retrouver avec un lien de longueur 0
+            // il faudra travailler sur le range, ajouter 1 à droite et à gauche, donc on passe par exemple de 0-1 à 1-2
+        distancesToKeep = select(sortedDistances, mostNearestPointsSelector),
+        pointsKept = keepPoints(distancesToKeep, points)
+    )
+    pointsKept];
 
 
 // type is an int

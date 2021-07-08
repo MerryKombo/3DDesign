@@ -22,9 +22,9 @@ positionTopBoard(0, [10,10], feet, feet2);
 positionTopBoard(1, [0,0], feet, feet2);
 positionTopBoard(2, [0,0], feet, feet2);
 positionTopBoard(3, [0,0], feet, feet2);
-centeredTopBoard = positionTopBoard(4, [0,0], feet, feet2);
+centeredTopBoard = positionTopBoard(4, [0,-5.39], feet, feet2);
 centeredBoards = [centeredTopBoard, feet2];
-getNearestPoints(getAllPoints(centeredTopBoard, feet2));
+echo("Nearest points", getNearestPoints(getAllPoints(centeredTopBoard, feet2)));
 draw_mesh(centeredBoards);
 
 module draw_mesh(boards) {
