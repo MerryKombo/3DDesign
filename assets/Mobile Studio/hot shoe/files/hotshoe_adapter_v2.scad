@@ -20,19 +20,19 @@ color("silver") hotshoe_adapter(1, true);
 
 // ---------- hotshoe adapter module ----------
 
+// Internal shoe dimensions measured on a Nikon D5100:
+intwid = 18.7;  // internal width of hot shoe
+intlen = 18.0;  // internal length (sliding distance)
+intht = 2.05;   // internal height
+wingspc = 12.6; // space between wing edges
+winglen = 16.4; // length of wings (sliding distance)
+
 // parameters:
 // pedestal_ht: height of center pedestal
 // base_only:
 //  true = show only pedestal with bottom at z=0
 //  false = show adapter with TOP of pedstal at z=0
 module hotshoe_adapter(pedestal_ht, base_only=false) {
-    // Internal shoe dimensions measured on a Nikon D5100:
-    intwid = 18.7;  // internal width of hot shoe
-    intlen = 18.0;  // internal length (sliding distance)
-    intht = 2.05;   // internal height
-    wingspc = 12.6; // space between wing edges
-    winglen = 16.4; // length of wings (sliding distance)
-
     // adapter dimensions to fit in the shoe, with clerances:
     halfwid = 0.5*intwid - 0.2;
     halflen = 0.5*intlen;

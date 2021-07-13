@@ -52,13 +52,20 @@ module khadas_vim3L_hotShoe_adapter_main() {
 module khadas_vim3L_hotShoe_adapter_vertical() {
     khadas_vim3L_hotShoe_adapter_base();
     middlePoint = IntersectionOfLines(feet[0], feet[3], feet[2], feet[1]);
-    khadas_vim3L_vertical_bracket();
+
+    xMiddle = max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) / 2;
+    // How much of the board will go past the X holes?
+    xOverHang = abs((size.x - (xMiddle * 2)) / 2);
+
+    translate([10, 10,hotShoeHeightClearance+ xOverHang]) khadas_vim3L_vertical_bracket();
 }
 
 module khadas_vim3L_vertical_bracket() {
     middlePoint = IntersectionOfLines(feet[0], feet[3], feet[2], feet[1]);
+    //    translate([0, 0, hotShoeHeightClearance - baseHeight]) translate(- middlePoint)vertical_bracket(feet, holeSize,
+    //baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
     translate([0, 0, hotShoeHeightClearance - baseHeight]) translate(- middlePoint)vertical_bracket(feet, holeSize,
-    baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+    baseSize, baseHeight, totalHeight, linkThickness, linkHeight, true);
 }
 
 module khadas_vim3L_hotShoe_adapter_base() {
