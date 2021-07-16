@@ -11,20 +11,21 @@ translate(size) battery_charger_bracket();
 translate(size) translate(size) battery_charger_drilling_template();
 translate(size) translate(size) translate(size) battery_charger_dimensions_verifier();
 
-translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) battery_charger_hotShoe_adapters();
+translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) battery_charger_hotShoe_adapters()
+;
 translate([- size.x, size.y, size.z]) battery_charger_vertical_bracket();
 
 module battery_charger_feet() {
-    feet_feet(feet,holeSize, baseSize, baseHeight, totalHeight) ;
+    feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
 module battery_charger_bracket() {
     bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
 }
-    
-  
+
+
 module battery_charger_drilling_template() {
-   drillTemplate(feet, holeSize, drillTemplateThickness, drillTemplateGuideHeight);
+    drillTemplate(feet, holeSize, drillTemplateThickness, drillTemplateGuideHeight);
 }
 
 module battery_charger_dimensions_verifier() {
@@ -60,7 +61,7 @@ module battery_charger_hotShoe_adapter_vertical() {
     // How much of the board will go past the X holes?
     xOverHang = abs(size.x - (xMiddle * 2));
 
-    translate([6, 10,hotShoeHeightClearance*2+1]) battery_charger_vertical_bracket();
+    translate([6, 10, hotShoeHeightClearance * 2 + 1]) battery_charger_vertical_bracket();
 }
 
 module battery_charger_hotShoe_adapter_vertical_90_degrees() {
@@ -71,7 +72,7 @@ module battery_charger_hotShoe_adapter_vertical_90_degrees() {
     // How much of the board will go past the X holes?
     xOverHang = abs(size.x - (xMiddle * 2));
 
-    translate([-9, 6,hotShoeHeightClearance*2+1]) rotate([0,0,90])battery_charger_vertical_bracket();
+    translate([- 9, 6, hotShoeHeightClearance * 2 + 1]) rotate([0, 0, 90])battery_charger_vertical_bracket();
 }
 
 module battery_charger_vertical_bracket() {
