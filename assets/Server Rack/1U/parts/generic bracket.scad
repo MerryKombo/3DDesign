@@ -1,6 +1,7 @@
 //include <../boards/khadas vim3L dimensions.scad>
 include <../boards/orangepi zero dimensions.scad>
 use <../utils/intersection.scad>
+use <rod mount.scad>
 include <BOSL2/std.scad>
 
 bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);

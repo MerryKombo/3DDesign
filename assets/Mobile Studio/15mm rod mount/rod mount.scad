@@ -74,13 +74,13 @@ module block_module(){ //create module
                 translate ([0,0,0]) rotate ([0,0,0]) cylinder(bar_x+cap_height+3,bolt_d/2,bolt_d/2, center=true);
 
                 //create strain relief to chinch on rods
-                #translate ([0,(((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2),0]) cube([bar_x+3,((bar_y/2)-(rod_spread/2)),gap],center=true);
+                translate ([0,(((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2),0]) cube([bar_x+3,((bar_y/2)-(rod_spread/2)),gap],center=true);
 
-                #translate ([0,-((((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2)),0]) cube([bar_x+3,((bar_y/2)-(rod_spread/2)),gap],center=true);
+                translate ([0,-((((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2)),0]) cube([bar_x+3,((bar_y/2)-(rod_spread/2)),gap],center=true);
 
                 //create mounting bolt openings
-                #translate ([0,(((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2),5]) cylinder(bar_x+cap_height+3,bolt_d/2,bolt_d/2, center=true);
-                #translate ([0,-((((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2)),5]) cylinder(bar_x+cap_height+3,bolt_d/2,bolt_d/2, center=true);
+                translate ([0,(((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2),5]) cylinder(bar_x+cap_height+3,bolt_d/2,bolt_d/2, center=true);
+                translate ([0,-((((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2)),5]) cylinder(bar_x+cap_height+3,bolt_d/2,bolt_d/2, center=true);
 
                 //create hex cap head recess for mounting bolts
                 translate ([0,(((bar_y/2)-(rod_spread/2))/2)+(rod_spread/2),(bar_z/2)+(cap_height/2)+1]) cylinder(cap_height,cap_d/2,cap_d/2,$fn=6, center=true);
