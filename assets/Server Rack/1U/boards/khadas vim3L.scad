@@ -34,6 +34,7 @@ module khadas_vim3L_hotShoe_adapters() {
     khadas_vim3L_hotShoe_adapter_main();
     translate([- size.x * 2, 0, 0]) khadas_vim3L_hotShoe_adapter_reverted();
     translate([- size.x * 3, 0, 0]) khadas_vim3L_hotShoe_adapter_vertical();
+    translate([- size.x * 4, 0, 0]) khadas_vim3L_hotShoe_adapter_vertical_90_degrees();
 }
 
 module khadas_vim3L_hotShoe_adapter_reverted() {
@@ -55,9 +56,20 @@ module khadas_vim3L_hotShoe_adapter_vertical() {
 
     xMiddle = max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) / 2;
     // How much of the board will go past the X holes?
-    xOverHang = abs((size.x - (xMiddle * 2)) / 2);
+    xOverHang = abs(size.x - (xMiddle * 2));
 
-    translate([10, 10,hotShoeHeightClearance+ xOverHang]) khadas_vim3L_vertical_bracket();
+    translate([17, 24,hotShoeHeightClearance*2+ xOverHang*2+1]) khadas_vim3L_vertical_bracket();
+}
+
+module khadas_vim3L_hotShoe_adapter_vertical_90_degrees() {
+    khadas_vim3L_hotShoe_adapter_base();
+    middlePoint = IntersectionOfLines(feet[0], feet[3], feet[2], feet[1]);
+
+    xMiddle = max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) / 2;
+    // How much of the board will go past the X holes?
+    xOverHang = abs(size.x - (xMiddle * 2));
+
+    translate([-24, 17,hotShoeHeightClearance*2+ xOverHang*2+1]) rotate([0,0,90])khadas_vim3L_vertical_bracket();
 }
 
 module khadas_vim3L_vertical_bracket() {
