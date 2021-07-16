@@ -11,3 +11,5 @@ linkHeight = 2;
 verifierPlateThickness = 0.4;
 drillTemplateThickness = 1;
 drillTemplateGuideHeight = 20;
+
+hotShoeHeightClearance = 5;
