@@ -1,35 +1,90 @@
-totalWidth = 450;
-numberOfUnits = 5;
-sizeOfEars = 5;
-moduleWidth = (totalWidth - (sizeOfEars * 2)) / numberOfUnits;
-moduleLength = 150;
-oneU = 43.66;
-numberOfU = 1;
-moduleHeight = numberOfU * oneU;
+include <two-stories-module.scad>
+include <module-dimensions.scad>
 
-wallThickness = 5;
-threadedRodDiameter = 3;
-surroundingDiameter = 2;
-rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
-rodEarHeight = 5;
-rodEarDistanceFromSide = rodSurroundingDiameter + surroundingDiameter;
+basicModule();
 
-points = [ [0,0,0], [10,0,0], [0,10,0], [10,10,0] ];
+module basicModule() {
+    difference() {
+        union() {
+            difference() {
+                union() {
+                    cube([moduleWidth, moduleLength, moduleHeight]);
+                    ears();
+                    strangePlate();
+                }
+                pinsPath();
+                hollowOut();
+            }
+            rodAlcoves();
+        }
+        threadedRods();
+    }
+}
 
-union() {
-    cube([moduleWidth, moduleLength, moduleHeight]);
+module hollowOut() {
+    translate([wallThickness, - wallThickness, - .1]) cube([moduleWidth - 2 * wallThickness, moduleLength + 1,
+            moduleHeight
+            + 1]);
+}
 
-    color ("red") {
-        translate ([moduleWidth, rodEarDistanceFromSide, moduleHeight - rodEarDistanceFromSide]) rotate(a=90, v = [0,1,0]){
-        #    difference() {
-          #     cylinder(rodEarHeight, r=rodSurroundingDiameter, $fn=100);
-        # translate ([0, 0, - wallThickness]) cylinder(rodEarHeight +            wallThickness + 1, r=threadedRodDiameter, $fn=100);
+module pinsPath() {
+    translate([wallThickness - width + 1.1, 0, radius + sizeOfEars]) rotate([90, 0, 90]) platePath(radius,
+    firstArcAngles, secondArcAngles, thirdArcAngles, trackLength, width);
+}
+
+module rodAlcoves() {
+    rodAlcove();
+    translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2) , 0]) rodAlcove();
+}
+
+module rodAlcove() {
+    translate([0, (threadedRodDiameter + surroundingDiameter * 2) / 2, (threadedRodDiameter + surroundingDiameter * 2) /
+        2])
+        rotate([90, 0, 90])
+            difference() {
+                cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleWidth);
+                threadedRod();
+            }
+}
+
+module threadedRods() {
+    union() {
+        translate([- moduleWidth * .1, (threadedRodDiameter + surroundingDiameter * 2) / 2, (threadedRodDiameter +
+                surroundingDiameter * 2) / 2])
+            rotate([90, 0, 90])
+                threadedRod();
+        translate([- moduleWidth * .1, moduleLength - (threadedRodDiameter + surroundingDiameter * 2) / 2, (
+            threadedRodDiameter +
+                surroundingDiameter * 2) / 2])
+            rotate([90, 0, 90])
+                threadedRod();
+    }
+}
+
+module threadedRod() {
+    cylinder(d = threadedRodDiameter, h = moduleWidth * 1.2, $fn = 100);
+}
+
+module ears() {
+    color("red") {
+        translate([moduleWidth, rodEarDistanceFromSide, moduleHeight - rodEarDistanceFromSide]) rotate(a = 90, v
+        = [
+            0, 1, 0]) {
+            difference() {
+                cylinder(rodEarHeight, r = rodSurroundingDiameter, $fn = 100);
+                translate([0, 0, - wallThickness]) cylinder(rodEarHeight + wallThickness + 1, r =
+                threadedRodDiameter, $fn = 100);
             }
         }
     }
-         color ("blue") hull(){
-        for (p = points){
-            translate(p) cylinder(r=radius, h=height);
+}
+
+module strangePlate() {
+    radius = 5;
+    height = 3;
+    color("blue") hull() {
+        for (p = points) {
+            translate(p) cylinder(r = radius, h = height);
         }
     }
 }

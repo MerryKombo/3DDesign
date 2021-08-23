@@ -1,7 +1,7 @@
 //include <../boards/khadas vim3L dimensions.scad>
 include <../boards/orangepi zero dimensions.scad>
 use <../utils/intersection.scad>
-use <rod mount.scad>
+include <rod mount.scad>
 include <BOSL2/std.scad>
 
 bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
@@ -282,3 +282,10 @@ ll = len(list)
 ) wrap
 ? [for (i = [0:1:ll - 1]) [list[i], list[(i + 1) % ll]]]
 : [for (i = [0:1:ll - 2]) [list[i], list[i +1]]];
+
+
+function getMinPoint(points) =
+[min(subindex(points,0)),min(subindex(points,1))];
+
+function getMaxPoint(points) =
+[max(subindex(points,0)),max(subindex(points,1))];

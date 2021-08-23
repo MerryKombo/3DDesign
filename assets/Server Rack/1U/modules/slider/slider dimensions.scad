@@ -10,3 +10,6 @@ dovetailAngle = 15;
 plateThickness = 1.5;
 baseDovetailBottomHeight = tan(dovetailAngle)*dovetailHeight;
 baseDovetailTopHeight = dovetailHeight -baseDovetailBottomHeight;
+pinSize = [2,2];
+frontPinsShift = 25;
+rearPinsShift = 20;

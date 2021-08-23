@@ -1,17 +1,21 @@
 include <../../../Mobile Studio/15mm rod mount/rod mount.scad>
+include <BOSL2/std.scad>
+include <BOSL2/threading.scad>
 
 
 module rod_module() {//create module
     difference() {
         union() {//start union
-            translate([0, 0, 0]) cube([bar_x, bar_y, bar_z], center = true);
-
+            /**difference() {*/
+            color("yellow", 0.1)translate([0, 0, 0]) cube([bar_x, bar_y, bar_z], center = true);
+            translate([0, (((bar_y / 2) - (rod_spread / 2)) / 2) + (rod_spread / 2), (bar_z / 2) + (cap_height /2)+8.8])
+                threaded_nut(od = 8*1.02, id = 5, h = 4.8, pitch = 1.25, left_handed = true, $slop = 0.2, $fa = 1, $fs = 1);
             //create mounting caps for bolts
-            translate([0, (((bar_y / 2) - (rod_spread / 2)) / 2) + (rod_spread / 2), (bar_z / 2) + (cap_height / 2)])
-                cylinder(cap_height, bar_x / 2, bar_x / 2, center = true);
-            translate([0, - ((((bar_y / 2) - (rod_spread / 2)) / 2) + (rod_spread / 2)), (bar_z / 2) + (cap_height / 2)]
-            ) cylinder(cap_height, bar_x / 2, bar_x / 2, center = true);
-
+            /*   translate([0, (((bar_y / 2) - (rod_spread / 2)) / 2) + (rod_spread / 2), (bar_z / 2) + (cap_height / 2)])
+                   cylinder(cap_height, bar_x / 2, bar_x / 2, center = true);
+               translate([0, - ((((bar_y / 2) - (rod_spread / 2)) / 2) + (rod_spread / 2)), (bar_z / 2) + (cap_height / 2)]
+               ) cylinder(cap_height, bar_x / 2, bar_x / 2, center = true);
+   *//*}*/
         } //end union
 
         //start subtraction of difference
