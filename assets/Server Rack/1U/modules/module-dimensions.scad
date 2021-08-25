@@ -9,9 +9,12 @@ moduleHeight = numberOfU * oneU;
 
 wallThickness = 5;
 threadedRodDiameter = 5;
+threadedRodDiameterHole = 5.3;
 surroundingDiameter = 2;
 rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
-rodEarDistanceFromSide = rodSurroundingDiameter + surroundingDiameter;
+rodEarDistanceFromSide = rodSurroundingDiameter / 2 + surroundingDiameter;
 
 points = [[0, 0, 0], [10, 0, 0], [0, 10, 0], [10, 10, 0]];
+
+echo("rodSurroundingDiameter is", rodSurroundingDiameter);

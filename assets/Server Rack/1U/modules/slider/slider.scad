@@ -21,11 +21,13 @@ module slider() {
 module slider_plate_pins() {
     union() {
         // Front pins
-        translate([- pinSize.x, (plateThickness - (pinSize.x / 2)), - (frontPinsShift)]) pin();
-        translate([usableSize[0], (plateThickness - (pinSize.x / 2)), - (frontPinsShift)]) pin();
+        translate([- pinDepth, (plateThickness - (pinSize.x / 2)), - (frontPinsShift)]) pin();
+        translate([usableSize[0] - (pinSize.x - pinDepth), (plateThickness - (pinSize.x / 2)), - (frontPinsShift)]) pin(
+        );
         // Rear pins
-        translate([- pinSize.x, (plateThickness - (pinSize.x / 2)), - usableSize[1] + rearPinsShift]) pin();
-        translate([usableSize[0], (plateThickness - (pinSize.x / 2)), - usableSize[1] + rearPinsShift]) pin();
+        translate([- pinDepth, (plateThickness - (pinSize.x / 2)), - usableSize[1] + rearPinsShift]) pin();
+        translate([usableSize[0] - (pinSize.x - pinDepth), (plateThickness - (pinSize.x / 2)), - usableSize[1] +
+            rearPinsShift]) pin();
     }
 }
 
