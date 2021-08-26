@@ -4,7 +4,6 @@ include <BOSL2/std.scad>
 include <BOSL2/metric_screws.scad>
 include <slider/slider dimensions.scad>
 
-basicModule();
 pathRadius = rodSurroundingDiameter * 1.125;
 /*translate([0, - moduleHeight, 0]) platePath(pathRadius, moduleLength - 2 * (rodSurroundingDiameter + surroundingDiameter
 ), wallThickness, pinSize.x, pinDepth);*/
@@ -95,7 +94,7 @@ module leftEar() {
         = [0, 1, 0]) {
             difference() {
                 scale([1.1, 1.1, 1.1])earLobe();
-                scale([0.9, 0.9, 0.9])earInternals();
+                scale([1.0, 1.0, 1.0])earInternals();
             }
         }
     }

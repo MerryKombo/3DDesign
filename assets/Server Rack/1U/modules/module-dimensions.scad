@@ -9,7 +9,7 @@ moduleHeight = numberOfU * oneU;
 
 wallThickness = 5;
 threadedRodDiameter = 5;
-threadedRodDiameterHole = 5.3;
+threadedRodDiameterHole = 5.2;
 surroundingDiameter = 2;
 rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
