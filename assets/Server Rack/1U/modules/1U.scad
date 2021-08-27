@@ -1,7 +1,7 @@
 include <module.scad>
 
-//printBitsForChecking();
-oneModuleJustForFun();
+printBitsForChecking();
+//oneModuleJustForFun();
 
 module oneModuleJustForFun() {
     translate([- moduleWidth * 1.1, 0, 0]) basicModule();
@@ -9,14 +9,14 @@ module oneModuleJustForFun() {
 
 module printBitsForChecking() {
     union() {
-        /*intersection() {
+        translate([threadedRodDiameter * 2, 0, 0])intersection() {
             basicModule();
             // Threaded rod insert
             translate([wallThickness, 0, 0]) cube([20, rodSurroundingDiameter + surroundingDiameter,
                     rodSurroundingDiameter
                     +
                     surroundingDiameter]);
-        }/*
+        }
         intersection() {
             basicModule();
             // Male ear
@@ -26,7 +26,7 @@ module printBitsForChecking() {
                     wallThickness, rodSurroundingDiameter +
                     wallThickness]);
             // Female ear
-        }*/
+        }
         intersection() {
             basicModule();
             // Female ear
@@ -35,6 +35,12 @@ module printBitsForChecking() {
                     rodSurroundingDiameter +
                     wallThickness, rodSurroundingDiameter +
                     wallThickness]);
+        }
+        intersection() {
+            basicModule();
+            // Pins path and perpendicular Rod Alcove
+            translate([0, 0, 0]) cube([rodSurroundingDiameter + wallThickness,
+                moduleLength, rodSurroundingDiameter * 2 + threadedRodDiameter]);
         }
     }
 }

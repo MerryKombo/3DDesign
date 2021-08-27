@@ -7,6 +7,12 @@ include <slider/slider dimensions.scad>
 pathRadius = rodSurroundingDiameter * 1.125;
 /*translate([0, - moduleHeight, 0]) platePath(pathRadius, moduleLength - 2 * (rodSurroundingDiameter + surroundingDiameter
 ), wallThickness, pinSize.x, pinDepth);*/
+//basicModule();
+
+module perpendicularRodAlcoves() {
+    perpendicularRodAlcove();
+    translate([moduleWidth, 0, 0]) perpendicularRodAlcove();
+}
 
 module basicModule() {
     difference() {
@@ -21,6 +27,7 @@ module basicModule() {
                 translate([moduleWidth - wallThickness - (wallThickness - pinDepth), 0, 0]) pinsPath();
                 hollowOut();
                 leftEar();
+                perpendicularRodAlcoves();
             }
             rodAlcoves();
         }
@@ -34,10 +41,11 @@ module hollowOut() {
                 moduleHeight + 1]);
         // Let's remove a big cube from left to right
         translate([- 0.1, rodSurroundingDiameter + rodEarDistanceFromSide, rodSurroundingDiameter + surroundingDiameter
-            + pinSize.x]
+            + pinSize.x + threadedRodDiameter]
         ) cube([moduleWidth * 1.1, moduleLength - 2 *
             wallThickness - rodSurroundingDiameter - rodEarDistanceFromSide, moduleHeight - rodSurroundingDiameter -
-                wallThickness * 2 - pinSize.x]);
+                wallThickness * 2 - pinSize.x - /* because we now have a perpendicularRodAlcove*/ rodSurroundingDiameter
+            ]);
     }
 }
 
@@ -63,8 +71,26 @@ module rodAlcove() {
                     cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleWidth, $fn = 100);
                     threadedRod();
                 }
-                //metric_nut(size = threadedRodDiameter, hole = false);
+                //
             }
+}
+
+module perpendicularRodAlcove() {
+    translate([0, moduleLength + 2 * rodSurroundingDiameter + threadedRodDiameter, threadedRodDiameter * 2 + 2 *
+        surroundingDiameter])
+        rotate([90, 0, 0])
+            union() {/*
+                difference() {
+                    cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleLength, $fn = 100);*/
+                perpendicularThreadedRod();
+                /**  }*/
+                translate([0, 0, (moduleLength + surroundingDiameter)]) metric_nut(size = threadedRodDiameter, hole =
+                false);
+            }
+}
+
+module perpendicularThreadedRod() {
+    cylinder(d = threadedRodDiameterHole, h = moduleLength, $fn = 100);
 }
 
 module threadedRods() {
