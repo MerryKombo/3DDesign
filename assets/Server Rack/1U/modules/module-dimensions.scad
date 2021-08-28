@@ -15,6 +15,9 @@ rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
 rodEarDistanceFromSide = rodSurroundingDiameter / 2 + surroundingDiameter;
 
+
+m5NutScalingRatio = 1.05;
+
 points = [[0, 0, 0], [10, 0, 0], [0, 10, 0], [10, 10, 0]];
 
 echo("rodSurroundingDiameter is", rodSurroundingDiameter);

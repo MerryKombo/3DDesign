@@ -24,7 +24,7 @@ module basicModule() {
                     //strangePlate();
                 }
                 pinsPath();
-                translate([moduleWidth - wallThickness - (wallThickness - pinDepth), 0, 0]) pinsPath();
+                translate([moduleWidth - wallThickness - (wallThickness - pinDepth) , 0, 0]) pinsPath();
                 hollowOut();
                 leftEar();
                 perpendicularRodAlcoves();
@@ -84,7 +84,8 @@ module perpendicularRodAlcove() {
                     cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleLength, $fn = 100);*/
                 perpendicularThreadedRod();
                 /**  }*/
-                translate([0, 0, (moduleLength + surroundingDiameter)]) metric_nut(size = threadedRodDiameter, hole =
+                translate([0, 0, (moduleLength + surroundingDiameter)]) scale([1.1, 1.1, 1.1]) metric_nut(size =
+                threadedRodDiameter, hole =
                 false);
             }
 }
