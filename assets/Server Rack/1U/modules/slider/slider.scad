@@ -2,7 +2,7 @@ include <slider dimensions.scad>
 use <../../utils/dovetails.scad>
 
 //slider();
-printSliderBitsForChecking();
+//printSliderBitsForChecking();
 //sliderWithPins();
 
 module printSliderBitsForChecking() {

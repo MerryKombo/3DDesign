@@ -9,6 +9,7 @@
 ##### Module
 
 - Add a dovetail at the rear so that we can slide in back modules (with power, network, whatever)
+- Add a fan module at the rear
 
 ## Done
 

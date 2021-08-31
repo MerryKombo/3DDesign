@@ -1,9 +1,12 @@
 include <module.scad>
 include <slider/slider.scad>
+include <fan/noctua.scad>
 
-printBitsForChecking();
-//oneModuleJustForFun();
-
+//printBitsForChecking();
+oneModuleJustForFun();
+/*translate([(moduleWidth - fanWidth) / 2, moduleLength, fanWidth + (rodSurroundingDiameter + surroundingDiameter) / 2])
+    fanEnclosure();
+*/
 module oneModuleJustForFun() {
     /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule();
     translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])rotate([90, 0, 0])
