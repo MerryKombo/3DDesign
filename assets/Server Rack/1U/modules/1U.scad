@@ -4,12 +4,12 @@ include <fan/noctua.scad>
 
 //printBitsForChecking();
 oneModuleJustForFun();
-/*translate([(moduleWidth - fanWidth) / 2, moduleLength, fanWidth + (rodSurroundingDiameter + surroundingDiameter) / 2])
+translate([(moduleWidth - fanEnclosureWidth) / 2, moduleLength, 0])
     fanEnclosure();
-*/
+
 module oneModuleJustForFun() {
     /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule();
-    translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])rotate([90, 0, 0])
+    color("red") translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6]) rotate([90, 0, 0])
         sliderWithPins();
 }
 

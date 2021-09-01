@@ -1,26 +1,29 @@
 use <../module.scad>
 include <../module-dimensions.scad>
 include <./noctua-dimensions.scad>
+include <../dovetails/dovetails.scad>
 
-fanEnclosure();
+//fanEnclosure();
+//translate(centeredFanTranslationBehindTheEnclosure) fan();
 //fan();
 //fanScrewHoles();
 
 module fanEnclosure() {
     difference() {
         union() {
-            maleDovetails();
-            translate(centeredFanTranslationBehindTheEnclosure) fan();
-            fanVerticalReinforcements();
+            color("SaddleBrown") maleDovetails(moduleWidth);
+            translate([(moduleWidth - fanEnclosureWidth) / 2, 0, 0]) color("SaddleBrown") fanVerticalReinforcements(
+            moduleWidth);
         }
+        //translate(centeredFanTranslationBehindTheEnclosure) fan();
         fanScrewHoles();
     }
 }
 
-module fanVerticalReinforcements() {
+module fanVerticalReinforcements(width) {
     difference() {
         union() {
-            fanVerticalReinforcement();
+            fanVerticalReinforcement(width);
             translate([fanEnclosureWidth, 0, moduleHeight]) rotate([0, 180, 0]) fanVerticalReinforcement();
 
         }
@@ -31,8 +34,9 @@ module fanVerticalReinforcements() {
     }
 }
 
-module fanVerticalReinforcement() {
-    translate([0, dovetailMaleToFemaleRatio * dovetailHeight, 0])
+module fanVerticalReinforcement(width) {
+    //reinforcementXShift = (width - fanVerticalReinforcementWidth * 2) / 2;
+    translate([fanVerticalReinforcementWidth, /*dovetailMaleToFemaleRatio **/ dovetailHeight, 0])
         union() {
             // The main bar
             cube(size = [fanVerticalReinforcementWidth,
@@ -61,9 +65,11 @@ module fanScrewHoles() {
 }
 
 module fanScrewHole() {
-    color("purple") rotate([90, 0, 0]) cylinder(d = fanScrewHoleSize, h = fanWidth, $fn = 100);
+    color("purple") rotate([90, 0, 0]) cylinder(d = fanScrewHoleSize, h = /*fanDepth +*/ fanVerticalReinforcementDepth,
+    $fn
+    = 100);
 }
-
+/*
 module maleDovetails() {
     maleDovetail();
     translate([0, 0, moduleHeight - (dovetailMaleToFemaleRatio * (dovetailBaseMaxWidth + dovetailMaxMinusMaxWidth))])
@@ -75,9 +81,9 @@ module maleDovetail() {
         dovetailBaseMaxWidth + dovetailMaxMinusMaxWidth)])    rotate([180, 90, 0]) linear_extrude(height =
     fanEnclosureWidth)  scale([dovetailMaleToFemaleRatio, dovetailMaleToFemaleRatio])
         mainDovetailEnclosureDovetail();
-}
+}*/
 
 module fan() {
     color("#E8D9C5") translate([fanWidth / 2, fanDepth / 2,
-            fanWidth / 2]) rotate([0, 90, 0]) import("./noctua-main-body.stl", convexity = 10);
+            fanWidth / 2]) rotate([0, 90, 0]) import("fan/noctua-main-body.stl", convexity = 10);
 }
