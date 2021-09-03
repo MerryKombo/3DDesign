@@ -14,12 +14,16 @@ fanEnclosureRatio = 0.95;
 fanEnclosureWidth = fanWidth * enclosureToFanRatio;
 fanVerticalReinforcementWidth = fanScrewHoleSize * 1.5 * fanEnclosureRatio;
 fanVerticalReinforcementDepth = fanScrewHoleSize;
+fanEnclosureLength = fanDepth + 2 * (rodSurroundingDiameter + surroundingDiameter) + fanVerticalReinforcementDepth * 2;
 
-fanHoles = [[fanScrewHolePad, fanVerticalReinforcementDepth, fanScrewHolePad], [fanWidth - fanScrewHolePad, fanVerticalReinforcementDepth, fanScrewHolePad
-    ], [fanScrewHolePad, fanVerticalReinforcementDepth, fanWidth - fanScrewHolePad], [fanWidth - fanScrewHolePad, fanVerticalReinforcementDepth, fanWidth
-    - fanScrewHolePad]];
+fanHoles = [[fanScrewHolePad, fanVerticalReinforcementDepth, fanScrewHolePad], [fanWidth - fanScrewHolePad,
+    fanVerticalReinforcementDepth, fanScrewHolePad
+    ], [fanScrewHolePad, fanVerticalReinforcementDepth, fanWidth - fanScrewHolePad], [fanWidth - fanScrewHolePad,
+    fanVerticalReinforcementDepth, fanWidth
+        - fanScrewHolePad]];
 
-centeredFanTranslation = [(moduleWidth - fanWidth) / 2, dovetailHeight, (moduleHeight
+centeredFanTranslation = [(moduleWidth - fanWidth) / 2, dovetailHeight + fanVerticalReinforcementDepth +
+    fanVerticalReinforcementWidth, (moduleHeight
     - fanWidth) / 2];
 centeredFanTranslationBehindTheEnclosure = [centeredFanTranslation.x, centeredFanTranslation.y +
     fanVerticalReinforcementDepth, centeredFanTranslation.z];

@@ -8,7 +8,7 @@ translate([(moduleWidth - fanEnclosureWidth) / 2, moduleLength, 0])
     fanEnclosure();
 
 module oneModuleJustForFun() {
-    /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule();
+    /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule(moduleWidth, moduleLength, moduleHeight);
     color("red") translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6]) rotate([90, 0, 0])
         sliderWithPins();
 }

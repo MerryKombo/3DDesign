@@ -12,16 +12,34 @@ module fanEnclosure() {
     difference() {
         union() {
             color("SaddleBrown") maleDovetails(moduleWidth);
-            translate([(moduleWidth - fanEnclosureWidth) / 2, 0, 0]) color("SaddleBrown") fanVerticalReinforcements(
-            moduleWidth);
+            translate([(moduleWidth - fanEnclosureWidth) / 2, 0, 0]) fanVerticalReinforcements(moduleWidth);
+            fanModule(moduleWidth, fanEnclosureLength, moduleHeight);
         }
         //translate(centeredFanTranslationBehindTheEnclosure) fan();
         fanScrewHoles();
     }
 }
 
+module fanModule(moduleWidth, fanEnclosureLength, moduleHeight) {
+    translate([0, dovetailHeight, 0]) difference() {
+        union() {
+            basicModule(moduleWidth, fanEnclosureLength, moduleHeight, false);
+        }
+        // Hollow out so that we dont get a threaded rod insert that blocks the fan bottom
+        hollowOutFanModule(moduleWidth, fanEnclosureLength, moduleHeight);
+        // We need the threaded rod path to clear the whole rodEarDistanceFromSide
+        fanPerpendicularRodAlcoves(moduleWidth, fanEnclosureLength, moduleHeight);
+    }
+}
+
+module hollowOutFanModule(moduleWidth, fanEnclosureLength, moduleHeight) {
+    translate([wallThickness, 0, 0]) cube([moduleWidth - 2 * wallThickness, rodSurroundingDiameter + surroundingDiameter
+        , rodSurroundingDiameter +
+            surroundingDiameter]);
+}
+
 module fanVerticalReinforcements(width) {
-    difference() {
+    color("Seashell") difference() {
         union() {
             fanVerticalReinforcement(width);
             translate([fanEnclosureWidth, 0, moduleHeight]) rotate([0, 180, 0]) fanVerticalReinforcement();
@@ -37,35 +55,92 @@ module fanVerticalReinforcements(width) {
 module fanVerticalReinforcement(width) {
     //reinforcementXShift = (width - fanVerticalReinforcementWidth * 2) / 2;
     translate([fanVerticalReinforcementWidth, /*dovetailMaleToFemaleRatio **/ dovetailHeight, 0])
-        union() {
-            // The main bar
-            cube(size = [fanVerticalReinforcementWidth,
-                fanScrewHoleSize,
-                moduleHeight]);
-            // Bottom ear
-            translate([fanVerticalReinforcementWidth, 0, 0]) cube(size = [fanVerticalReinforcementWidth,
-                fanScrewHoleSize,
-                fanVerticalReinforcementWidth]);
-            // Top ear
-            translate([fanVerticalReinforcementWidth, 0, moduleHeight - fanVerticalReinforcementWidth]) cube(size =
-                [
-                fanVerticalReinforcementWidth,
-                fanScrewHoleSize,
-                fanVerticalReinforcementWidth]);
+        difference() {
+            union() {
+                // The main bar
+                cube(size = [fanVerticalReinforcementWidth,
+                    fanScrewHoleSize,
+                    moduleHeight]);
+                // Bottom ear
+                fanVerticalReinforcementBottomEar();
+                // Top ear
+                fanVerticalReinforcementTopEar();
+            }
+            fanVerticalReinforcementEarHole();
         }
+}
+
+
+module fanVerticalReinforcementBottomEar() {
+    translate([0, 0, 0]) cube(size = [fanVerticalReinforcementWidth * 2,
+        fanVerticalReinforcementWidth,
+            fanVerticalReinforcementWidth * 1.5]);
+}
+
+
+module fanVerticalReinforcementTopEar() {
+    translate([0, 0, moduleHeight - fanVerticalReinforcementWidth * 1.5]) cube(size = [
+            fanVerticalReinforcementWidth * 2, fanVerticalReinforcementWidth, fanVerticalReinforcementWidth * 1.5]);
+}
+
+module fanVerticalReinforcementEarHole() {
+    // First, the bottom nut
+    union() {
+        translate([fanScrewHolePad + fanVerticalReinforcementWidth - (m5NutWidthAcrossFlats * m5NutScalingRatio / 2),
+                        m5FinishedJamNut * m5NutScalingRatio / 2 - 0.1, 0]) fanVerticalReinforcementNutMainRecess();
+        translate([fanScrewHolePad + fanVerticalReinforcementWidth - (m5NutWidthAcrossFlats * m5NutScalingRatio / 2),
+                        m5FinishedJamNut * m5NutScalingRatio / 2 - 0.1,
+                    (threadedRodDiameterHole - fanScrewHolePad) / 2 + (m5NutWidthAcrossSpikes * m5NutScalingRatio) / 2])
+            fanVerticalReinforcementNutSecondRecess();
+
+        // Then, the top nut
+        union() {
+            translate([fanScrewHolePad + fanVerticalReinforcementWidth - (m5NutWidthAcrossFlats * m5NutScalingRatio / 2)
+                , m5FinishedJamNut * m5NutScalingRatio / 2 - 0.1, moduleHeight - (m5NutScalingRatio *
+                    m5NutWidthAcrossSpikes)])fanVerticalReinforcementNutMainRecess()            ;
+            translate([fanScrewHolePad + fanVerticalReinforcementWidth - (m5NutWidthAcrossFlats * m5NutScalingRatio / 2)
+                , m5FinishedJamNut * m5NutScalingRatio / 2 - 0.1, moduleHeight - (threadedRodDiameterHole -
+                    fanScrewHolePad) / 2 + (m5NutWidthAcrossSpikes * m5NutScalingRatio) / 2])
+                fanVerticalReinforcementNutSecondRecess();
+        }
+    }
+}
+
+module fanVerticalReinforcementNutSecondRecess() {
+    rotate([0, 90, 90]) scale([m5NutScalingRatio, m5NutScalingRatio, m5NutScalingRatio]) metric_nut(size =
+    threadedRodDiameter, hole = true, $fn = 100);
+}
+
+module fanVerticalReinforcementNutMainRecess() {
+    linear_extrude(height = m5NutScalingRatio * m5NutWidthAcrossSpikes) projection() rotate([0, 90, 90]) scale([
+        m5NutScalingRatio, m5NutScalingRatio, m5NutScalingRatio]) metric_nut(size =
+    threadedRodDiameter, hole = true, $fn = 100);
+
 }
 
 module fanScrewHoles() {
     translate(centeredFanTranslation) union() {
         translate(fanHoles[0]) fanScrewHole();
         translate(fanHoles[1]) fanScrewHole();
-        translate(fanHoles[2])fanScrewHole();
-        translate(fanHoles[3])fanScrewHole();
+        translate(fanHoles[2]) fanScrewHole();
+        translate(fanHoles[3]) fanScrewHole();
     }
 }
 
+
+module fanPerpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight) {
+    fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
+    translate([moduleWidth, 0, 0]) fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
+}
+
+module fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight) {
+    translate([- 0, moduleLength, threadedRodDiameter * 2 + 2 *
+        surroundingDiameter])        rotate([90, 0, 0])            perpendicularThreadedRod(moduleWidth, moduleLength,
+    moduleHeight);
+}
+
 module fanScrewHole() {
-    color("purple") rotate([90, 0, 0]) cylinder(d = fanScrewHoleSize, h = /*fanDepth +*/ fanVerticalReinforcementDepth,
+    color("purple") rotate([90, 0, 0]) cylinder(d = fanScrewHoleSize, h = fanDepth + fanVerticalReinforcementDepth,
     $fn
     = 100);
 }

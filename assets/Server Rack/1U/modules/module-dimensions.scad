@@ -18,6 +18,9 @@ rodEarHeight = 5;
 rodEarDistanceFromSide = rodSurroundingDiameter / 2 + surroundingDiameter;
 
 m5NutScalingRatio = 1.05;
+m5NutWidthAcrossFlats = 8;
+m5NutWidthAcrossSpikes = 9.3;
+m5FinishedJamNut = 4;
 
 points = [[0, 0, 0], [10, 0, 0], [0, 10, 0], [10, 10, 0]];
 
