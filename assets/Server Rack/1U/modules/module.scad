@@ -12,12 +12,13 @@ pathRadius = rodSurroundingDiameter * 1.125;
 basicModule(moduleWidth, moduleLength, moduleHeight);
 
 
-module perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight) {
-    perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
-    translate([moduleWidth, 0, 0]) perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
+module perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutRecess = true) {
+    perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutRecess);
+    translate([moduleWidth, 0, 0]) perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutRecess);
 }
 
-module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nutRecess=true) {
+module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nutRecess = true) {
+    echo("In basicModule, nutRecess is ", nutRecess);
     difference() {
         union() {
             difference() {
@@ -28,11 +29,12 @@ module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nut
                 }
                 if (pinsPath) {
                     pinsPath(moduleWidth, moduleLength, moduleHeight);
-                    translate([moduleWidth - wallThickness - (wallThickness - pinDepth), 0, 0]) pinsPath(moduleWidth, moduleLength, moduleHeight);
+                    translate([moduleWidth - wallThickness - (wallThickness - pinDepth), 0, 0]) pinsPath(moduleWidth,
+                    moduleLength, moduleHeight);
                 }
                 hollowOut(moduleWidth, moduleLength, moduleHeight);
                 leftEar(moduleWidth, moduleLength, moduleHeight);
-                perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight);
+                perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutRecess);
             }
             rodAlcoves(moduleWidth, moduleLength, moduleHeight);
             moduleDovetails(moduleWidth, moduleLength, moduleHeight);
@@ -63,7 +65,8 @@ module pinsPath(moduleWidth, moduleLength, moduleHeight) {
 
 module rodAlcoves(moduleWidth, moduleLength, moduleHeight) {
     rodAlcove(moduleWidth, moduleLength, moduleHeight);
-    translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2), 0]) rodAlcove(moduleWidth, moduleLength, moduleHeight);
+    translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2), 0]) rodAlcove(moduleWidth,
+    moduleLength, moduleHeight);
     translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2), moduleHeight - (threadedRodDiameter +
             surroundingDiameter * 2)]) rodAlcove(moduleWidth, moduleLength, moduleHeight);
 }
@@ -81,7 +84,8 @@ module rodAlcove(moduleWidth, moduleLength, moduleHeight) {
             }
 }
 
-module perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight) {
+module perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles = true) {
+    echo("In perpendicularRodAlcove, nutHoles is ", nutHoles);
     translate([0, moduleLength + 2 * rodSurroundingDiameter + threadedRodDiameter, threadedRodDiameter * 2 + 2 *
         surroundingDiameter])
         rotate([90, 0, 0])
@@ -90,9 +94,12 @@ module perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight) {
                     cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleLength, $fn = 100);*/
                 perpendicularThreadedRod(moduleWidth, moduleLength, moduleHeight);
                 /**  }*/
-                translate([0, 0, (moduleLength + surroundingDiameter)]) scale([1.1, 1.1, 1.1]) metric_nut(size =
-                threadedRodDiameter, hole =
-                false);
+                if (nutHoles) {
+                    translate([0, 0, (moduleLength + surroundingDiameter)]) scale([m5NutScalingRatio, m5NutScalingRatio,
+                        m5NutScalingRatio]) metric_nut(size = threadedRodDiameter, hole = false);
+                } else {
+                    echo("No need to worry, nutHoles is ", nutHoles);
+                }
             }
 }
 

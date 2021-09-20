@@ -23,7 +23,7 @@ module fanEnclosure() {
 module fanModule(moduleWidth, fanEnclosureLength, moduleHeight) {
     translate([0, dovetailHeight, 0]) difference() {
         union() {
-            basicModule(moduleWidth, fanEnclosureLength, moduleHeight, false);
+            basicModule(moduleWidth, fanEnclosureLength, moduleHeight, false, false);
         }
         // Hollow out so that we dont get a threaded rod insert that blocks the fan bottom
         hollowOutFanModule(moduleWidth, fanEnclosureLength, moduleHeight);
@@ -38,11 +38,12 @@ module hollowOutFanModule(moduleWidth, fanEnclosureLength, moduleHeight) {
             surroundingDiameter]);
 }
 
-module fanVerticalReinforcements(width) {
+module fanVerticalReinforcements(width, makeHoles = true) {
     color("Seashell") difference() {
         union() {
-            fanVerticalReinforcement(width);
-            translate([fanEnclosureWidth, 0, moduleHeight]) rotate([0, 180, 0]) fanVerticalReinforcement();
+            fanVerticalReinforcement(width, makeHoles);
+            translate([fanEnclosureWidth, 0, moduleHeight]) rotate([0, 180, 0]) fanVerticalReinforcement(width,
+            makeHoles);
 
         }
         // Blades
@@ -52,7 +53,7 @@ module fanVerticalReinforcements(width) {
     }
 }
 
-module fanVerticalReinforcement(width) {
+module fanVerticalReinforcement(width, makeHoles = true) {
     //reinforcementXShift = (width - fanVerticalReinforcementWidth * 2) / 2;
     translate([fanVerticalReinforcementWidth, /*dovetailMaleToFemaleRatio **/ dovetailHeight, 0])
         difference() {
@@ -66,7 +67,9 @@ module fanVerticalReinforcement(width) {
                 // Top ear
                 fanVerticalReinforcementTopEar();
             }
-            fanVerticalReinforcementEarHole();
+            if (makeHoles) {
+                fanVerticalReinforcementEarHole();
+            }
         }
 }
 
@@ -128,15 +131,16 @@ module fanScrewHoles() {
 }
 
 
-module fanPerpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight) {
-    fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
-    translate([moduleWidth, 0, 0]) fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight);
+module fanPerpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutHoles = true) {
+    echo("In fanPerpendicularRodAlcoves, nutHoles is ", nutHoles);
+    fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles);
+    translate([moduleWidth, 0, 0]) fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles);
 }
 
-module fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight) {
-    translate([- 0, moduleLength, threadedRodDiameter * 2 + 2 *
-        surroundingDiameter])        rotate([90, 0, 0])            perpendicularThreadedRod(moduleWidth, moduleLength,
-    moduleHeight);
+module fanPerpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles = true) {
+    echo("In fanPerpendicularRodAlcove, nutHoles is ", nutHoles);
+    translate([- 0, moduleLength, threadedRodDiameter * 2 + 2 * surroundingDiameter])        rotate([90, 0, 0])
+        perpendicularThreadedRod(moduleWidth, moduleLength, moduleHeight);
 }
 
 module fanScrewHole() {
@@ -160,5 +164,5 @@ module maleDovetail() {
 
 module fan() {
     color("#E8D9C5") translate([fanWidth / 2, fanDepth / 2,
-            fanWidth / 2]) rotate([0, 90, 0]) import("fan/noctua-main-body.stl", convexity = 10);
+            fanWidth / 2]) rotate([0, 90, 0]) import("../fan/noctua-main-body.stl", convexity = 10);
 }

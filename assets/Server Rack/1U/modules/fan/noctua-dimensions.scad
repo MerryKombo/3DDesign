@@ -15,6 +15,8 @@ fanEnclosureWidth = fanWidth * enclosureToFanRatio;
 fanVerticalReinforcementWidth = fanScrewHoleSize * 1.5 * fanEnclosureRatio;
 fanVerticalReinforcementDepth = fanScrewHoleSize;
 fanEnclosureLength = fanDepth + 2 * (rodSurroundingDiameter + surroundingDiameter) + fanVerticalReinforcementDepth * 2;
+fanAndHarnessWidth = fanWidth + fanVerticalReinforcementWidth;
+fanAndHarnessDepth = fanVerticalReinforcementDepth * 1.5;
 
 fanHoles = [[fanScrewHolePad, fanVerticalReinforcementDepth, fanScrewHolePad], [fanWidth - fanScrewHolePad,
     fanVerticalReinforcementDepth, fanScrewHolePad
