@@ -9,7 +9,7 @@ use <dovetails/dovetails.scad>
 pathRadius = rodSurroundingDiameter * 1.125;
 /*translate([0, - moduleHeight, 0]) platePath(pathRadius, moduleLength - 2 * (rodSurroundingDiameter + surroundingDiameter
 ), wallThickness, pinSize.x, pinDepth);*/
-basicModule(moduleWidth, moduleLength, moduleHeight);
+// basicModule(moduleWidth, moduleLength, moduleHeight);
 
 
 module perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutRecess = true) {
@@ -43,17 +43,21 @@ module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nut
     }
 }
 
-module hollowOut(moduleWidth, moduleLength, moduleHeight) {
+module hollowOut(moduleWidth, moduleLength, moduleHeight, hollowWalls = true) {
     union() {
         translate([wallThickness, - wallThickness, - .1]) cube([moduleWidth - 2 * wallThickness, moduleLength + 10,
                 moduleHeight + 1]);
-        // Let's remove a big cube from left to right
-        translate([- 0.1, rodSurroundingDiameter + rodEarDistanceFromSide, rodSurroundingDiameter + surroundingDiameter
-            + pinSize.x + threadedRodDiameter]
-        ) cube([moduleWidth * 1.1, moduleLength - 2 *
-            wallThickness - rodSurroundingDiameter - rodEarDistanceFromSide, moduleHeight - rodSurroundingDiameter -
-                wallThickness * 2 - pinSize.x - /* because we now have a perpendicularRodAlcove*/ rodSurroundingDiameter
-            ]);
+        if (hollowWalls) {
+            // Let's remove a big cube from left to right
+            translate([- 0.1, rodSurroundingDiameter + rodEarDistanceFromSide, rodSurroundingDiameter +
+                surroundingDiameter
+                + pinSize.x + threadedRodDiameter]
+            ) cube([moduleWidth * 1.1, moduleLength - 2 *
+                wallThickness - rodSurroundingDiameter - rodEarDistanceFromSide, moduleHeight - rodSurroundingDiameter -
+                    wallThickness * 2 - pinSize.x - /* because we now have a perpendicularRodAlcove*/
+                rodSurroundingDiameter
+                ]);
+        }
     }
 }
 

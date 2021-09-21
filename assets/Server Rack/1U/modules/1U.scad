@@ -4,16 +4,19 @@ include <fan/noctua.scad>
 include <power-and-fan/fan-and-power.scad>
 
 //printBitsForChecking();
-oneModuleJustForFun();
-color("DarkKhaki") translate([(moduleWidth - fanEnclosureWidth) / 2, moduleLength, 0]) fanEnclosure();
-translate([0, moduleLength + fanEnclosureLength + dovetailHeight, 0]) fanAndPowerEnclosure(moduleWidth,
-fanEnclosureLength, moduleHeight);
+
+module oneU() {
+    oneModuleJustForFun();
+    // color("DarkKhaki") translate([(moduleWidth - fanEnclosureWidth) / 2, moduleLength, 0]) fanEnclosure();
+    translate([0, moduleLength /*+ fanEnclosureLength+ dovetailHeight*/, 0]) fanAndPowerEnclosure(moduleWidth,
+    fanEnclosureLength, moduleHeight);
+}
 
 module oneModuleJustForFun() {
     /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule(moduleWidth, moduleLength, moduleHeight);
-    color("red") translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])
+    /*color("red") translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])
         rotate([90, 0, 0])
-            sliderWithPins();
+            sliderWithPins();*/
 }
 
 module printBitsForChecking() {
