@@ -26,6 +26,7 @@ moduleHeight = numberOfU * oneU;
 
 threadedRodDiameter = 5;
 threadedRodDiameterHole = 5.15;
+
 surroundingDiameter = 2;
 rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
