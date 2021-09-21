@@ -2,7 +2,19 @@ include <slider dimensions.scad>
 use <../../utils/dovetails.scad>
 
 //slider();
-sliderWithPins();
+//printSliderBitsForChecking();
+//sliderWithPins();
+
+module printSliderBitsForChecking() {
+    union() {
+        /*translate([threadedRodDiameter * 2, 0, 0]) */ intersection() {
+            sliderWithPins();
+            // Threaded rod insert
+            translate([- pinSize.x, -pinSize.y, 0]) rotate([270, 0, 0])  cube([usableSize[0] * .3, usableSize[1], pinSize.y+usableSize[2]])
+                ;
+        }
+    }
+}
 
 module sliderWithPins() {
     union() {
