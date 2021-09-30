@@ -23,6 +23,7 @@ m5FinishedJamNut = 4;
 moduleWidth = (totalWidth - (thicknessOfEars * 2 + m5FinishedJamNut * m5NutScalingRatio * 2)) / numberOfUnits;
 moduleLength = 150;
 moduleHeight = numberOfU * oneU;
+printerMaxSize = 300;
 
 threadedRodDiameter = 5;
 threadedRodDiameterHole = 5.15;

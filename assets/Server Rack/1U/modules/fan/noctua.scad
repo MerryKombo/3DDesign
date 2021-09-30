@@ -39,6 +39,7 @@ module hollowOutFanModule(moduleWidth, fanEnclosureLength, moduleHeight) {
 }
 
 module fanVerticalReinforcements(width, makeHoles = true) {
+    echo("In fanVerticalReinforcements, makeHoles is", makeHoles);
     color("Seashell") difference() {
         union() {
             fanVerticalReinforcement(width, makeHoles);
