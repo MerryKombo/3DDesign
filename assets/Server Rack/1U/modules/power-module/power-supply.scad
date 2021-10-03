@@ -19,7 +19,9 @@ include <power-supply-dimensions.scad>
 
 include <../../utils/hexgrid.scad>
 
-//powerSupplyModule(false);
+include <scallop.scad>
+
+powerSupplyModule(true);
 
 module powerSupplyModule(hiveWall = true) {
     //echo("IEC body width is : ", iecBodyWidth);
@@ -34,48 +36,116 @@ module powerSupplyModule(hiveWall = true) {
             union() {
                 // The full module
                 basicModule(psuModuleWidth * moduleWidth, psuModuleLength, moduleHeight, pinsPath = false, nutRecess =
-                false, rearDovetails=false, frontDovetails=true);
+                false, rearDovetails = false, frontDovetails = true);
                 powerSupplyModuleWalls(hiveWall);
             }
             // We dig a big funky hole inside it
             /*   translate([0, powerSupplyLength, 0]) cube([powerSupplyWidth + 2 * wallThickness, dovetailHeight * 1.1,
                        moduleHeight * 1.1]);*/
-            // Let's get rid of the dovetails
-            /*translate([- 0.1, psuModuleLength, 0]) color("yellow") cube([psuModuleWidth * moduleWidth * 1.5,
-                    dovetailHeight * 2, moduleHeight * 1.5]);*/
             powerSupplySideWallTrack();
-
             translate([0, psuModuleLength - (psuModuleLength - powerSupplyLength) / 2, 0]) rotate([0, 0, 270])
                 color("purple")  powerSupplySideWallTrackNotTranslated();
         }
-
-        /* translate([0, psuModuleLength - (psuModuleLength - powerSupplyLength) / 2, 0]) rotate([0, 0, 270])
-             color("purple")  powerSupplySideWallTrackNotTranslated();*/
-        //powerSupplySideWallTrackNotTranslated();
         // This is a comment :-D
         powerSupply();
         powerSupplySideWallInsert();
         translate([0, - powerSupplyLength * .9, 0]) powerSupplySideWallInsert(true);
+
+        // The rear blower fan
         /* translate([psuModuleWidth * moduleWidth - blower_depth(PE4020) - wallThickness, psuModuleLength -
-             rodSurroundingDiameter - surroundingDiameter, 0]) powerSupplyRearBlower();*/
+             rodSurroundingDiameter - surroundingDiameter, 0])*/ powerSupplyRearBlower();
         /*difference() {
             cube([blower_length(PE4020), blower_length(PE4020), blower_depth(PE4020)]);
             blower_hole_positions(PE4020) cylinder(d = 3, h = blower_depth(PE4020));
 
         }*/
+        cube([psuModuleWidth * moduleWidth, psuModuleLength, basePlateThickness]);
     }
 }
 
 
-module powerSupplyRearBlower() {
-    translate([blower_depth(powerSupplyModuleBlower), 0, blower_depth(powerSupplyModuleBlower) * 2]) rotate([0, 90, 180]
-    ) blower(powerSupplyModuleBlower);
+module powerSupplyRearBlower(displayBlower = true) {
+    /*blower_top(powerSupplyModuleBlower)*/
+
+    translate([wallThickness + powerSupplyWidth * 1.05, psuModuleLength - (rodSurroundingDiameter +
+        surroundingDiameter),
+            moduleHeight - surroundingDiameter * 2])
+        union() {
+            // The Blower itself
+            if (displayBlower) {
+                rotate([0, 180, 180]) blower(powerSupplyModuleBlower);
+            }
+            // The plate the feet will rest one
+            color("blue") translate([0, 0, - moduleHeight + surroundingDiameter * 2]) linear_extrude(height =
+            basePlateThickness) projection() rotate([0, 180, 180]) blower(powerSupplyModuleBlower);
+            // The scallop to link the blower to the outside
+            // The size of the hole
+            size = [blower_exit(powerSupplyModuleBlower), moduleHeight - 2 * (rodSurroundingDiameter - surroundingDiameter)];
+            color("beige") translate([0, (rodSurroundingDiameter + surroundingDiameter) / 2 + wallThickness, - size.y -
+                (
+                    rodSurroundingDiameter - 3 * surroundingDiameter)]) scallopedVent(size);
+            // The feet
+            rotate([0, 180, 180]) powerSupplyRearBlowerFeet();
+        }
 }
 
-module powerSupplyModuleWalls(hiveWall = true) {
-    powerSupplySideWall(true);
+module powerSupplyRearBlowerFeet() {
+    screwHoles = blower_screw_holes(powerSupplyModuleBlower);
+    echo("The Blower Screw Holes coordinates are ", screwHoles);
+    for (currentPoint = screwHoles) {
+        color("blue") translate([currentPoint.x, currentPoint.y, blower_lug(powerSupplyModuleBlower)])
+            powerSupplyRearBlowerFoot();
+    }
+}
+
+module powerSupplyRearBlowerFoot() {
+    difference() {
+        cylinder(d = blower_screw_hole(powerSupplyModuleBlower) + 2, h = moduleHeight - (blower_depth(
+        powerSupplyModuleBlower)) + surroundingDiameter * 2);
+        cylinder(d = blower_screw_hole(powerSupplyModuleBlower), h = moduleHeight - surroundingDiameter * 2);
+    }
+}
+
+module powerSupplyModuleWalls(hiveWallBuilding = true) {
+    powerSupplySideWall(translateWall = true);
     //powerSupplyRearWall();
-    translate([wallThickness, psuModuleLength, 0]) powerSupplyRearWallDebug(hiveWall);
+    translate([wallThickness, psuModuleLength, 0]) powerSupplyRearWallDebug(hiveWallBuilding);
+    powerSupplyFrontWall(hiveWallBuilding);
+}
+
+module powerSupplyFrontWall(hiveWall = true) {
+    union() {
+        difference() {
+            union() {
+                // The wall
+                if (hiveWall) {
+                    union() {
+                        // The ventilated wall
+                        // first arg is vector that defines the bounding box, length, width, height
+                        // second arg in the 'diameter' of the holes. In OpenScad, this refers to the corner-to-corner diameter, not flat-to-flat
+                        // this diameter is 2/sqrt(3) times larger than flat to flat
+                        // third arg is wall thickness.  This also is measured that the corners, not the flats.
+                        translate([wallThickness, wallThickness, 0]) rotate([90, 0, 0]) hexgrid([
+                                    psuModuleWidth *
+                                    moduleWidth - 2 * wallThickness, moduleHeight, wallThickness], 5, 1);
+                        union() {
+                            translate([wallThickness, 0, 0]) cube([psuModuleWidth * moduleWidth - 2 * wallThickness,
+                                wallThickness, wallThickness]);
+                            translate([wallThickness, 0, moduleHeight - wallThickness]) cube([psuModuleWidth *
+                                moduleWidth - 2 * wallThickness, wallThickness, wallThickness]);
+                        }
+                    }
+                } else {
+                    translate([wallThickness, wallThickness, 0]) rotate([90, 0, 0]) cube([
+                                psuModuleWidth *
+                                moduleWidth - 2 * wallThickness, moduleHeight, wallThickness]);
+                }
+            }
+            translate([0, (threadedRodDiameter + surroundingDiameter * 2) / 2 + threadedRodDiameter, 0])  scale([1 / 1.1
+                , 1, 1]) color("black") moduleThreadedRod();
+            //scale([1.1, 1, 1])
+        }
+    }
 }
 
 module powerSupplyRearWallDebug(hiveWall = true) {
@@ -230,7 +300,7 @@ module powerSupply() {
         rodSurroundingDiameter
         / 2, 0])*/
     translate([wallThickness, psuModuleLength - (psuModuleLength - powerSupplyLength) / 2, 0]) translate([
-            powerSupplyWidth / 2, - powerSupplyLength / 2, 0]) rotate([0, 0, 270]) psu(powerSupplyBase);
+            powerSupplyWidth / 2, - powerSupplyLength / 2, basePlateThickness]) rotate([0, 0, 270]) psu(powerSupplyBase);
     echo("The PSU module length is ", psuModuleLength, " and the powerSupplyLength ", powerSupplyLength);
     /*module psus()
     layout([for (p = psus) psu_width(p)], 10) let(p = psus[$i])

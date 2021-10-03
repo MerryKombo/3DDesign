@@ -159,7 +159,7 @@ powerSupplyModuleBlower = PE4020;
 powerSupplyModuleLength = powerSupplyLength + iecBodyLength;
 
 psuLength = psu_length(powerSupplyBase);
-psuModuleWidth = ceil(psuLength / (moduleWidth - 2 * wallThickness));
+psuModuleWidth = ceil((powerSupplyWidth + blower_width(powerSupplyModuleBlower)) / (moduleWidth - 2 * wallThickness));
 powerSupplyModuleFanSize = blower_length(powerSupplyModuleBlower);
 echo("powerSupplyModuleFanSize is ", powerSupplyModuleFanSize);
 // Let's try to make this module as long as a multiple of the basic module

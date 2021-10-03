@@ -32,6 +32,8 @@ rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
 rodEarDistanceFromSide = rodSurroundingDiameter / 2 + surroundingDiameter;
 
+basePlateThickness = 1;
+
 points = [[0, 0, 0], [10, 0, 0], [0, 10, 0], [10, 10, 0]];
 
 echo("rodSurroundingDiameter is", rodSurroundingDiameter);
