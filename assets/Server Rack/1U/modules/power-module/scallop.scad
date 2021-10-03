@@ -1,7 +1,7 @@
 include <../module-dimensions.scad>
 include <power-supply-dimensions.scad>
 
-size = [30, 40];
+//size = [30, 40];
 // scallopedVent(size);
 // scallops(size);
 // insideScallops(size);

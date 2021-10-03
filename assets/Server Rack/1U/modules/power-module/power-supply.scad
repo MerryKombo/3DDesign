@@ -21,7 +21,7 @@ include <../../utils/hexgrid.scad>
 
 include <scallop.scad>
 
-powerSupplyModule(true);
+// powerSupplyModule(true);
 
 module powerSupplyModule(hiveWall = true) {
     //echo("IEC body width is : ", iecBodyWidth);

@@ -149,7 +149,7 @@ PD_150_12 =
 []
 ];
 
-powerSupplyBase = PD_150_12;
+powerSupplyBase = PD_150_12; // S_96_12;//
 
 powerSupplyWidth = powerSupplyBase[3];
 powerSupplyHeight = powerSupplyBase[4];;

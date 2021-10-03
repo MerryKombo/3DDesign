@@ -13,7 +13,7 @@ fan40x20 = [40, 20, 37, 16,    M3_dome_screw, 25,   7.5,100, 9, 0,   undef];
 //fan_assembly(type, thickness, include_fan = true, screw = false, full_depth = false)
 //fan_assembly(fan40x20, 0 + fan_guard_thickness(), include_fan = true, screw = false);
 
-fanAndPowerEnclosure(moduleWidth, fanEnclosureLength, moduleHeight);
+//fanAndPowerEnclosure(moduleWidth, fanEnclosureLength, moduleHeight);
 //fanModule(moduleWidth, fanEnclosureLength, moduleHeight);
 //fanHarness();
 
