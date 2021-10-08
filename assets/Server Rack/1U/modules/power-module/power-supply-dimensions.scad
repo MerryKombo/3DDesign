@@ -177,8 +177,8 @@ psuTempModuleRatio;
 
 echo("The psu module ratio is ", psuModuleRatio);
 
-psuModuleLength = psuModuleRatio * moduleLength;
+psuModuleLength = psuModuleRatio * moduleLength - dovetailHeight;
 if (psuModuleLength > printerMaxSize) {
-echo("ERROR ! psuModuleLength is bigger than printerMaxSize!!!");
+echo("ERROR ! PSU module length is bigger than printerMaxSize!!!");
 }
 echo("PSU module length will be ", psuModuleLength, " (", psuModuleRatio, ")");

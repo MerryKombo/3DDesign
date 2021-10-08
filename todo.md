@@ -29,18 +29,19 @@
 ##### Power Supply Module
 
 - Find a 43mm 10A+ power supply
-- Add a side wall to support the PSU
-- Remove dovetails
-- Get the threaded rod hole to get up to front
-- Make a T-shaped hole in the side to host some sliding pads
-- Make some sliding pads to connect the PSU to the side
 - Design an end side blocker pad for the threaded rod hosting the two nuts for the X rods and finishing the Y rod (sort of an ear for the rear, so a rearear? ;-) )
+- Reinforce the feet of the blower (triangles like the PCB adapters, or truss, or whatever)
 
 ##### Fan Module
 
 - Add a nut to the reinforcement
 - Get the holes right
 - Find a way to reroute the air flow for modules facing the PSU wall
+
+##### Network Switch Module
+
+- Use the eight_ports_gigabit_switch_feet_vertical_bracket as a model to build a stiffer plate to screw the PCB on
+- Add "virtual feet" that would lay in the walls so that we can get a stronger platform to screw the PCB on
 
 ##### Ears
 
@@ -63,7 +64,11 @@
 ##### Power Supply Module
 
 - Add a rear wall to support the IEC plug
-- 
+- Get the threaded rod hole to get up to front
+- Add a side wall to support the PSU
+- Make a T-shaped hole in the side to host some sliding pads
+- Make some sliding pads to connect the PSU to the side
+- Remove dovetails
 
 ##### Fan Module
 
