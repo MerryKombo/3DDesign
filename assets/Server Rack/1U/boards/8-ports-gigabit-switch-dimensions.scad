@@ -19,7 +19,7 @@ eightPortsGigabitSwitchHolesDiameter = 3;
 // ^\       ^
 // | \      |
 // 1  \____>3
-feet = [[0, 0, 0],
+feet = [/*[-10,0],*/[0, 0, 0],
         [eightPortsGigabitSwitchLength - eightPortsGigabitSwitchDistanceFromEdgeX * 2,
         0, 0],
         [0, eightPortsGigabitSwitchWidth -

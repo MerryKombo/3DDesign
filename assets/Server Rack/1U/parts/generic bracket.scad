@@ -9,7 +9,7 @@ translate([- size.x, - size.y, - size.z]) vertical_bracket(feet, holeSize, baseS
 linkThickness, linkHeight, true);
 
 module vertical_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight, center) {
-    rotate(a = [-90, -90, 0]) union() {
+    rotate(a = [- 90, - 90, 0]) union() {
         bracket_feet(feet, holeSize, baseSize, baseHeight, totalHeight);
         bracket_link(feet, linkThickness, linkHeight);
         bracket_square_link(feet, linkThickness, linkHeight);
@@ -18,33 +18,35 @@ module vertical_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkT
 }
 
 module bracket_middle_reinforcement(feet, linkThickness, linkHeight, center) {
-    echo("Center is", center);
-    middlePoint = IntersectionOfLines(feet[0], feet[3], feet[2], feet[1]);
-    yMiddle = max(feet[0][1], feet[1][1], feet[2][1], feet[3][1]) / 2;
-    xMiddle = max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) / 2;
-    // How much of the board will go past the X holes?
-    xOverHang = abs((size.x - (xMiddle * 2)) / 2);
-    echo("The overhang is ", xOverHang);
-    topPoint = [max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) + xOverHang, center? yMiddle:middlePoint.y, 0];
-    // We need to extend the link down to the board size and then add the feet width, so that it doesn't interfere with the existing feet
-    bottomPoint = [min(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) - (xOverHang + baseSize), center? yMiddle:
-            middlePoint.y, 0];
-    if (center) {
-        // find the center instead of finding the intersection point
-        // todo!
-        mesh_link([topPoint, bottomPoint], linkThickness, linkHeight, 1);
-    } else {
-        mesh_link([topPoint, bottomPoint], linkThickness, linkHeight, 1);
+    union() {
+        echo("Center is", center);
+        middlePoint = IntersectionOfLines(feet[0], feet[3], feet[2], feet[1]);
+        yMiddle = max(feet[0][1], feet[1][1], feet[2][1], feet[3][1]) / 2;
+        xMiddle = max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) / 2;
+        // How much of the board will go past the X holes?
+        xOverHang = abs((size.x - (xMiddle * 2)) / 2);
+        echo("The overhang is ", xOverHang);
+        topPoint = [max(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) + xOverHang, center? yMiddle:middlePoint.y, 0];
+        // We need to extend the link down to the board size and then add the feet width, so that it doesn't interfere with the existing feet
+        bottomPoint = [min(feet[0][0], feet[1][0], feet[2][0], feet[3][0]) - (xOverHang + baseSize), center? yMiddle:
+                middlePoint.y, 0];
+        if (center) {
+            // find the center instead of finding the intersection point
+            // todo!
+            mesh_link([topPoint, bottomPoint], linkThickness, linkHeight, 1);
+        } else {
+            mesh_link([topPoint, bottomPoint], linkThickness, linkHeight, 1);
+        }
+        //points = flatten([[topPoint, bottomPoint], feet]);
+        //points = [topPoint, bottomPoint, feet[0], feet[2]];
+        points = [topPoint, feet[1], feet[3]];
+        echo("Points is ", points);
+        link_harness_to_bracket(points, linkThickness, linkHeight);
+        bottomPoints = [bottomPoint, feet[0], feet[2]];
+        echo("Points is ", bottomPoints);
+        link_harness_to_bracket(bottomPoints, linkThickness, linkHeight);
+        topAndBottom_reinforcement(topPoint, bottomPoint, linkThickness, linkHeight);
     }
-    //points = flatten([[topPoint, bottomPoint], feet]);
-    //points = [topPoint, bottomPoint, feet[0], feet[2]];
-    points = [topPoint, feet[1], feet[3]];
-    echo("Points is ", points);
-    link_harness_to_bracket(points, linkThickness, linkHeight);
-    bottomPoints = [bottomPoint, feet[0], feet[2]];
-    echo("Points is ", bottomPoints);
-    link_harness_to_bracket(bottomPoints, linkThickness, linkHeight);
-    topAndBottom_reinforcement(topPoint, bottomPoint, linkThickness, linkHeight);
 }
 
 module topAndBottom_reinforcement(topPoint, bottomPoint, linkThickness, linkHeight) {
@@ -76,9 +78,19 @@ module bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
     }
 }
 
+module empty_bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
+    color("red") translate([0, 0, - 0.5]) cylinder(r = holeSize / 2, h = totalHeight + 1, $fn = 100);
+}
+
 module bracket_feet(points, holeSize, baseSize, baseHeight, totalHeight) {
     for (point = points) {
         translate(point) bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight);
+    }
+}
+
+module empty_bracket_feet(points, holeSize, baseSize, baseHeight, totalHeight) {
+    for (point = points) {
+        translate(point) empty_bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight);
     }
 }
 
@@ -100,23 +112,103 @@ module bracket_link(points, thickness, height) {
 }
 
 
+module new_mesh_link(points, thickness, height, number) {
+    echo("In new_mesh_link, points are ", points);
+    firstPoint = points[0];
+    secondPoint = points[1];
+    firstXPoint = points[0][0];
+    secondXPoint = points[1][0];
+    firstYPoint = points[0][1];
+    secondYPoint = points[1][1];
+    // Biggest first
+    sortedByXPoints = firstXPoint > secondXPoint ? [firstPoint, secondPoint]:[secondPoint, firstPoint];
+    sortedByYPoints = firstYPoint > secondYPoint ? [firstPoint, secondPoint]:[secondPoint, firstPoint];
+    echo("Sorted by X Points is ", sortedByXPoints);
+    echo("Sorted by Y Points is ", sortedByYPoints);
+    horizontalSize = sortedByXPoints[0][0] - sortedByXPoints[1][0];
+    verticalSide = sortedByYPoints[0][1] - sortedByYPoints[1][1];
+    echo("horizontalSize is ", horizontalSize);
+    echo("verticalSide is ", verticalSide);
+    linkLength = sqrt(pow(horizontalSize, 2) + pow(verticalSide, 2)) - holeSize;
+    // We sorted them earlier, so of course it's the second one
+    minX = sortedByXPoints[1][0];
+    echo("minX is ", minX);
+    minY = sortedByYPoints[1][1];
+    maxY = sortedByYPoints[0][1];
+    echo("minY is ", minY, "and maxY is ", maxY);
+    tempAtan = atan(horizontalSize / verticalSide);
+    xIsNegative = sortedByYPoints[0][0] + sortedByYPoints[1][0] < 0;
+    yIsNegative = sortedByYPoints[0][1] + sortedByYPoints[1][1] < 0;
+    echo("xIsNegative ", xIsNegative);
+    echo("yIsNegative ", yIsNegative);
+    // {\displaystyle m={y_{b}-y_{a} \over x_{b}-x_{a}}} ;
+    atanTest = (secondYPoint - firstYPoint) / (secondXPoint - firstXPoint) < 0;//yIsNegative && !xIsNegative;
+    atan = atanTest? 180 - tempAtan:tempAtan;
+    echo("atan is ", atan, ", atantTest (negative slope) is ", atanTest);
+    biggestXIsZero = sortedByXPoints[0][0] == 0;
+    biggestYIsZero = sortedByYPoints[0][1] == 0;
+    xMove = biggestXIsZero? minX:minX;
+    // yMove = biggestYIsZero? minY:0;
+    yPointsAreAtTheSameHeight = minY == maxY;
+    yMove = atanTest? maxY: (yIsNegative && xIsNegative) || yPointsAreAtTheSameHeight || minY < 0 || maxY - minY > 0?
+        minY:0;
+    //yMove = biggestYIsZero? minY: minY;
+    //******************************************************************************************************************
+    // Clean that up, please
+    meshColor = xMove == 0 && yMove == 0 ? "white": "WhiteSmoke";
+    echo("mesh_link treating", sortedByXPoints);
+    echo("moving X : ", xMove);
+    echo("moving Y : ", yMove);
+    union() {
+        //debugColor = linkLength < 46? [10 * number / 255, 10 * number / 255, 10 * number / 255]: meshColor;
+        //"purple"
+        echo("I will move ", xMove, " and ", yMove, " with height ", height * 2);
+        echo("I will rotate ", 270, 0, - atan);
+        color(meshColor) translate([xMove, yMove, height * 2]) rotate([270, 0, - atan])
+            translate([0, 0, holeSize / 2]) cylinder(h = linkLength, r = thickness / 2, center = false, $fn = 100)
+                ;
+        echo("Finished treating mesh_link ", sortedByXPoints, " with length ", linkLength);
+
+    }
+    // *****************************************************************************************************************
+    // end of the mess to clean up
+}
+
 module mesh_link(points, thickness, height, number) {
     // modified
-    firstSide = points[1][0] - points[0][0];
-    secondSide = points[1][1] - points[0][1];
+    signedFirstSide = points[1][0] - points[0][0];
+    firstSide = abs(signedFirstSide);
+    signedSecondSide = points[1][1] - points[0][1];
+    secondSide = abs(signedSecondSide);
+    echo("Signed First side is ", signedFirstSide);
     echo("First side is ", firstSide);
     echo("Second side is ", secondSide);
-    gap = points[1][0] - points[0][0];
+    gap = abs(points[1][0] - points[0][0]);
     // modified
     mesh_link_length = sqrt(pow(firstSide, 2) + pow(secondSide, 2)) - holeSize;
     // original
     atan = atan(firstSide / secondSide);
     minX = min(points[1][0], points[0][0]);
+    echo("minX is ", minX);
     minY = min(points[1][1], points[0][1]);
+    echo("minY is ", minY);
     // xMove = firstSide < 0? abs(firstSide) + minX:0;
-    xMove = firstSide < 0? abs(firstSide) + minX:points[0][0] > 0? points[0][0]:0;
+    //xMove = firstSide < 0? abs(firstSide) + minX:points[0][0] > 0? points[0][0]:0;
+    echo("Signed First side is", signedFirstSide);
+    echo("Signed Second side is", signedSecondSide);
+    echo("minX is ", minX);
+    echo("minY is ", minY);
+    echo("points[0][0] is", points[0][0]);
+    echo("points[0][1] is", points[0][1]);
+    echo("abs(firstSide) + minX", abs(firstSide) + minX);
+    echo("abs(secondSide) + minY", abs(secondSide) + minY);
+    // le problème est là
+    //xMove = signedFirstSide < 0 ? abs(firstSide) + minX:points[0][0] > 0? points[0][0]:0;
+    xMove = signedFirstSide < 0 && points[1][0] != 0? abs(firstSide) + minX:points[0][0] > 0 && points[1][0] != 0 > 0?
+        points[0][0]:minX;
     //yMove = secondSide < 0? abs(secondSide) + minY:0;
-    yMove = secondSide < 0? abs(secondSide) + minY:points[0][1] > 0? points[0][1]:0;
+    //yMove = secondSide < 0? abs(secondSide) + minY:points[0][1] > 0? points[0][1]:0;
+    yMove = signedSecondSide < 0? abs(secondSide) + minY:points[0][1] > 0? points[0][1]:minY;
     meshColor = xMove == 0 && yMove == 0 ? "white": "WhiteSmoke";
     echo("mesh_link treating", points);
     echo("moving X : ", xMove);
@@ -187,7 +279,7 @@ module bracket_square_link(points, thickness, height) {
           translate([verticalLength + holeSize, 0, 0])horizontalLink(height, thickness, horizontalLength);
           verticalLink(height, thickness, verticalLength);
           translate([0, horizontalLength + holeSize, 0])verticalLink(height, thickness, verticalLength);
-  */
+        */
         link_everyone(points, thickness, height);
     }
 }
@@ -203,6 +295,20 @@ module link_everyone(points, thickness, height) {
         p = allLinks[idx];
         echo("P is now: ", p);
         mesh_link(p, thickness, height, idx);
+    }
+}
+
+module new_link_everyone(points, thickness, height) {
+    echo("Link everyone");
+    allLinks = superCombinations(points, 2);
+    echo("All links are: ", allLinks);
+    for (idx = [0 : len(allLinks) - 1]) {
+        //for (p = allLinks) {
+        //   stroke(p, endcap2 = "arrow2");
+        //p = sort(allLinks[idx]);
+        p = allLinks[idx];
+        echo("P is now: ", p);
+        new_mesh_link(p, thickness, height, idx);
     }
 }
 
@@ -285,7 +391,7 @@ ll = len(list)
 
 
 function getMinPoint(points) =
-[min(subindex(points,0)),min(subindex(points,1))];
+[min(subindex(points, 0)), min(subindex(points, 1))];
 
 function getMaxPoint(points) =
-[max(subindex(points,0)),max(subindex(points,1))];
+[max(subindex(points, 0)), max(subindex(points, 1))];
