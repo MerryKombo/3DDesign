@@ -94,7 +94,133 @@ module empty_bracket_feet(points, holeSize, baseSize, baseHeight, totalHeight) {
     }
 }
 
+/*function getFirstPoint(points, minX, minY) = [for (currentPoint = points) currentPoint.x == minX && currentPoint.y ==
+minY ? currentPoint];*/
+// find the maximum value in a vector
+function maxInVector(v, m = - 999999999999, i = 0, maxX = true, maxY = false) =
+    (i == len(v))
+    ?     m
+    :     (m > (maxX? v[i].x:maxY?v[i].y:v[i].x))
+    ?    maxInVector(v, m, i + 1, maxX, maxY)
+    :    maxInVector(v, maxX? v[i].x:maxY?v[i].y:v[i].x, i + 1, maxX, maxY);
+
+// input : list of points
+// output : sorted by x vector of points
+function quicksortVectorByX(vec) = !(len(vec) > 0) ? [] : let(
+    pivot = vec[floor(len(vec) / 2)],
+    lesser = [for (y = vec) if (y.x < pivot.x) y],
+    equal = [for (y = vec) if (y.x == pivot.x) y],
+    greater = [for (y = vec) if (y.x > pivot.x) y]
+) concat(
+quicksortVectorByX(lesser), equal, quicksortVectorByX(greater)
+);
+
+function removeDuplicates(vector) = !(len(vector) > 0)?[] : let(
+    pivot = vector[floor(len(vector) / 2)],
+    lesser = [for (y = vector) if (y.x < pivot.x) y],
+    equal = [for (y = vector) if ((y.x == pivot.x) && (y.y == pivot.y) && (y.z == pivot.z)) y],
+    cleanedEqual = [len(equal) > 0? equal[0]:undef],
+    greater = [for (y = vector) if (y.x > pivot.x) y]) concat(removeDuplicates(lesser), cleanedEqual, removeDuplicates(
+greater)
+);
+
+// input : list of points
+// output : sorted by x vector of points
+function quicksortVectorByY(vec) = !(len(vec) > 0) ? [] : let(
+    pivot = vec[floor(len(vec) / 2)],
+    lesser = [for (y = vec) if (y.y < pivot.y) y],
+    equal = [for (y = vec) if (y.y == pivot.y) y],
+    greater = [for (y = vec) if (y.y > pivot.y) y]
+) concat(
+quicksortVectorByY(lesser), equal, quicksortVectorByY(greater)
+);
+
+function getFirstPoint(points, minX, minY) = len(points) > 0? (points[0].x == minX && points[0].y == minY? points[0] :
+        getFirstPoint(select(points, [1:len(points) - 1]))):echo("nothing");
+
+function getTopLineIndex(minY, index, unsortedBottomPoints) = len(unsortedBottomPoints) <= 0? 0
+    : //else
+            unsortedBottomPoints[0].y > minY?index:getTopLineIndex(minY, index + 1, select(unsortedBottomPoints, [index:
+        1:len(unsortedBottomPoints) - 1]));
+
+module new_bracket_link(points, thickness, height) {
+    // modified
+    // This gives us two "points", one containing all the minimums, and one containing all the maximums
+    pt_pair = pointlist_bounds(points);
+    minX = pt_pair[0].x;
+    minY = pt_pair[0].y;
+    maxX = pt_pair[1].x;
+    maxY = pt_pair[1].y;
+    echo("Points bounds are ", pt_pair);
+    /*echo("First point is", getFirstPoint(points, minX, minY));*/
+    unsortedBottomPoints = quicksortVectorByY(points);
+    topLineIndex = getTopLineIndex(minY, 0, unsortedBottomPoints);
+    echo("topLineIndex is ", topLineIndex);
+    echo("quick sort of the points by Y ", unsortedBottomPoints);
+    bottomPoints = quicksortVectorByX(select(unsortedBottomPoints, [0, 1]));
+    echo("bottom points are ", bottomPoints);
+    topPoints = quicksortVectorByX(select(unsortedBottomPoints, [2, 3]));
+    echo("top points are ", topPoints);
+    echo("max", maxInVector(points, maxX = false, maxY = true));   // ECHO: "max", 9
+    horizontalSide = topPoints[1][0] - bottomPoints[0][0];//points[3][0] - points[0][0];
+    verticalSide = topPoints[1][1] - bottomPoints[0][1];//points[3][1] - points[0][1];
+    gap = topPoints[0][0] - topPoints[1][0];//points[1][0] - points[3][0];
+    echo("Horizontal side is ", horizontalSide);
+    echo("Vertical side is ", verticalSide);
+    echo("Gap is ", gap);
+    // modified
+    length = sqrt(pow(horizontalSide, 2) + pow(verticalSide, 2)) - holeSize;
+    // original
+    atan = atan(horizontalSide / verticalSide);
+    union() {
+        color("blue") translate([0, 0, height * 2]) rotate([270, 0, - atan]) translate([0, 0, holeSize / 2]) cylinder(h
+        = length, r = thickness / 2, center = false, $fn = 100);
+        color("green") translate([bottomPoints[1][0], 0, height * 2])
+            /*translate([horizontalSide + gap, 0, height * 2])*/ rotate([270, 0, atan]) translate([0, 0, holeSize
+                / 2]
+            ) cylinder(h = length, r = thickness / 2, center = false, $fn = 100);
+    }
+}
+//[[26.5401, 30.0688, 0], [38.9207, 0, 0], [12.3807, 30.0688, 0], [0, 0, 0]]
 module bracket_link(points, thickness, height) {
+    // modified
+    // This gives us two "points", one containing all the minimums, and one containing all the maximums
+    pt_pair = pointlist_bounds(points);
+    minX = pt_pair[0].x;
+    minY = pt_pair[0].y;
+    maxX = pt_pair[1].x;
+    maxY = pt_pair[1].y;
+    echo("Points bounds are ", pt_pair);
+    /*echo("First point is", getFirstPoint(points, minX, minY));*/
+    unsortedBottomPoints = quicksortVectorByY(points);
+    echo("quick sort of the points by Y ", unsortedBottomPoints);
+    bottomPoints = quicksortVectorByX(select(unsortedBottomPoints, [0, 1]));
+    echo("bottom points are ", bottomPoints);
+    topPoints = quicksortVectorByX(select(unsortedBottomPoints, [2, 3]));
+    echo("top points are ", topPoints);
+    echo("max", maxInVector(points, maxX = false, maxY = true));   // ECHO: "max", 9
+    horizontalSide = topPoints[1][0] - bottomPoints[0][0];//points[3][0] - points[0][0];
+    verticalSide = topPoints[1][1] - bottomPoints[0][1];//points[3][1] - points[0][1];
+    gap = topPoints[0][0] - topPoints[1][0];//points[1][0] - points[3][0];
+    echo("Horizontal side is ", horizontalSide);
+    echo("Vertical side is ", verticalSide);
+    echo("Gap is ", gap);
+    // modified
+    length = sqrt(pow(horizontalSide, 2) + pow(verticalSide, 2)) - holeSize;
+    // original
+    atan = atan(horizontalSide / verticalSide);
+    union() {
+        color("blue") translate([0, 0, height * 2]) rotate([270, 0, - atan]) translate([0, 0, holeSize / 2]) cylinder(h
+        = length, r = thickness / 2, center = false, $fn = 100);
+        color("green") translate([bottomPoints[1][0], 0, height * 2])
+            /*translate([horizontalSide + gap, 0, height * 2])*/ rotate([270, 0, atan]) translate([0, 0, holeSize
+                / 2]
+            ) cylinder(h = length, r = thickness / 2, center = false, $fn = 100);
+    }
+}
+
+/* this is the legacy one, that works almost for all cases... Almost. */
+module bracket_link_backup(points, thickness, height) {
     // modified
     firstSide = points[3][0] - points[0][0];
     secondSide = points[3][1] - points[0][1];
@@ -125,6 +251,16 @@ module new_mesh_link(points, thickness, height, number) {
     sortedByYPoints = firstYPoint > secondYPoint ? [firstPoint, secondPoint]:[secondPoint, firstPoint];
     echo("Sorted by X Points is ", sortedByXPoints);
     echo("Sorted by Y Points is ", sortedByYPoints);
+
+    pt_pair = pointlist_bounds(points);
+    minX = pt_pair[0].x;
+    minY = pt_pair[0].y;
+    maxX = pt_pair[1].x;
+    maxY = pt_pair[1].y;
+    unsortedBottomPoints = quicksortVectorByY(points);
+    topLineIndex = getTopLineIndex(minY, 0, unsortedBottomPoints);
+    echo("top Line Index is ", topLineIndex);
+
     horizontalSize = sortedByXPoints[0][0] - sortedByXPoints[1][0];
     verticalSide = sortedByYPoints[0][1] - sortedByYPoints[1][1];
     echo("horizontalSize is ", horizontalSize);
