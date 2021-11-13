@@ -35,6 +35,87 @@ module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nut
                 hollowOut(moduleWidth, moduleLength, moduleHeight);
                 leftEar(moduleWidth, moduleLength, moduleHeight);
                 perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutRecess);
+                    rightEar();
+                    //strangePlate();
+                }
+                pinsPath();
+                translate([moduleWidth - wallThickness - (wallThickness - pinDepth), 0, 0]) pinsPath();
+                hollowOut();
+                leftEar();
+            }
+            rodAlcoves();
+        }
+        threadedRods();
+    }
+}
+
+module hollowOut() {
+    union() {
+        translate([wallThickness, - wallThickness, - .1]) cube([moduleWidth - 2 * wallThickness, moduleLength + 10,
+                moduleHeight + 1]);
+        // Let's remove a big cube from left to right
+        translate([- 0.1, rodSurroundingDiameter + rodEarDistanceFromSide, rodSurroundingDiameter + surroundingDiameter
+            + pinSize.x]
+        ) cube([moduleWidth * 1.1, moduleLength - 2 *
+            wallThickness - rodSurroundingDiameter - rodEarDistanceFromSide, moduleHeight - rodSurroundingDiameter -
+                wallThickness * 2 - pinSize.x]);
+    }
+}
+
+module pinsPath() {
+    translate([wallThickness - pinDepth, 0, radius + sizeOfEars]) rotate([90, 0, 90]) platePath(pathRadius, moduleLength
+        - rodSurroundingDiameter * 4,
+    wallThickness, pinSize.x, pinDepth);
+}
+
+module rodAlcoves() {
+    rodAlcove();
+    translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2), 0]) rodAlcove();
+    translate([0, moduleLength - (threadedRodDiameter + surroundingDiameter * 2), moduleHeight - (threadedRodDiameter +
+            surroundingDiameter * 2)]) rodAlcove();
+}
+
+module rodAlcove() {
+    translate([0, (threadedRodDiameter + surroundingDiameter * 2) / 2, (threadedRodDiameter + surroundingDiameter * 2) /
+        2])
+        rotate([90, 0, 90])
+            union() {
+                difference() {
+                    cylinder(d = threadedRodDiameter + surroundingDiameter * 2, h = moduleWidth, $fn = 100);
+                    threadedRod();
+                }
+                //metric_nut(size = threadedRodDiameter, hole = false);
+            }
+}
+
+module threadedRods() {
+    union() {
+        translate([- moduleWidth * .1, (threadedRodDiameter + surroundingDiameter * 2) / 2, (threadedRodDiameter +
+                surroundingDiameter * 2) / 2])
+            rotate([90, 0, 90])
+                threadedRod();
+        translate([- moduleWidth * .1, moduleLength - (threadedRodDiameter + surroundingDiameter * 2) / 2, (
+            threadedRodDiameter +
+                surroundingDiameter * 2) / 2])
+            rotate([90, 0, 90])
+                threadedRod();
+        translate([- moduleWidth * .1, moduleLength - (threadedRodDiameter + surroundingDiameter * 2) / 2, moduleHeight
+            - (threadedRodDiameter + surroundingDiameter * 2) / 2])            rotate([90, 0, 90])
+            threadedRod();
+    }
+}
+
+module threadedRod() {
+    cylinder(d = threadedRodDiameterHole, h = moduleWidth * 1.2, $fn = 100);
+}
+
+module leftEar() {
+    translate([- moduleWidth, 0, 0]) color("red") {
+        translate([moduleWidth, rodEarDistanceFromSide, moduleHeight - rodEarDistanceFromSide]) rotate(a = 90, v
+        = [0, 1, 0]) {
+            difference() {
+                scale([1.1, 1.1, 1.1])earLobe();
+                scale([0.9, 0.9, 0.9])earInternals();
             }
             rodAlcoves(moduleWidth, moduleLength, moduleHeight);
             if (rearDovetails) {
@@ -170,10 +251,17 @@ module ear(moduleWidth, moduleLength, moduleHeight) {
     }
 }
 
-module earInternals(moduleWidth, moduleLength, moduleHeight) {
-    translate([0, 0, - wallThickness]) cylinder(h = rodEarHeight + wallThickness + 1, d = threadedRodDiameter, $fn = 100
+module earInternals(moduleWidth, moduleLength, moduleHeight) {    translate([0, 0, - wallThickness]) cylinder(h = rodEarHeight + wallThickness + 1, d = threadedRodDiameter, $fn = 100
     );
 }
+
+module ear() {
+    difference() {
+        earLobe();
+        earInternals();
+    }
+}
+
 
 module earLobe(moduleWidth, moduleLength, moduleHeight) {
     cylinder(h = rodEarHeight * .8, d = rodSurroundingDiameter, $fn = 100);
@@ -188,7 +276,6 @@ module strangePlate() {
         }
     }
 }
-
 
 module maleDovetails(width) {
     translate([0,-dovetailHeight,0]) union() {
