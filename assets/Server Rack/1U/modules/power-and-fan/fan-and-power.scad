@@ -3,6 +3,15 @@ include <../module-dimensions.scad>
 include <../fan/noctua-dimensions.scad>
 include <../fan/noctua.scad>
 include <../dovetails/dovetails.scad>
+/*include <NopSCADlib/core.scad>
+include <NopSCADlib/vitamins/fans.scad>
+include <NopSCADlib/printed/fan_guard.scad>
+
+use <NopSCADlib/utils/layout.scad>
+fan40x20 = [40, 20, 37, 16,    M3_dome_screw, 25,   7.5,100, 9, 0,   undef];
+*/
+//fan_assembly(type, thickness, include_fan = true, screw = false, full_depth = false)
+//fan_assembly(fan40x20, 0 + fan_guard_thickness(), include_fan = true, screw = false);
 
 //fanAndPowerEnclosure(moduleWidth, fanEnclosureLength, moduleHeight);
 //fanModule(moduleWidth, fanEnclosureLength, moduleHeight);
@@ -13,13 +22,14 @@ module fanAndPowerEnclosure(moduleWidth, fanEnclosureLength, moduleHeight) {
         difference() {
             union() {
                 color("OliveDrab") maleDovetails(moduleWidth);
-                // il faut que tu calcules la largeur de l'harbess, puisque tout dépend de ça...
+                // il faut que tu calcules la largeur de l'harness, puisque tout dépend de ça...
                 // aussi bien pour déplacer le harness, que de faire un trou pour le loger
                 fanAndPowerModule(moduleWidth, fanEnclosureLength, moduleHeight);
             }
             //translate([wallThickness, - fanAndHarnessDepth + fanScrewHoleSize - 2.2, 0]) fanHarnessEraser();
             //translate(centeredFanTranslationBehindTheEnclosure) fan();
-            translate([wallThickness, fanAndHarnessDepth - 1.5 * fanDepth, 0]) color("blue") linear_extrude(height = moduleHeight) projection() fanHarness(false);
+            translate([wallThickness, fanAndHarnessDepth - 1.5 * fanDepth, 0]) color("blue") linear_extrude(height =
+            moduleHeight) projection() fanHarness(false);
 
         }
         //translate([wallThickness + 3, fanEnclosureLength - fanDepth, 3]) fan();
@@ -29,6 +39,7 @@ module fanAndPowerEnclosure(moduleWidth, fanEnclosureLength, moduleHeight) {
 }
 
 module fanHarness(makeHoles = true) {
+    echo("In fanHarness, makesHoles is ", makeHoles);
     /*translate([65, 0, 0])*/
     /* translate([moduleWidth - wallThickness, 0, 0])*/
     /*translate([fanAndHarnessWidth,0,0])*/
@@ -37,8 +48,12 @@ module fanHarness(makeHoles = true) {
             translate([fanVerticalReinforcementWidth, fanVerticalReinforcementDepth * dovetailMaleToFemaleRatio,
                 0])
                 rotate([0, 0, 180])  difference() {
-                    fanVerticalReinforcements(moduleWidth, makeHoles);
-                    translate([- fanVerticalReinforcementWidth * 2, 0, 0]) fanScrewHoles();
+                    union() {
+                        fanVerticalReinforcements(moduleWidth, makeHoles);
+                        //translate([0,0,0]) fan();
+                        /*translate(- centeredFanTranslation)
+                            fanScrewHoles();*/
+                    }
                 }
 }
 
@@ -52,21 +67,21 @@ module fanHarnessEraser() {
 module fanAndPowerModule(moduleWidth, fanEnclosureLength, moduleHeight) {
     //echo("In fanAndPowerModule, )
     color("OliveDrab")
-        translate([0, dovetailHeight, 0])
-        union() {
-            difference() {
-                union() {
-                    basicModule(moduleWidth, fanEnclosureLength, moduleHeight, false, false);
+        translate([0, 0, 0])
+            union() {
+                difference() {
+                    union() {
+                        basicModule(moduleWidth, fanEnclosureLength, moduleHeight, false, false);
 
+                    }
+                    // Hollow out so that we dont get a threaded rod insert that blocks the fan bottom
+                    //hollowOutFanAndPowerModule(moduleWidth, fanEnclosureLength, moduleHeight);
+                    // We need the threaded rod path to clear the whole rodEarDistanceFromSide
+                    fanPerpendicularRodAlcoves(moduleWidth, fanEnclosureLength, moduleHeight, false);
                 }
-                // Hollow out so that we dont get a threaded rod insert that blocks the fan bottom
-                //hollowOutFanAndPowerModule(moduleWidth, fanEnclosureLength, moduleHeight);
-                // We need the threaded rod path to clear the whole rodEarDistanceFromSide
-                fanPerpendicularRodAlcoves(moduleWidth, fanEnclosureLength, moduleHeight, false);
+                //eraseRodInsert();
+                //translate([0, 0, moduleHeight]) eraseRodInsert();
             }
-            //eraseRodInsert();
-            //translate([0, 0, moduleHeight]) eraseRodInsert();
-        }
 }
 
 module hollowOutFanAndPowerModule(moduleWidth, fanEnclosureLength, moduleHeight) {
