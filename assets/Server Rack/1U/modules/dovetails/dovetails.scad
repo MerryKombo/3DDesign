@@ -51,3 +51,16 @@ module mainDovetailEnclosureRightEar(moduleWidth, moduleLength, moduleHeight) {
         ]], paths = [[0, 1, 3, 2]], convexity = 1);
 }
 
+
+module maleDovetails(width) {
+    maleDovetail(width);
+    translate([0, 0, (moduleHeight - dovetailMaleToFemaleRatio * (dovetailEnclosureWidth + dovetailBaseMaxWidth))])
+        maleDovetail(width);
+}
+
+module maleDovetail(width) {
+    translate([width, dovetailHeight, dovetailMaleToFemaleRatio * dovetailEnclosureWidth]) rotate([180, 90, 0])
+        linear_extrude(height =
+        width)  scale([dovetailMaleToFemaleRatio, dovetailMaleToFemaleRatio])
+            mainDovetailEnclosureDovetail();
+}

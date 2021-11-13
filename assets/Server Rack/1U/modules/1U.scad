@@ -8,14 +8,15 @@ include <power-and-fan/fan-and-power.scad>
 module oneU() {
     oneModuleJustForFun();
     // color("DarkKhaki") translate([(moduleWidth - fanEnclosureWidth) / 2, moduleLength, 0]) fanEnclosure();
-    translate([0, moduleLength + dovetailHeight/*+ fanEnclosureLength*/, 0]) fanAndPowerEnclosure(moduleWidth,
+    translate([0, moduleLength /*+ fanEnclosureLength+ dovetailHeight*/, 0]) fanAndPowerEnclosure(moduleWidth,
     fanEnclosureLength, moduleHeight);
 }
 
 module oneModuleJustForFun() {
     /*translate([- moduleWidth * 1.1, 0, 0]) */ basicModule(moduleWidth, moduleLength, moduleHeight);
-    translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])
-        rotate([90, 0, 0]) sliderWithPins();
+    /*color("red") translate([wallThickness, rodSurroundingDiameter + surroundingDiameter, threadedRodDiameter + .6])
+        rotate([90, 0, 0])
+            sliderWithPins();*/
 }
 
 module printBitsForChecking() {

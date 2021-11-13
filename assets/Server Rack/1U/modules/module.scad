@@ -17,7 +17,7 @@ module perpendicularRodAlcoves(moduleWidth, moduleLength, moduleHeight, nutReces
     translate([moduleWidth, 0, 0]) perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutRecess);
 }
 
-module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nutRecess = true, rearDovetails=true, frontDovetails=false) {
+module basicModule(moduleWidth, moduleLength, moduleHeight, pinsPath = true, nutRecess = true) {
     echo("In basicModule, nutRecess is ", nutRecess);
     difference() {
         union() {
@@ -118,13 +118,7 @@ module leftEar() {
                 scale([0.9, 0.9, 0.9])earInternals();
             }
             rodAlcoves(moduleWidth, moduleLength, moduleHeight);
-            if (rearDovetails) {
-                moduleDovetails(moduleWidth, moduleLength, moduleHeight);
-            }
-            if (frontDovetails) {
-                echo("You asked for front dovetails, here you go!");
-                maleDovetails(moduleWidth);
-            }
+            moduleDovetails(moduleWidth, moduleLength, moduleHeight);
         }
         threadedRods(moduleWidth, moduleLength, moduleHeight);
     }
@@ -177,7 +171,6 @@ module rodAlcove(moduleWidth, moduleLength, moduleHeight) {
 
 module perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles = true) {
     echo("In perpendicularRodAlcove, nutHoles is ", nutHoles);
-    echo("In perpendicularRodAlcove, moduleLength is ", moduleLength);
     translate([0, moduleLength + 2 * rodSurroundingDiameter + threadedRodDiameter, threadedRodDiameter * 2 + 2 *
         surroundingDiameter])
         rotate([90, 0, 0])
@@ -191,14 +184,11 @@ module perpendicularRodAlcove(moduleWidth, moduleLength, moduleHeight, nutHoles 
                         m5NutScalingRatio]) metric_nut(size = threadedRodDiameter, hole = false);
                 } else {
                     echo("No need to worry, nutHoles is ", nutHoles);
-                    // Let's make a longer hole, then, as we don't have a nut, we believe we need a traversing threaded rod
-                    perpendicularThreadedRod(moduleWidth, moduleLength * 2, moduleHeight);
                 }
             }
 }
 
 module perpendicularThreadedRod(moduleWidth, moduleLength, moduleHeight) {
-    echo("In perpendicularThreadedRod, module Length is ", moduleLength);
     cylinder(d = threadedRodDiameterHole, h = moduleLength, $fn = 100);
 }
 
@@ -275,19 +265,4 @@ module strangePlate() {
             translate(p) cylinder(r = radius, h = height);
         }
     }
-}
-
-module maleDovetails(width) {
-    translate([0,-dovetailHeight,0]) union() {
-        maleDovetail(width);
-        translate([0, 0, (moduleHeight - dovetailMaleToFemaleRatio * (dovetailEnclosureWidth + dovetailBaseMaxWidth))])
-            maleDovetail(width);
-    }
-}
-
-module maleDovetail(width) {
-    translate([width, dovetailHeight, dovetailMaleToFemaleRatio * dovetailEnclosureWidth]) rotate([180, 90, 0])
-        linear_extrude(height =
-        width)  scale([dovetailMaleToFemaleRatio, dovetailMaleToFemaleRatio])
-            mainDovetailEnclosureDovetail();
 }
