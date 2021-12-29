@@ -104,6 +104,14 @@ function maxInVector(v, m = - 999999999999, i = 0, maxX = true, maxY = false) =
     ?    maxInVector(v, m, i + 1, maxX, maxY)
     :    maxInVector(v, maxX? v[i].x:maxY?v[i].y:v[i].x, i + 1, maxX, maxY);
 
+// find the minimum value in a vector
+function minInVector(v, m = 999999999999, i = 0, minX = true, minY = false) =
+    (i == len(v))
+    ?     m
+    :     (m < (minX? v[i].x:minY?v[i].y:v[i].x))
+    ?    minInVector(v, m, i + 1, minX, minY)
+    :    minInVector(v, minX? v[i].x:minY?v[i].y:v[i].x, i + 1, minX, minY);
+
 // input : list of points
 // output : sorted by x vector of points
 function quicksortVectorByX(vec) = !(len(vec) > 0) ? [] : let(
@@ -463,13 +471,35 @@ module link_harness_to_bracket(points, thickness, height) {
 }
 
 module horizontalLink(height, thickness, horizontalLength) {
-    color("black")  translate([0, holeSize / 2, height * 2]) rotate([270, 0, 0])cylinder(h = horizontalLength, r =
+    color("black")  translate([0, holeSize / 2, height * 2]) rotate([270, 0, 0]) cylinder(h = horizontalLength, r =
         thickness / 2, center = false, $fn = 100);
 }
 
 module  verticalLink(height, thickness, verticalLength) {
-    color("white") translate([holeSize / 2, - 0, height * 2]) rotate([0, 90, 0])cylinder(h = verticalLength, r =
+    color("white") translate([holeSize / 2, - 0, height * 2]) rotate([0, 90, 0]) cylinder(h = verticalLength, r =
         thickness / 2, center = false, $fn = 100);
+}
+
+module earsForScrewingIntoAPlank(points, thickness, height, baseSize, baseHeight, totalHeight) {
+    //new_mesh_link(points, thickness, height, number);
+    maxYPoint = maxInVector(points, maxX = false, maxY = true);
+    minYPoint = minInVector(points, minX = false, minY = true);
+    maxXPoint = maxInVector(points, maxX = true, maxY = false);
+    minXPoint = minInVector(points, minX = true, minY = false);
+    leftScrewPoint = [minXPoint - lengthFromBoardHarnessToEars, (maxYPoint - minYPoint) / 2, 0];
+    rightScrewPoint = [maxXPoint + lengthFromBoardHarnessToEars, (maxYPoint - minYPoint) / 2, 0];
+    pointsWithEars = concat(points, [leftScrewPoint], [rightScrewPoint]);
+    echo("Points with ears ", pointsWithEars);
+    difference() {
+        union() {
+            new_link_everyone(pointsWithEars, thickness, height);
+            translate(leftScrewPoint) bracket_foot(leftScrewPoint, earsHoleDiameter, baseSize, baseHeight, totalHeight);
+            translate(rightScrewPoint) bracket_foot(rightScrewPoint, earsHoleDiameter, baseSize, baseHeight, totalHeight
+            );
+        }
+        translate(rightScrewPoint) cylinder(d = earsHoleDiameter, h = lengthFromBoardHarnessToEars, $fn = 100);
+        translate(leftScrewPoint) cylinder(d = earsHoleDiameter, h = lengthFromBoardHarnessToEars, $fn = 100);
+    }
 }
 
 // Function: combinations()

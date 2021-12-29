@@ -2,7 +2,7 @@ use <1U.scad>
 include <ears.scad>
 use <power-module/power-supply.scad>
 include <power-module/power-supply-dimensions.scad>
-include <fan/noctua-dimensions.scad>
+include <fans/sunon-pf40281bx-d060-s99-dimensions.scad>
 use <switch-module/8-ports-gigabit-switch.scad>
 use <switch-module/8-ports-fast-ethernet-switch.scad>
 

@@ -3,7 +3,7 @@ include <../module.scad>
 include <../switch-module/8-ports-gigabit-switch-dimensions.scad>
 include <../../boards/8-ports-gigabit-switch.scad>
 
-eightPortsGigabitSwitchModule(true);
+eightPortsGigabitSwitchModule(false);
 //eightPortsGigabitSwitchPCB();
 
 module eightPortsGigabitSwitchModule(displayPCB = false) {

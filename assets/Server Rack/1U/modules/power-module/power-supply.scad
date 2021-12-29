@@ -19,7 +19,9 @@ include <../../utils/hexgrid.scad>
 
 include <scallop.scad>
 
-powerSupplyModule(hiveWall = false, iec = false, psu = false, blower = false, cleanup = false);
+powerSupplyModule(hiveWall = true, iec = true, psu = true, blower = true, cleanup = true);
+//powerSupplyModule(hiveWall = false, iec = false, psu = false, blower = false, cleanup = true);
+//powerSupplyModule(iec = true, psu = true, blower = true);
 
 module powerSupplyModule(hiveWall = true, iec = false, psu = false, blower = false, cleanup = true) {
     //echo("IEC body width is : ", iecBodyWidth);
@@ -66,12 +68,27 @@ module powerSupplyModule(hiveWall = true, iec = false, psu = false, blower = fal
 
         }*/
             // The bottom
-            cube([psuModuleWidth * moduleWidth, psuModuleLength, basePlateThickness]);
+            hull() {
+                maxBlowerSize = blower_width(powerSupplyModuleBlower) > blower_length(powerSupplyModuleBlower)?
+                    blower_width
+                    (powerSupplyModuleBlower): blower_length(powerSupplyModuleBlower);
+                echo("maxBlowerSize is ", maxBlowerSize);
+                powerSupplyBottom(1.05 * (powerSupplyWidth), psuModuleLength, basePlateThickness);
+                // The base plate for the blower fan
+                translate([1.05 * (powerSupplyWidth), psuModuleLength - (maxBlowerSize + rodSurroundingDiameter +
+                    surroundingDiameter), 0])
+                    powerSupplyBottom(maxBlowerSize + surroundingDiameter + rodSurroundingDiameter, maxBlowerSize +
+                        surroundingDiameter + rodSurroundingDiameter, basePlateThickness);
+            }
         }
         if (cleanup) {
             cleanUpTopAndBottom();
         }
     }
+}
+
+module powerSupplyBottom(width, length, thickness = basePlateThickness) {
+    cube([width, length, thickness]);
 }
 
 module cleanUpTopAndBottom() {
@@ -110,10 +127,10 @@ module blowerScallopedVent(hole = true) {
         /*wallThickness + powerSupplyWidth * 1.05, psuModuleLength - (rodSurroundingDiameter +
         surroundingDiameter),
             moduleHeight - surroundingDiameter * 2]*/
-        color("black") translate([wallThickness + powerSupplyWidth * 1.05 + size.x - surroundingDiameter,
+        /*color("red") translate([wallThickness + powerSupplyWidth * 1.05 + size.x - surroundingDiameter,
                 psuModuleLength - size.y / 2, surroundingDiameter + rodSurroundingDiameter]) rotate([90, 0, 180]) cube(
         size = [size.x - 2 * surroundingDiameter, moduleHeight - 2 * (surroundingDiameter + rodSurroundingDiameter),
-            size.y], center = false);
+            size.y], center = false);*/
     } else {
         translate([wallThickness + powerSupplyWidth * 1.05 - surroundingDiameter,
                 psuModuleLength - (surroundingDiameter + rodSurroundingDiameter), surroundingDiameter +
