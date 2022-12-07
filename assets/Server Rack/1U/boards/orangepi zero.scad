@@ -6,24 +6,26 @@ use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
 
-
+/*
 orangepi_zero_feet();
 translate(size) orangepi_zero_bracket();
 translate(size) translate(size) orangepi_zero_drilling_template();
 translate(size) translate(size) translate(size) orangepi_zero_dimensions_verifier();
-translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) orangepi_zero_hotShoe_adapters();
-translate([- size.x, size.y, size.z]) orangepi_zero_vertical_bracket();
+translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) orangepi_zero_hotShoe_adapters();*/
+translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) translate(size)
+    orangepi_zero_screw_on_plank();
+/*translate([- size.x, size.y, size.z]) orangepi_zero_vertical_bracket();*/
 
 module orangepi_zero_feet() {
-    feet_feet(feet,holeSize, baseSize, baseHeight, totalHeight) ;
+    feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
 module orangepi_zero_bracket() {
     bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
 }
-    
+
 module orangepi_zero_drilling_template() {
-   drillTemplate(feet, holeSize, drillTemplateThickness, drillTemplateGuideHeight);
+    drillTemplate(feet, holeSize, drillTemplateThickness, drillTemplateGuideHeight);
 }
 
 module orangepi_zero_dimensions_verifier() {
@@ -58,7 +60,7 @@ module orangepi_zero_hotShoe_adapter_vertical() {
     // How much of the board will go past the X holes?
     xOverHang = abs(size.x - (xMiddle * 2));
 
-    translate([1, 15,hotShoeHeightClearance*2]) orangepi_zero_vertical_bracket();
+    translate([1, 15, hotShoeHeightClearance * 2]) orangepi_zero_vertical_bracket();
 }
 
 module orangepi_zero_hotShoe_adapter_vertical_90_degrees() {
@@ -69,7 +71,7 @@ module orangepi_zero_hotShoe_adapter_vertical_90_degrees() {
     // How much of the board will go past the X holes?
     xOverHang = abs(size.x - (xMiddle * 2));
 
-    translate([-15, 2,hotShoeHeightClearance*2]) rotate([0,0,90])orangepi_zero_vertical_bracket();
+    translate([- 15, 2, hotShoeHeightClearance * 2]) rotate([0, 0, 90])orangepi_zero_vertical_bracket();
 }
 
 module orangepi_zero_vertical_bracket() {
@@ -83,4 +85,11 @@ module orangepi_zero_vertical_bracket() {
 module orangepi_zero_hotShoe_adapter_base() {
     hotshoe_adapter(1);
     color("silver") hotshoe_adapter(hotShoeHeightClearance, true);
+}
+
+module orangepi_zero_screw_on_plank() {
+    union() {
+        orangepi_zero_bracket();
+        earsForScrewingIntoAPlank(feet, linkThickness, linkHeight, baseSize, baseHeight, totalHeight);
+    }
 }
