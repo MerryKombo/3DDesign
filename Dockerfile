@@ -22,9 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     imagemagick \
     openscad \
     python3 \
+    python3-pip \
     xauth \
     xvfb \
     && ln -s /usr/bin/python3 /usr/bin/python \
+    && pip install colorama codespell markdown \
     && rm -rf /var/lib/apt/lists/* 
 
 # VOLUME directive must happen after setting up permissions and content
