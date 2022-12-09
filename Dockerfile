@@ -29,6 +29,9 @@ VOLUME "${OPENSCAD_AGENT_HOME}" "/tmp" "/run" "/var/run"
 WORKDIR "${OPENSCAD_AGENT_HOME}"
 
 ENV LANG='C.UTF-8' LC_ALL='C.UTF-8'
+ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scripts:${PATH}"
+
+RUN echo "PATH=${PATH}" >> /etc/environment
 
 USER ${user}
 
