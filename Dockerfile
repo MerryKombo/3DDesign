@@ -46,6 +46,10 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
 # Install NOPSCAD Library
     && git clone https://github.com/nophead/NopSCADlib.git \
 # Install Bolts Library
-    && curl -L https://github.com/boltsparts/BOLTS_archive/releases/download/v0.4.1/boltsfc_0.4.1.tar.gz | tar xz
+    && curl -L https://github.com/boltsparts/BOLTS_archive/releases/download/v0.4.1/boltsfc_0.4.1.tar.gz | tar xz \
+# Install Threads Library \
+    && git clone https://github.com/rcolyer/threads-scad.git \
+# Install funcutils Library \
+    && git clone https://github.com/thehans/funcutils.git
 # Install OpenSCAD-Utils Library
 #    && git clone
