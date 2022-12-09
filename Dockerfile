@@ -34,4 +34,6 @@ USER ${user}
 
 # Install BOSL2 Library
 RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
-    && git clone https://github.com/revarbat/BOSL2.git
+    && git clone https://github.com/revarbat/BOSL2.git \
+# Install NOPSCAD Library
+    && git clone https://github.com/nophead/NopSCADlib.git
