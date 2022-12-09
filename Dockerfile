@@ -50,6 +50,6 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
 # Install Threads Library \
     && git clone https://github.com/rcolyer/threads-scad.git \
 # Install funcutils Library \
-    && git clone https://github.com/thehans/funcutils.git
-# Install OpenSCAD-Utils Library
-#    && git clone
+    && git clone https://github.com/thehans/funcutils.git \
+# Install dotSCAD Library
+    && git clone https://github.com/JustinSDK/dotSCAD.git
