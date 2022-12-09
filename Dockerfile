@@ -5,5 +5,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg \
     openscad \
+    xauth \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
