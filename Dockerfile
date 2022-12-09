@@ -25,8 +25,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     xauth \
     xvfb \
+    # Some openSCAD libraries need python
     && ln -s /usr/bin/python3 /usr/bin/python \
+    # Some openSCAD libraries need pip
     && pip install colorama codespell markdown \
+    # Install gh CLI
+    && type -p curl >/dev/null || apt install curl -y \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt update \
+    && apt install gh -y  \
+    # Cleanup
     && rm -rf /var/lib/apt/lists/* 
 
 # VOLUME directive must happen after setting up permissions and content
@@ -58,3 +68,6 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     # find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png
     # and
     # find . -type f -name "*scad" -print0 | xargs -I{} --null openscad {} -o {}.stl
+    # create a new branch (or check if exists) thanks to gh cli, and move only the binary files while keeping the same directory structure
+    # rsync -rv --include '*/' --include '*.js' --exclude '*' --prune-empty-dirs Source/ Target/
+    # found there: https://unix.stackexchange.com/a/230536/488327
