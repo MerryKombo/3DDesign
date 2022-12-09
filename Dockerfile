@@ -17,6 +17,7 @@ RUN groupadd -g ${gid} ${group} \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    git \
     gnupg \
     openscad \
     xauth \
