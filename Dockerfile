@@ -44,4 +44,8 @@ USER ${user}
 RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && git clone https://github.com/revarbat/BOSL2.git \
 # Install NOPSCAD Library
-    && git clone https://github.com/nophead/NopSCADlib.git
+    && git clone https://github.com/nophead/NopSCADlib.git \
+# Install Bolts Library
+    && curl -L https://github.com/boltsparts/BOLTS_archive/releases/download/v0.4.1/boltsfc_0.4.1.tar.gz | tar xz
+# Install OpenSCAD-Utils Library
+#    && git clone
