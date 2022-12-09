@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gnupg \
     openscad \
+    python3 \
     xauth \
     xvfb \
     && rm -rf /var/lib/apt/lists/* 
