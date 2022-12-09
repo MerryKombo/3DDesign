@@ -53,3 +53,8 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && git clone https://github.com/thehans/funcutils.git \
 # Install dotSCAD Library
     && git clone https://github.com/JustinSDK/dotSCAD.git
+
+# And then... \
+    # find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png
+    # and
+    # find . -type f -name "*scad" -print0 | xargs -I{} --null openscad {} -o {}.stl
