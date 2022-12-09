@@ -31,3 +31,7 @@ WORKDIR "${OPENSCAD_AGENT_HOME}"
 ENV LANG='C.UTF-8' LC_ALL='C.UTF-8'
 
 USER ${user}
+
+# Install BOSL2 Library
+RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
+    && git clone https://github.com/revarbat/BOSL2.git
