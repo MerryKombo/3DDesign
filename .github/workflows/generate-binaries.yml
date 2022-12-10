@@ -34,4 +34,4 @@ jobs:
       - name: generate-binaries
         shell: bash
         run: |
-          cd /tmp && generate-binaries.sh
+          cd /home/openscad/projects/ && generate-binaries.sh
