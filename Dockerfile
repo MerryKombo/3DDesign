@@ -7,6 +7,8 @@ ARG gid=1000
 
 ARG OPENSCAD_AGENT_HOME=/home/${user}
 
+# Create a volume to link to the current project
+
 COPY scripts/*.sh /usr/local/bin/
 
 RUN groupadd -g ${gid} ${group} \
