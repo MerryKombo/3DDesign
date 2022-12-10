@@ -71,6 +71,9 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
 # Install dotSCAD Library
     && git clone https://github.com/JustinSDK/dotSCAD.git && cd dotSCAD && mv src/* . && rm -rf src
 
+# TODO
+# Create a entrypoint script to start the default parsing/rendering process
+
 # And then... \
     # find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png
     # and
