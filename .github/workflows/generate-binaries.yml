@@ -21,9 +21,11 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed -e 's#/#-#g')"
         id: extract_branch
+    outputs:
+      branch-name: ${{ steps.extract_branch.outputs.branch }}
   generate-binaries:
     needs: generate-branch-name
-    runs-on: gounthar/openscad:${{ steps.extract_branch.outputs.branch }}
+    runs-on: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
     steps:
       - name: generate-binaries
         shell: bash
