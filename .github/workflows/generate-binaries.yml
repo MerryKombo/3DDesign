@@ -1,0 +1,31 @@
+name: Generate PNG images and STL files from 3D models
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches: [ '*' ]
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Will build everyday at 4:30 and 16:30
+    - cron:  '30 4,16 * * *'
+
+jobs:
+  generate-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed -e 's#/#-#g')"
+        id: extract_branch
+  generate-binaries:
+    needs: generate-branch-name
+    runs-on: gounthar/openscad:${{ steps.extract_branch.outputs.branch }}
+    steps:
+      - name: generate-binaries
+        shell: bash
+        run: |
+          find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png

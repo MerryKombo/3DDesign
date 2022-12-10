@@ -71,3 +71,4 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     # create a new branch (or check if exists) thanks to gh cli, and move only the binary files while keeping the same directory structure
     # rsync -rv --include '*/' --include '*.js' --exclude '*' --prune-empty-dirs Source/ Target/
     # found there: https://unix.stackexchange.com/a/230536/488327
+    # to create the branch with gh, get inspiration from MyFirstAndroidAppBuiltWithJenkins
