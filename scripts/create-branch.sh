@@ -2,7 +2,7 @@
 
 # create a new branch (or check if exists) thanks to gh cli
 
-echo "$GITHUB_CREDENTIALS_PSW" | gh auth login --with-token
+echo "$GH_CREDENTIALS_PSW" | gh auth login --with-token
 # Get current branch name
 branch_name=$GIT_BRANCH
 echo "Working on branch $branch_name for repo $GIT_URL"
