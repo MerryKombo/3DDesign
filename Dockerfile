@@ -7,12 +7,16 @@ ARG gid=1000
 
 ARG OPENSCAD_AGENT_HOME=/home/${user}
 
+COPY scripts/*.sh /usr/local/bin/
+
 RUN groupadd -g ${gid} ${group} \
     && useradd -d "${OPENSCAD_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}" \
     # Prepare subdirectories
     && mkdir -p "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     # Make sure that user 'openscad' own these directories and their content
-    && chown -R "${uid}":"${gid}" "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/
+    && chown -R "${uid}":"${gid}" "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
+    # Change scripts permissions
+    && chmod +x /usr/local/bin/*.sh
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
