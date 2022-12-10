@@ -14,7 +14,7 @@ COPY scripts/*.sh /usr/local/bin/
 RUN groupadd -g ${gid} ${group} \
     && useradd -d "${OPENSCAD_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}" \
     # Prepare subdirectories
-    && mkdir -p "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ "${OPENSCAD_AGENT_HOME}"/project \
+    && mkdir -p "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ "${OPENSCAD_AGENT_HOME}"/projects \
     # Make sure that user 'openscad' own these directories and their content
     && chown -R "${uid}":"${gid}" "${OPENSCAD_AGENT_HOME}" "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     # Change scripts permissions
@@ -47,8 +47,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* 
 
 # VOLUME directive must happen after setting up permissions and content
-VOLUME "${OPENSCAD_AGENT_HOME}" "/tmp" "/run" "/var/run" "${OPENSCAD_AGENT_HOME}"/project
-WORKDIR "${OPENSCAD_AGENT_HOME}"/project
+VOLUME "${OPENSCAD_AGENT_HOME}" "/tmp" "/run" "/var/run" "${OPENSCAD_AGENT_HOME}"/projects
+WORKDIR "${OPENSCAD_AGENT_HOME}"/projects
 
 ENV LANG='C.UTF-8' LC_ALL='C.UTF-8'
 ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scripts:${PATH}"
