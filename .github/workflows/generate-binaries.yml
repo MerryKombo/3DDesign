@@ -34,4 +34,4 @@ jobs:
       - name: generate-binaries
         shell: bash
         run: |
-          find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad --imgsize=4096,2160 {} -o {}.png
+          cd /tmp && generate-binaries.sh
