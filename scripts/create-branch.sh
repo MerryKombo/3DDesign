@@ -8,5 +8,5 @@ branch_name=$GIT_BRANCH
 echo "Working on branch $branch_name for repo $GIT_URL"
 new_branch_name="binaries-for-$branch_name"
 git config --global user.email "116569+gounthar@users.noreply.github.com"
-git config --global user.name "$GITHUB_CREDENTIALS_USR"
+git config --global user.name "$GH_CREDENTIALS_PSW"
 git switch -c "${new_branch_name}" -m
