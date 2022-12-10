@@ -29,7 +29,6 @@ jobs:
     env:
       BRANCH_NAME: ${{ needs.generate-branch-name.outputs.branch-name }}
       GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
-      GIT_BRANCH: $(echo ${GITHUB_REF_NAME})
     container:
       image: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
       volumes:
