@@ -26,6 +26,9 @@ jobs:
   generate-binaries:
     needs: generate-branch-name
     runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.branch-name }}
+      GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
     container:
       image: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
       volumes:
