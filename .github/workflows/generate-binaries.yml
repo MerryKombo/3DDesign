@@ -37,4 +37,5 @@ jobs:
       - name: generate-binaries
         shell: bash
         run: |
+          echo $BRANCH_NAME
           cd /home/openscad/projects/ && generate-binaries.sh
