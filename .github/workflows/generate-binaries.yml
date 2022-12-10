@@ -25,7 +25,11 @@ jobs:
       branch-name: ${{ steps.extract_branch.outputs.branch }}
   generate-binaries:
     needs: generate-branch-name
-    runs-on: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
+    runs-on: ubuntu-latest
+    container:
+      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
+      volumes:
+        - ${{ github.workspace }}:/tmp
     steps:
       - name: generate-binaries
         shell: bash
