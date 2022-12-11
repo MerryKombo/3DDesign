@@ -2,6 +2,7 @@ use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
 use <../Server Rack/1U/boards/orangepi zero dimensions.scad>
 use <../Server Rack/1U/boards/khadas vim3L dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
+use <openscad-extra/torus.scad>
 
 opiZeroFeet = [[0, 0, 0], [42.11, 0, 0], [0, 40.11, 0], [42.11, 40.11, 0]];
 opiZeroSize = [48, 46, 2];
@@ -19,3 +20,6 @@ translate([0, 0, mpiMQProSize.x]) rotate([90, 90, 90]) board(mpiMQProSize, mpiMQ
 translate([kvim3LSize.x, 0, kvim3LSize.x]) rotate([90, 90, 90]) board(kvim3LSize, kvim3LFeet, kvim3LHoleSize);
 translate([kvim3LSize.x, kvim3LSize.x, mpiMQProSize.x]) rotate([0, 90, 90]) board(mpiMQProSize, mpiMQProFeet,
 mpiMQProHoleSize);
+
+firstCircleHeight = min([opiZeroFeet[3].y, mpiMQProFeet[3].y, kvim3LFeet[3].y]);
+torus(r1=5, r2=60, angle=360, endstops=0, $fn=100);
