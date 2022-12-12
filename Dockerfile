@@ -70,11 +70,11 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
 # Install funcutils Library \
     && git clone https://github.com/thehans/funcutils.git \
 # Install dotSCAD Library
-    && git clone https://github.com/JustinSDK/dotSCAD.git && cd dotSCAD && rm -frv !("src") && mv src/* . \
-    && rm -rf src \
-# Install openscad-extra library \
-    && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && rm -frv !("src") \
-    && mv src/* . && rm -rf src
+    && git clone https://github.com/JustinSDK/dotSCAD.git && cd dotSCAD && for dir in *; do [ "$dir" = "src" ] \
+    && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
+# Install openscad-extra library
+    && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && for dir in *; do [ "$dir" = "src" ] \
+    && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src
 
 # TODO
 # Create a entrypoint script to start the default parsing/rendering process
