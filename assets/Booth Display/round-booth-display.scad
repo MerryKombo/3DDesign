@@ -21,5 +21,9 @@ translate([kvim3LSize.x, 0, kvim3LSize.x]) rotate([90, 90, 90]) board(kvim3LSize
 translate([kvim3LSize.x, kvim3LSize.x, mpiMQProSize.x]) rotate([0, 90, 90]) board(mpiMQProSize, mpiMQProFeet,
 mpiMQProHoleSize);
 
-firstCircleHeight = min([opiZeroFeet[3].y, mpiMQProFeet[3].y, kvim3LFeet[3].y]);
-torus(r1=5, r2=60, angle=360, endstops=0, $fn=100);
+firstCircleHeight = min([(opiZeroSize.y - opiZeroFeet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (kvim3LSize.y
+    - kvim3LFeet[0].y) / 2]);
+echo("First circle height is ", firstCircleHeight);
+torusHeight = 5;
+translate(([0, 0, firstCircleHeight + torusHeight / 2]))
+    torus(r1 = torusHeight, r2 = 60, angle = 360, endstops = 0, $fn = 100);
