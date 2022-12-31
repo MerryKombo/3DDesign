@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     rsync \
+    unzip \
     xauth \
     xvfb \
     # Some openSCAD libraries need python
@@ -55,6 +56,11 @@ ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scri
 
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
+
+# Install fonts
+RUN cd /tmp && curl -O https://media.fontsgeek.com/download/zip/i/s/isonorm-3098-regular_s3NoJ.zip && unzip iso*zip && \
+    rm isonorm-3098-regular_s3NoJ.zip && cp Isonorm\ 3098\ Regular/Isonorm\ 3098\ Regular.otf /usr/local/share/fonts && \
+    rm -fr Isonorm\ 3098\ Regular/Isonorm
 
 USER ${user}
 
