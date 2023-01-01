@@ -1,6 +1,8 @@
-feet = [[0,0,0], [42.11,0,0], [0,40.11,0], [42.11,40.11,0]];
+feet = [[0,0,0], [93,0,0], [0,49,0], [93,49,0]];
 size = [100, 74, 2];
-holeSize = 3;
+// Top of the board, bottom of the board
+height = [19, 1];
+holeSize = 3.5;
 baseSize = 9;
 footSize = 5;
 baseHeight = 3;
