@@ -1,5 +1,5 @@
 include <../boards/starfive visionfive 2 dimensions.scad>
-
+include <NopSCADlib/lib.scad> 
 
 // Put a label on a third part, with two holes to screw on top of the box (or in front). Like a label on an old machine, in brass
 // Don't use hardcoded values, put everything into variables
@@ -31,11 +31,26 @@ module boardProtectiveBoxTop(size, feet, holeSize, height) {
 module boardProtectiveBoxBottom(size, feet, holeSize, height) {
     union() {
         difference() {
-            cube([size.x + xOffset, size.y + yOffset, size.z + height.y]);
+            cube([size.x + xOffset, size.y + yOffset, size.z + height.y*2]);
             translate([wallSize, wallSize, wallSize]) cube([size.x + (xOffset - wallSize * 2), size.y + (yOffset -
-                    wallSize * 2), size.z + height.y]);
+                    wallSize * 2), size.z + height.y*2]);
         }
+        union() {
         feet(size, feet, holeSize, [height.y, height.y]);
+        feet_feet(size, feet, holeSize, [height.y, height.y]);
+    }
+}
+}
+
+module feet_feet(size, feet, holeSize, height) {
+    feetXOffset = (size.x - feet[1].x) / 2;
+    feetYOffset = (size.y - feet[3].y) / 2;
+    union() {
+        for (foot = feet) {
+            translate([foot.x + feetXOffset + xOffset / 2, foot.y + feetYOffset + yOffset / 2, size.z])
+                
+        rotate([180,0,0]) screw(M3_cap_screw, 10, $fn=100);
+        }
     }
 }
 
