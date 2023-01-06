@@ -18,6 +18,4 @@ plateThickness = 1.5;
 pinSize = [5, 5];
 pinDepth = 3;
 frontPinsShift = pinSize.x;
-baseDovetailBottomHeight = tan(dovetailAngle)*dovetailHeight;
-baseDovetailTopHeight = dovetailHeight -baseDovetailBottomHeight;
 rearPinsShift = 20;

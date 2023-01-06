@@ -30,7 +30,7 @@ module sliderWithPins() {
         /*translate([size.x / 2, size.z * 2.6, - size.y * 1.3]) rotate([270, 90, 0]) import(
         "../../../../OrangePiZeroUps/OrangePi_Zero_LTS.stl",*/
         // When working in the 1U rack
-        color("#003366") translate([size.x / 2, size.z * 2.6, - size.y * 1.5]) rotate([270, 90, 0]) import(
+        /*color("#003366")*/ translate([size.x / 2, size.z * 2.6, - size.y * 1.5]) rotate([270, 90, 0]) import(
         "../../../OrangePiZeroUps/OrangePi_Zero_LTS.stl",
         convexity = 10);
         translate([usableSize.x - battery_diameter(S25R18650) / 2, battery_diameter(S25R18650) / 2, - usableSize.x -
