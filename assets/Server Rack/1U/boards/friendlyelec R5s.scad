@@ -30,7 +30,7 @@ module friendlyelec_r5s_bracket() {
     echo("Tan is", tanOppositeAngle);
     oppositeAngle=90 - atan(tanOppositeAngle);
     echo("Angle is", oppositeAngle);
-    rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
+    rotate([0,0,oppositeAngle]) translate([baseSize/4,-baseSize,baseHeight-plateHeight])
         drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
 
     }
