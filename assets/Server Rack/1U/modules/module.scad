@@ -45,6 +45,14 @@ frontDovetails = false, frontDovetailSupport = false, frontRod = true) {
                 echo("You asked for front dovetails, here you go!");
                 maleDovetails(moduleWidth, rearSupport = frontDovetailSupport);
             }
+            rodAlcoves(moduleWidth, moduleLength, moduleHeight, frontRod);
+            if (rearDovetails) {
+                moduleDovetails(moduleWidth, moduleLength, moduleHeight);
+            }
+            if (frontDovetails) {
+                echo("You asked for front dovetails, here you go!");
+                maleDovetails(moduleWidth, rearSupport = frontDovetailSupport);
+            }
         }
         threadedRods(moduleWidth, moduleLength, moduleHeight);
     }
@@ -193,7 +201,6 @@ module strangePlate() {
     }
 }
 
-
 module maleDovetails(width, rearSupport = false) {
     translate([0, - dovetailHeight, 0]) union() {
         maleDovetail(width, rearSupport);
@@ -216,3 +223,4 @@ module maleDovetail(width, rearSupport = false) {
         }
     }
 }
+
