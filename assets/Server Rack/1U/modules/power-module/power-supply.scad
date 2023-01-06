@@ -19,7 +19,8 @@ include <../../utils/hexgrid.scad>
 
 include <scallop.scad>
 
-powerSupplyModule(hiveWall = true, iec = true, psu = true, blower = true, cleanup = true);
+powerSupplyModule(hiveWall = true, iec = true, psu = false, blower = false, cleanup = true);
+
 //powerSupplyModule(hiveWall = false, iec = false, psu = false, blower = false, cleanup = true);
 //powerSupplyModule(iec = true, psu = true, blower = true);
 

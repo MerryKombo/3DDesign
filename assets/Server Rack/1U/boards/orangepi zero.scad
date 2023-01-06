@@ -11,10 +11,11 @@ orangepi_zero_feet();
 translate(size) orangepi_zero_bracket();
 translate(size) translate(size) orangepi_zero_drilling_template();
 translate(size) translate(size) translate(size) orangepi_zero_dimensions_verifier();
-translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) orangepi_zero_hotShoe_adapters();*/
+translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) orangepi_zero_hotShoe_adapters();
 translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) translate(size)
     orangepi_zero_screw_on_plank();
-/*translate([- size.x, size.y, size.z]) orangepi_zero_vertical_bracket();*/
+translate([- size.x, size.y, size.z]) orangepi_zero_vertical_bracket();
+
 
 module orangepi_zero_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;

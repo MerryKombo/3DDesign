@@ -21,13 +21,13 @@ m5FinishedJamNut = 4;
 
 // Need to leave room for the end nuts and the ear walls
 moduleWidth = (totalWidth - (thicknessOfEars * 2 + m5FinishedJamNut * m5NutScalingRatio * 2)) / numberOfUnits;
+echo ("moduleWidth is ", moduleWidth);
 moduleLength = 150;
 moduleHeight = numberOfU * oneU;
 printerMaxSize = 300;
 
 threadedRodDiameter = 5;
 threadedRodDiameterHole = 5.15;
-
 surroundingDiameter = 2;
 rodSurroundingDiameter = threadedRodDiameter + surroundingDiameter;
 rodEarHeight = 5;
