@@ -199,7 +199,7 @@ module bracket_link(points, thickness, height) {
     maxX = pt_pair[1].x;
     maxY = pt_pair[1].y;
     echo("Points bounds are ", pt_pair);
-    /*echo("First point is", getFirstPoint(points, minX, minY));*/
+    echo("First point is", getFirstPoint(points, minX, minY));
     unsortedBottomPoints = quicksortVectorByY(points);
     echo("quick sort of the points by Y ", unsortedBottomPoints);
     bottomPoints = quicksortVectorByX(select(unsortedBottomPoints, [0, 1]));
@@ -218,7 +218,8 @@ module bracket_link(points, thickness, height) {
     // original
     atan = atan(horizontalSide / verticalSide);
     union() {
-        color("blue") translate([0, 0, height * 2]) rotate([270, 0, - atan]) translate([0, 0, holeSize / 2]) cylinder(h
+        color("blue") translate([bottomPoints[0].x, 0, height * 2]) rotate([270, 0, - atan]) translate([0, 0, holeSize /
+            2]) cylinder(h
         = length, r = thickness / 2, center = false, $fn = 100);
         color("green") translate([bottomPoints[1][0], 0, height * 2])
             /*translate([horizontalSide + gap, 0, height * 2])*/ rotate([270, 0, atan]) translate([0, 0, holeSize
@@ -522,9 +523,9 @@ module earsForScrewingIntoAPlank(points, thickness, height, baseSize, baseHeight
 //   for (p=combinations(regular_ngon(n=7,d=100))) stroke(p);
 function superCombinations(l, n = 2, _s = 0) =
 assert(is_finite(n) && n >= 1 && n <= len(l), "Invalid number `n`.")
-n == 1
-? [for (i = [_s:1:len(l)- 1]) [l[i]]]
-: [for (i = [_s:1:len(l)- n], p = superCombinations(l, n = n - 1, _s =i + 1)) concat([l[i]], p)];
+    n == 1
+    ? [for (i = [_s:1:len(l) - 1]) [l[i]]]
+    : [for (i = [_s:1:len(l) - n], p = superCombinations(l, n = n - 1, _s = i + 1)) concat([l[i]], p)];
 
 // Function: pair()
 // Usage:
@@ -547,17 +548,17 @@ n == 1
 //   l = ["A","B","C","D"];
 //   echo([for (p=pair(l)) str(p.y,p.x)]);  // Outputs: ["BA", "CB", "DC"]
 function megaPair(list, wrap = false) =
-assert(is_list(list)|| is_string(list), "Invalid input." )
+assert(is_list(list) || is_string(list), "Invalid input." )
 assert(is_bool(wrap))
 let(
-ll = len(list)
+    ll = len(list)
 ) wrap
-? [for (i = [0:1:ll - 1]) [list[i], list[(i + 1) % ll]]]
-: [for (i = [0:1:ll - 2]) [list[i], list[i +1]]];
+    ? [for (i = [0:1:ll - 1]) [list[i], list[(i + 1) % ll]]]
+    : [for (i = [0:1:ll - 2]) [list[i], list[i + 1]]];
 
 
 function getMinPoint(points) =
-[min(subindex(points, 0)), min(subindex(points, 1))];
+    [min(subindex(points, 0)), min(subindex(points, 1))];
 
 function getMaxPoint(points) =
-[max(subindex(points, 0)), max(subindex(points, 1))];
+    [max(subindex(points, 0)), max(subindex(points, 1))];

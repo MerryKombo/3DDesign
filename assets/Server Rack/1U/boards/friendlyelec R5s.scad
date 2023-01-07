@@ -17,9 +17,9 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     friendlyelec_r5s_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) friendlyelec_r5s_vertical_bracket();*/
 
-//friendlyelec_r5s_bracket();
+friendlyelec_r5s_bracket();
 // translate([27.5,57.5,0]) import("NanoPi_R5S_Case.stl", convexity=3);
-friendlyelec_r5s_dimensions_verifier();
+// friendlyelec_r5s_dimensions_verifier();
 
 module friendlyelec_r5s_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
@@ -27,13 +27,13 @@ module friendlyelec_r5s_feet() {
 
 module friendlyelec_r5s_bracket() {
     union() {
-    bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
-    tanOppositeAngle=(feet[1].x-feet[0].x)/(feet[3].y-feet[1].y);
-    echo("Tan is", tanOppositeAngle);
-    oppositeAngle=90 - atan(tanOppositeAngle);
-    echo("Angle is", oppositeAngle);
-    rotate([0,0,oppositeAngle]) translate([baseSize/4,-baseSize,baseHeight-plateHeight])
-        drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+        bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+        tanOppositeAngle = (feet[1].x - feet[0].x) / (feet[3].y - feet[1].y);
+        echo("Tan is", tanOppositeAngle);
+        oppositeAngle = 90 - atan(tanOppositeAngle);
+        echo("Angle is", oppositeAngle);
+        rotate([0, 0, oppositeAngle]) translate([baseSize / 4, - baseSize, baseHeight - plateHeight])
+            drawLabel(label, baseSize, plateHeight, linkHeight / 2, feet);
 
     }
 }

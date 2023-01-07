@@ -6,6 +6,7 @@ use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
 include <friendlyelec nanopi duo2 label.scad>
+use <Dimensions_NanoPi_Duo2_V1.0_1807_PCB.scad>
 
 /*
 friendlyelec_nanopi_duo2_feet();
@@ -17,21 +18,25 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     friendlyelec_nanopi_duo2_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) friendlyelec_nanopi_duo2_vertical_bracket();*/
 
-//friendlyelec_nanopi_duo2_bracket();
-friendlyelec_nanopi_duo2_dimensions_verifier();
+friendlyelec_nanopi_duo2_bracket();
+// friendlyelec_nanopi_duo2_dimensions_verifier();
+
+//import (file = "Dimensions_NanoPi_Duo2_V1.0_1807_PCB.scad", layer = "fan_top");
+
 module friendlyelec_nanopi_duo2_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
 module friendlyelec_nanopi_duo2_bracket() {
     union() {
-    bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
-    tanOppositeAngle=(feet[1].x-feet[0].x)/(feet[3].y-feet[1].y);
-    echo("Tan is", tanOppositeAngle);
-    oppositeAngle=90 - atan(tanOppositeAngle);
-    echo("Angle is", oppositeAngle);
-    rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
-        drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+        bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+        tanOppositeAngle = (feet[1].x - feet[0].x) / (feet[3].y - feet[1].y);
+        echo("Tan is", tanOppositeAngle);
+        oppositeAngle = 90 - atan(tanOppositeAngle);
+        echo("Angle is", oppositeAngle);
+        rotate([0, 0, oppositeAngle]) translate([baseSize * .9, - 2.3 * linkThickness, baseHeight - plateHeight])
+            scale(0.9)
+                drawLabel(label, linkThickness, plateHeight, linkHeight / 2, feet);
 
     }
 }
