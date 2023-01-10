@@ -1,6 +1,6 @@
 use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
-use <../Server Rack/1U/boards/orangepi zero dimensions.scad>
-use <../Server Rack/1U/boards/khadas vim3L dimensions.scad>
+use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
+use <../Server Rack/1U/boards/friendlyelec r5s dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
 use <openscad-extra/torus.scad>
 
@@ -15,18 +15,18 @@ function quicksortVectorByX(vec) = !(len(vec) > 0) ? [] : let(
 quicksortVectorByX(lesser), equal, quicksortVectorByX(greater)
 );
 
-opiZeroFeet = [[0, 0, 0], [42.11, 0, 0], [0, 40.11, 0], [42.11, 40.11, 0]];
-opiZeroSize = [48, 46, 2];
-opiZeroHoleSize = 3;
+nanoPiDuo2Feet = [[7.56,0,0], [52.85,0,0], [7.56,21.34,0], [52.85,21.34,0]];
+nanoPiDuo2Size = [55, 25.4, 2];
+nanoPiDuo2HoleSize = 2.2;
 mpiMQProFeet = [[0, 0, 0], [58, 0, 0], [0, 23, 0], [58, 23, 0]];
 mpiMQProSize = [65, 30, 2];
 mpiMQProHoleSize = 2.75;
-kvim3LFeet = [[0, 0, 0], [77, 0, 0], [14, 45.50, 0], [63, 45.5, 0]];
-kvim3LSize = [82.0, 58.0, 2];
-kvim3LHoleSize = 3;
+R5SFeet = [[0,0,0], [84,0,0], [0,56,0], [84,56,0]];
+R5SSize = [90, 62, 1.6];
+R5SHoleSize = 3;
 minDistanceBetweenBoards = [5.8, 5.8];
-boards = [[opiZeroSize, opiZeroFeet, opiZeroHoleSize], [mpiMQProSize, mpiMQProFeet, mpiMQProHoleSize], [kvim3LSize,
-    kvim3LFeet, kvim3LHoleSize], [opiZeroSize, opiZeroFeet, opiZeroHoleSize]];
+boards = [[nanoPiDuo2Size, nanoPiDuo2Feet, nanoPiDuo2HoleSize], [mpiMQProSize, mpiMQProFeet, mpiMQProHoleSize], [R5SSize,
+    R5SFeet, R5SHoleSize], [nanoPiDuo2Size, nanoPiDuo2Feet, nanoPiDuo2HoleSize]];
 sortedBoards = quicksortVectorByX(boards);
 // From the smallest board in X to the biggest board in X.
 echo(sortedBoards);
@@ -50,8 +50,8 @@ definitivePositionBoards[2].x, definitivePositionBoards[2].y, definitivePosition
 translate([definitivePositionBoards[3].x.x, definitivePositionBoards[3].x.x, definitivePositionBoards[3].x.x]) rotate([
     90, 90, 90]) board(definitivePositionBoards[3].x, definitivePositionBoards[3].y, definitivePositionBoards[3].z);
 
-firstCircleHeight = min([(opiZeroSize.y - opiZeroFeet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (kvim3LSize.y
-    - kvim3LFeet[0].y) / 2]);
+firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (R5SSize.y
+    - R5SFeet[0].y) / 2]);
 echo("First circle height is ", firstCircleHeight);
 torusHeight = 5;
 translate(([0, 0, firstCircleHeight + torusHeight / 2]))
