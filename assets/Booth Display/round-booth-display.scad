@@ -24,9 +24,13 @@ mpiMQProHoleSize = 2.75;
 R5SFeet = [[0,0,0], [84,0,0], [0,56,0], [84,56,0]];
 R5SSize = [90, 62, 1.6];
 R5SHoleSize = 3;
+mpiMQQuadFeet = [[0,0,0], [57.56,0,0], [0,22.57,0], [57.56,22.57,0]];
+mpiMQQuadSize = [65, 30, 2];
+mpiMQQuadHoleSize = 2.75;
+    
 minDistanceBetweenBoards = [5.8, 5.8];
 boards = [[nanoPiDuo2Size, nanoPiDuo2Feet, nanoPiDuo2HoleSize], [mpiMQProSize, mpiMQProFeet, mpiMQProHoleSize], [R5SSize,
-    R5SFeet, R5SHoleSize], [nanoPiDuo2Size, nanoPiDuo2Feet, nanoPiDuo2HoleSize]];
+    R5SFeet, R5SHoleSize], [mpiMQQuadSize, mpiMQQuadFeet , mpiMQQuadHoleSize ]];
 sortedBoards = quicksortVectorByX(boards);
 // From the smallest board in X to the biggest board in X.
 echo(sortedBoards);
@@ -47,8 +51,8 @@ definitivePositionBoards[1].
 y, definitivePositionBoards[1].z);
 translate([definitivePositionBoards[2].x.x, 0, definitivePositionBoards[2].x.x]) rotate([90, 90, 90]) board(
 definitivePositionBoards[2].x, definitivePositionBoards[2].y, definitivePositionBoards[2].z);
-translate([definitivePositionBoards[3].x.x, definitivePositionBoards[3].x.x, definitivePositionBoards[3].x.x]) rotate([
-    90, 90, 90]) board(definitivePositionBoards[3].x, definitivePositionBoards[3].y, definitivePositionBoards[3].z);
+translate([-definitivePositionBoards[3].x.x/2, definitivePositionBoards[3].x.x, definitivePositionBoards[3].x.x]) rotate([
+    180, 90, 90]) board(definitivePositionBoards[3].x, definitivePositionBoards[3].y, definitivePositionBoards[3].z);
 
 firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (R5SSize.y
     - R5SFeet[0].y) / 2]);
