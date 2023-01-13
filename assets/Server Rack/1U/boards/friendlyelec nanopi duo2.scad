@@ -34,9 +34,14 @@ module friendlyelec_nanopi_duo2_bracket() {
         echo("Tan is", tanOppositeAngle);
         oppositeAngle = 90 - atan(tanOppositeAngle);
         echo("Angle is", oppositeAngle);
+        
+        diagonal = sqrt(feet[3].x^2+feet[3].y^2);
+        labelLength = (diagonal / 2) - baseSize / 2 - linkThickness / 2;
         rotate([0, 0, oppositeAngle]) translate([baseSize * .9, - 2.3 * linkThickness, baseHeight - plateHeight])
             scale(0.9)
-                drawLabel(label, linkThickness, plateHeight, linkHeight / 2, feet);
+        translate([baseSize/3,0,0])
+            drawLabel(label, linkThickness, labelLength, plateHeight, linkHeight / 2, feet);
+                //drawLabel(label, linkThickness, plateHeight, linkHeight / 2, feet);
 
     }
 }

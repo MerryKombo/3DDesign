@@ -6,7 +6,7 @@ use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
 include <friendlyelec r5s label.scad>
-
+include <../parts/board.scad>
 /*
 friendlyelec_r5s_feet();
 translate(size) friendlyelec_r5s_bracket();
@@ -17,6 +17,7 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     friendlyelec_r5s_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) friendlyelec_r5s_vertical_bracket();*/
 
+// board(size, feet, holeSize, label = "NanoPi R5S");
 friendlyelec_r5s_bracket();
 // translate([27.5,57.5,0]) import("NanoPi_R5S_Case.stl", convexity=3);
 // friendlyelec_r5s_dimensions_verifier();
@@ -32,8 +33,11 @@ module friendlyelec_r5s_bracket() {
         echo("Tan is", tanOppositeAngle);
         oppositeAngle = 90 - atan(tanOppositeAngle);
         echo("Angle is", oppositeAngle);
+        diagonal = sqrt(feet[3].x^2+feet[3].y^2);
+        labelLength = (diagonal / 2) - baseSize / 2 - linkThickness / 2;
         rotate([0, 0, oppositeAngle]) translate([baseSize / 4, - baseSize, baseHeight - plateHeight])
-            drawLabel(label, baseSize, plateHeight, linkHeight / 2, feet);
+        translate([baseSize/2- linkThickness / 2,0,0]) 
+            drawLabel(label, baseSize, labelLength, plateHeight, linkHeight / 2, feet);
 
     }
 }

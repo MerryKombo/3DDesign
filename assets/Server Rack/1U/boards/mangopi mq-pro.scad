@@ -28,8 +28,13 @@ module mangopi_mqpro_bracket() {
     echo("Tan is", tanOppositeAngle);
     oppositeAngle=90 - atan(tanOppositeAngle);
     echo("Angle is", oppositeAngle);
-    rotate([0,0,oppositeAngle]) translate([baseSize/2,-baseSize*0.8,baseHeight-plateHeight])
-        drawLabel(label, baseSize*0.8, plateHeight, linkHeight, feet); 
+        diagonal = sqrt(feet[3].x^2+feet[3].y^2);
+        labelLength = (diagonal / 2) - baseSize / 2 - linkThickness / 2;
+    rotate([0,0,oppositeAngle])
+        translate([baseSize/2,-baseSize*0.65,baseHeight-plateHeight])
+    drawLabel(label, baseSize*.6, labelLength, plateHeight, linkHeight/3, feet);
+
+        //drawLabel(label, baseSize*0.8, plateHeight, linkHeight, feet); 
 
     }
 }
