@@ -207,3 +207,15 @@ module buildFeetInTorus(boards, boardsTranslations, boardsRotation, highHoles, t
                 }
         }
 }
+
+// We'll need the size of the torus, the size of the board we want to attach
+// on top of the torus, then the feet coordinates and we should be good to go
+module torusToDisplayBracketAdapter(torus, board) {
+    // torus should be [radius, height, thickness]?
+    
+    // board should be as often  [[sizex, sizey,sizez], [[foot1x, foot1y, foot1z], [84, 0, 0], [0, 56, 0], [84, 56, 0]], holesize, "name"]
+    
+    // We already have a utility class the adapts one board to another
+    // Should we use it?
+    // include <../parts/boards adapter.scad>
+}
