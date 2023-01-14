@@ -58,7 +58,7 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
 # Install fonts
-RUN cd /tmp && curl -O https://media.fontsgeek.com/download/zip/i/s/isonorm-3098-regular_s3NoJ.zip && unzip iso*zip && \
+RUN cd /tmp && curl -O https://media.fontsgeek.com/download/zip/i/s/isonorm-3098_5MJ6L.zip && unzip iso*zip && \
     rm isonorm-3098-regular_s3NoJ.zip && cp Isonorm\ 3098\ Regular/Isonorm\ 3098\ Regular.otf /usr/local/share/fonts && \
     rm -fr Isonorm\ 3098\ Regular/Isonorm
 
