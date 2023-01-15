@@ -1,7 +1,8 @@
 use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
 use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
-use <../Server Rack/1U/boards/friendlyelec r5s dimensions.scad>
+use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
+use <../Server Rack/1U/boards/friendlyelec R5s.scad>
 use <openscad-extra/torus.scad>
 
 // input : list of points
@@ -93,6 +94,17 @@ boardsRotations = [firstBoardRotation, secondBoardRotation, thirdBoardRotation, 
 echo("boardsRotations is ", boardsRotations);
 
 buildToruses();
+firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (
+        R5SSize.y
+        - R5SFeet[0].y) / 2]);
+echo("First circle height is ", firstCircleHeight);
+lastTorusHeight = definitivePositionBoards[0][1][3][0];
+lastTorus = [torusRadius, torusHeight, lastTorusHeight]; 
+displayBoard = [[44, 36, 1.5], [[6.3,3,0], [44-7.7,3,0], [6.3,33,0], [44-7.7,33,0]], 2, "TFT Round Display 1"];
+translate([(torusRadius*2+torusHeight*2-displayBoard.x.x)/2,(torusRadius*2+torusHeight*2-displayBoard.x.y)/2,lastTorusHeight+torusHeight+displayBoard.x.z])
+board(displayBoard.x, displayBoard.y, displayBoard.z, displayBoard[3]);
+torusToDisplayBracketAdapter(lastTorus, displayBoard);
+
 // buildFeetInTorus(definitivePositionBoards, boardsTranslations, boardsRotations, false, torusHeight);
 
 // The toruses
@@ -208,11 +220,33 @@ module buildFeetInTorus(boards, boardsTranslations, boardsRotation, highHoles, t
         }
 }
 
+
 // We'll need the size of the torus, the size of the board we want to attach
 // on top of the torus, then the feet coordinates and we should be good to go
 module torusToDisplayBracketAdapter(torus, board) {
     // torus should be [radius, height, thickness]?
-    
+    torusRadius = torus.x;
+    torusHeight = torus.y;
+    lastTorusHeight = torus.z;
+    pointsAngle = 45;
+    firstPoint = [cos(pointsAngle)*(torusRadius+torusHeight), sin(pointsAngle) * (torusRadius+torusHeight)];
+   echo("First point is", firstPoint);
+    translate([torusRadius,torusRadius,lastTorusHeight])
+    translate([firstPoint.x, firstPoint.y, 0])
+    color("green") cylinder(r=torusHeight, h = 5*torusHeight, $fn=100);
+    secondPoint = [firstPoint.x, - firstPoint.y];
+    translate([torusRadius,torusRadius,lastTorusHeight])
+    translate([secondPoint.x, secondPoint.y, 0])
+    color("green") cylinder(r=torusHeight, h = 5*torusHeight, $fn=100);
+    thirdPoint = [-firstPoint.x, firstPoint.y];
+    translate([torusRadius,torusRadius,lastTorusHeight])
+    translate([thirdPoint.x, thirdPoint.y, 0])
+    color("green") cylinder(r=torusHeight, h = 5*torusHeight, $fn=100);
+    fourthPoint = [-firstPoint.x, -firstPoint.y];
+    translate([torusRadius,torusRadius,lastTorusHeight])
+    translate([fourthPoint.x, fourthPoint.y, 0])
+    color("green") cylinder(r=torusHeight, h = 5*torusHeight, $fn=100);
+    //friendlyelec_r5s_bracket();
     // board should be as often  [[sizex, sizey,sizez], [[foot1x, foot1y, foot1z], [84, 0, 0], [0, 56, 0], [84, 56, 0]], holesize, "name"]
     
     // We already have a utility class the adapts one board to another

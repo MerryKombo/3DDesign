@@ -1,11 +1,11 @@
-include <friendlyelec r5s dimensions.scad>
+include <friendlyelec R5s dimensions.scad>
 use <../parts/feet.scad>
 use <../parts/generic bracket.scad>
 use <../parts/generic drilling templates.scad>
 use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
-include <friendlyelec r5s label.scad>
+include <friendlyelec R5s label.scad>
 include <../parts/board.scad>
 /*
 friendlyelec_r5s_feet();
