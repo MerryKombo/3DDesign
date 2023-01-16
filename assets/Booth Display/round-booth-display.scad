@@ -7,6 +7,7 @@ use <openscad-extra/torus.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
 include <NopSCADlib/vitamins/rod.scad>
+include <NopSCADlib/vitamins/nuts.scad>
 
 // input : list of points
 // output : sorted by x vector of points
@@ -75,8 +76,8 @@ translate(firstBoardTranslation)
 secondBoardMiddleOfHole = (definitivePositionBoards[1].x.x - (definitivePositionBoards[1][1][1].x -
     definitivePositionBoards[1][1][0].x)) / 2;
 echo("secondBoardMiddleOfHole", secondBoardMiddleOfHole);
-secondBoardZTranslation = definitivePositionBoards[1].x.x + (torusHeight - secondBoardMiddleOfHole) + (
-    definitivePositionBoards[1][1][0].x - torusHeight);
+secondBoardZTranslation = definitivePositionBoards[1].x.x + (torusHeight - secondBoardMiddleOfHole * 2) + (
+    definitivePositionBoards[1][1][0].x + definitivePositionBoards[1][2] / 2);
 secondBoardTranslation = [0, (torusRadius * 2 - definitivePositionBoards[1].x.y) / 2 + definitivePositionBoards[1].x.y,
     secondBoardZTranslation];
 secondBoardRotation = [90, 90, 270];
@@ -148,31 +149,54 @@ module buildToruses() {
         R5SSize.y
         - R5SFeet[0].y) / 2]);
     echo("First circle height is ", firstCircleHeight);
-    translate(([torusRadius + torusHeight, torusRadius + torusHeight, torusHeight]))
-        difference() {
-            torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-            color("green")
-                rotate([0, 0, 45])
-                    translate([- (torusHeight+torusRadius)*1.1, 0, 0])
-                        rotate([0, 90, 0])
-                            studding(2*torusHeight*3/5, (torusHeight+torusRadius)*2.2, center=false, $fn=100);
-            //leadscrew(2*torusHeight*3/5, (torusHeight+torusRadius)*2,(torusHeight+torusRadius)*.2,4);
-                            //cylinder(r = torusHeight * 3 / 5, h = (torusHeight + torusRadius) * 2, $fn = 100);
+    difference() {
+        translate(([torusRadius + torusHeight, torusRadius + torusHeight, torusHeight]))
+            difference() {
+                torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+                $show_threads = true;
+                color("green")
+                    rotate([0, 0, 45])
+                        translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
+                            rotate([0, 90, 0])
+                                studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
+                                $fn = 100);
+                //leadscrew(2*torusHeight*3/5, (torusHeight+torusRadius)*2,(torusHeight+torusRadius)*.2,4);
+                //cylinder(r = torusHeight * 3 / 5, h = (torusHeight + torusRadius) * 2, $fn = 100);
 
-            color("blue")
-                rotate([0, 0, - 45])
-                    translate([- (torusHeight+torusRadius)*1.1, 0, 0])
-                        rotate([0, 90, 0])
-                            studding(2*torusHeight*3/5, (torusHeight+torusRadius)*2.2, center=false, $fn=100);
-                            //cylinder(r = torusHeight * 3 / 5, h = (torusHeight + torusRadius) * 2, $fn = 100);
-        }
+                color("blue")
+                    rotate([0, 0, - 45])
+                        translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
+                            rotate([0, 90, 0])
+                                let (show_threads = true)
+                                studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
+                                $show_threads = true, $fn =
+                                100);
+            }
+        color("white")
+            translate(firstBoardTranslation)
+                rotate(firstBoardRotation)
+                    buildInvertedFeet(definitivePositionBoards[0], true, torusHeight);
+        color("white")
+            translate(secondBoardTranslation)
+                rotate(secondBoardRotation)
+                    buildInvertedFeet(definitivePositionBoards[1], true, torusHeight);
+        color("white")
+            translate(thirdBoardTranslation)
+                rotate(thirdBoardRotation)
+                    buildInvertedFeet(definitivePositionBoards[2], true, torusHeight);
+        color("white")
+            translate(fourthBoardTranslation)
+                rotate(fourthBoardRotation)
+                    buildInvertedFeet(definitivePositionBoards[3], true, torusHeight);
+    }
     // Second torus
     // The height must be the one of the smallest board highest hole
     secondCircleHeight = definitivePositionBoards[3][1][3][0];
-    translate(([torusRadius + torusHeight, torusRadius + torusHeight, firstCircleHeight + torusHeight / 2 +
-        secondCircleHeight]))
-        torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-
+    difference() {
+        translate(([torusRadius + torusHeight, torusRadius + torusHeight, firstCircleHeight + torusHeight / 2 +
+            secondCircleHeight]))
+            torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+    }
     // Third torus
     // The height must be the one of the other board highest hole
     thirdCircleHeight = definitivePositionBoards[0][1][3][0];
@@ -208,8 +232,11 @@ module buildFeet(board, lowHoles, torusHeight) {
                 translate([firstFoot.x + feetTranslation.x, firstFoot.y + feetTranslation.y, 0])
                     difference() {
                         color("red") cylinder(r = torusHeight, h = feetHeight, $fn = 100);
-                        color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight * 2
+                        color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight
+                            * 2
                         , $fn = 100);
+                        translate([0, 0, - .1])
+                            feetNutRecess(holeSize);
                     }
                 secondFoot = feet[3];
                 echo("Second high foot", secondFoot);
@@ -218,6 +245,84 @@ module buildFeet(board, lowHoles, torusHeight) {
                         color("red") cylinder(r = torusHeight, h = feetHeight, $fn = 100);
                         color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight * 2
                         , $fn = 100);
+                        translate([0, 0, - .1])
+                            feetNutRecess(holeSize);
+                    }
+            } else {
+                firstFoot = feet[0];
+                echo("First low foot", firstFoot);
+                translate([firstFoot.x + feetTranslation.x, firstFoot.y + feetTranslation.y, 0])
+                    cylinder(r = holeSize / 2, h = feetHeight, $fn = 100);
+                secondFoot = feet[2];
+                echo("Second low foot", secondFoot);
+                translate([secondFoot.x + feetTranslation.x, secondFoot.y + feetTranslation.y, 0])
+                    cylinder(r = holeSize / 2, h = feetHeight, $fn = 100);
+            }
+    }
+}
+
+module feetNutRecess(realHoleSize) {
+    roundedHoleSize = roundToNearestHalf(realHoleSize);
+    holeSize = roundedHoleSize < realHoleSize ? roundedHoleSize : roundedHoleSize == realHoleSize? realHoleSize : roundedHoleSize - .5 ;
+    echo("Real hole size is", realHoleSize);
+    echo("Computed hole size is", holeSize);
+    union() {
+        scale([1.1, 1.1, 1.1])
+            feetNut(holeSize);
+        feetNut(holeSize);
+    }
+}
+
+function roundToNearestHalf(number) = round(number * 2) / 2;
+
+module feetNut(holeSize) {
+
+    if (holeSize == 3) {
+        nut(M3_nut);
+    } else if (holeSize == 2) {
+        nut(M2_nut);
+    } else if (holeSize == 2.5) {
+        nut(M2p5_nut);
+    } else if (holeSize == 4) {
+        nut(M4_nut);
+    } else if (holeSize == 5) {
+        nut(M5_nut);
+    } else if (holeSize == 6) {
+        nut(M6_nut);
+    } else if (holeSize == 8) {
+        nut(M8_nut);
+    }
+}
+module buildInvertedFeet(board, lowHoles, torusHeight) {
+    union() {
+        echo("Board is", board);
+        boardSize = board[0];
+        echo("Board size is", boardSize);
+        holeSize = board[2];
+        echo("Hole size is", holeSize);
+        feet = board[1];
+        echo("Feet are", feet);
+        feetHeight = torusHeight * 4;
+        // Distance between two feets in X and Y
+        feetTranslation = [(boardSize.x - feet[3].x) / 2, (boardSize.y - feet[3].y) / 2];
+        translate([0, 0, - feetHeight])
+            // The higher holes are the holes #1 and #3
+            if (lowHoles) {
+                firstFoot = feet[1];
+                echo("First high foot", firstFoot);
+                translate([firstFoot.x + feetTranslation.x, firstFoot.y + feetTranslation.y, 0])
+                    union() {
+                        color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight * 2
+                        , $fn = 100);
+                        color("red") cylinder(r = torusHeight, h = feetHeight, $fn = 100);
+                    }
+                secondFoot = feet[3];
+                echo("Second high foot", secondFoot);
+                translate([secondFoot.x + feetTranslation.x, secondFoot.y + feetTranslation.y, 0])
+                    union() {
+                        color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight * 2
+                        , $fn = 100);
+                        color("red") cylinder(r = torusHeight, h = feetHeight, $fn = 100);
                     }
             } else {
                 firstFoot = feet[0];
