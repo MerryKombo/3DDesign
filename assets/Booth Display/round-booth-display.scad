@@ -64,47 +64,29 @@ firstBoardZTranslation = definitivePositionBoards[0].x.x + (torusHeight - firstB
 firstBoardTranslation = [((torusRadius + torusHeight) * 2 - definitivePositionBoards[0].x.y) / 2, 0,
     firstBoardZTranslation];
 firstBoardRotation = [90, 90, 0];
-translate(firstBoardTranslation)
-    rotate(firstBoardRotation)
-        union() {
-            board(definitivePositionBoards[0].x, definitivePositionBoards[0].y, definitivePositionBoards[0].z,
-            definitivePositionBoards[0][3]);
-            //buildFeet(definitivePositionBoards[0], false, torusHeight);
-            buildFeet(definitivePositionBoards[0], true, torusHeight);
-        }
+
 // The second biggest board, on the left of the biggest board
 secondBoardMiddleOfHole = (definitivePositionBoards[1].x.x - (definitivePositionBoards[1][1][1].x -
     definitivePositionBoards[1][1][0].x)) / 2;
 echo("secondBoardMiddleOfHole", secondBoardMiddleOfHole);
 secondBoardZTranslation = definitivePositionBoards[1].x.x + (torusHeight - secondBoardMiddleOfHole * 2) + (
     definitivePositionBoards[1][1][0].x + definitivePositionBoards[1][2] / 2);
-secondBoardTranslation = [0, (torusRadius * 2 - definitivePositionBoards[1].x.y) / 2 + definitivePositionBoards[1].x.y,
+secondBoardTranslation = [0, (torusRadius * 2 - definitivePositionBoards[1].x.y) / 2 + definitivePositionBoards[1].x
+.y,
     secondBoardZTranslation];
 secondBoardRotation = [90, 90, 270];
-translate(secondBoardTranslation)
-    rotate(secondBoardRotation)
-        union() {
-            echo("Second board is ", definitivePositionBoards[1][3]);
-            board(definitivePositionBoards[1].x, definitivePositionBoards[1].y, definitivePositionBoards[1].z,
-            definitivePositionBoards[1][3]);
-            buildFeet(definitivePositionBoards[1], true, torusHeight);
-        }
+
 // The third biggest board, on the right of the biggest board
 thirdBoardMiddleOfHole = (definitivePositionBoards[2].x.x - (definitivePositionBoards[2][1][1].x -
     definitivePositionBoards[2][1][0].x)) / 2;
 echo("thirdBoardMiddleOfHole", thirdBoardMiddleOfHole);
 thirdBoardZTranslation = definitivePositionBoards[2].x.x + (torusHeight - thirdBoardMiddleOfHole);
-thirdBoardTranslation = [torusRadius * 2 + torusHeight * 2 + definitivePositionBoards[2].x.z - definitivePositionBoards[
-2].x.z, (torusRadius * 2 -
+thirdBoardTranslation = [torusRadius * 2 + torusHeight * 2 + definitivePositionBoards[2].x.z -
+    definitivePositionBoards[
+    2].x.z, (torusRadius * 2 -
     definitivePositionBoards[2].x.y) / 2, thirdBoardZTranslation];
 thirdBoardRotation = [90, 90, 90];
-translate(thirdBoardTranslation)
-    rotate(thirdBoardRotation)
-        union() {
-            board(definitivePositionBoards[2].x, definitivePositionBoards[2].y, definitivePositionBoards[2].z,
-            definitivePositionBoards[2][3]);
-            buildFeet(definitivePositionBoards[2], true, torusHeight);
-        }
+
 // The smallest board, which faces the biggest board
 fourthBoardMiddleOfHole = (definitivePositionBoards[3].x.x - (definitivePositionBoards[3][1][1].x -
     definitivePositionBoards[3][1][0].x)) / 2;
@@ -114,14 +96,42 @@ fourthBoardTranslation = [(torusRadius * 2 - definitivePositionBoards[3].x.y) / 
                     torusRadius * 2 + torusHeight * 2 +
             definitivePositionBoards[3].x.z - definitivePositionBoards[3].x.z, fourthBoardZTranslation];
 fourthBoardRotation = [180, 90, 270];
-translate(fourthBoardTranslation)
-    //translate([definitivePositionBoards[3].x.y, - definitivePositionBoards[3].x.z, definitivePositionBoards[3].x.x])
-    rotate(fourthBoardRotation)
-        union() {
-            board(definitivePositionBoards[3].x, definitivePositionBoards[3].y, definitivePositionBoards[3].z,
-            definitivePositionBoards[3][3]);
-            buildFeet(definitivePositionBoards[3], true, torusHeight);
-        }
+
+module buildBoards() {
+    translate(firstBoardTranslation)
+        rotate(firstBoardRotation)
+            union() {
+                board(definitivePositionBoards[0].x, definitivePositionBoards[0].y, definitivePositionBoards[0].z,
+                definitivePositionBoards[0][3]);
+                //buildFeet(definitivePositionBoards[0], false, torusHeight);
+                buildFeet(definitivePositionBoards[0], true, torusHeight);
+            }
+    translate(secondBoardTranslation)
+        rotate(secondBoardRotation)
+            union() {
+                echo("Second board is ", definitivePositionBoards[1][3]);
+                board(definitivePositionBoards[1].x, definitivePositionBoards[1].y, definitivePositionBoards[1].z,
+                definitivePositionBoards[1][3]);
+                buildFeet(definitivePositionBoards[1], true, torusHeight);
+            }
+    translate(thirdBoardTranslation)
+        rotate(thirdBoardRotation)
+            union() {
+                board(definitivePositionBoards[2].x, definitivePositionBoards[2].y, definitivePositionBoards[2].z,
+                definitivePositionBoards[2][3]);
+                buildFeet(definitivePositionBoards[2], true, torusHeight);
+            }
+    translate(fourthBoardTranslation)
+        //translate([definitivePositionBoards[3].x.y, - definitivePositionBoards[3].x.z, definitivePositionBoards[3].x.x])
+        rotate(fourthBoardRotation)
+            union() {
+                board(definitivePositionBoards[3].x, definitivePositionBoards[3].y, definitivePositionBoards[3].z,
+                definitivePositionBoards[3][3]);
+                buildFeet(definitivePositionBoards[3], true, torusHeight);
+            }
+
+}
+
 boardsTranslations = [firstBoardTranslation, secondBoardTranslation, thirdBoardTranslation, fourthBoardTranslation];
 echo("boardsTranslations is ", boardsTranslations);
 boardsRotations = [firstBoardRotation, secondBoardRotation, thirdBoardRotation, fourthBoardRotation];
@@ -136,11 +146,14 @@ lastTorusHeight = definitivePositionBoards[0][1][3][0];
 lastTorus = [torusRadius, torusHeight, lastTorusHeight];
 displayBoard = [[44, 36, 1.5], [[6.3, 3, 0], [44 - 7.7, 3, 0], [6.3, 33, 0], [44 - 7.7, 33, 0]], 2,
     "TFT Round Display 1"];
-translate([(torusRadius * 2 + torusHeight * 2 - displayBoard.x.x) / 2, (torusRadius * 2 + torusHeight * 2 - displayBoard
-.x.y) / 2, lastTorusHeight + torusHeight + displayBoard.x.z])
-    board(displayBoard.x, displayBoard.y, displayBoard.z, displayBoard[3]);
-torusToDisplayBracketAdapter(lastTorus, displayBoard);
 
+module displayBoard() {
+    translate([(torusRadius * 2 + torusHeight * 2 - displayBoard.x.x) / 2, (torusRadius * 2 + torusHeight * 2 -
+        displayBoard
+        .x.y) / 2, lastTorusHeight + torusHeight + displayBoard.x.z])
+        board(displayBoard.x, displayBoard.y, displayBoard.z, displayBoard[3]);
+    torusToDisplayBracketAdapter(lastTorus, displayBoard);
+}
 // buildFeetInTorus(definitivePositionBoards, boardsTranslations, boardsRotations, false, torusHeight);
 
 // The toruses
@@ -149,47 +162,65 @@ module buildToruses() {
         R5SSize.y
         - R5SFeet[0].y) / 2]);
     echo("First circle height is ", firstCircleHeight);
-    difference() {
-        translate(([torusRadius + torusHeight, torusRadius + torusHeight, torusHeight]))
-            difference() {
-                torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-                $show_threads = true;
-                color("green")
-                    rotate([0, 0, 45])
-                        translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
-                            rotate([0, 90, 0])
-                                studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
-                                $fn = 100);
-                //leadscrew(2*torusHeight*3/5, (torusHeight+torusRadius)*2,(torusHeight+torusRadius)*.2,4);
-                //cylinder(r = torusHeight * 3 / 5, h = (torusHeight + torusRadius) * 2, $fn = 100);
+    union() {
+        difference() {
+            translate(([torusRadius + torusHeight, torusRadius + torusHeight, torusHeight]))
+                difference() {
+                    torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+                    color("green")
+                        rotate([0, 0, 45])
+                            translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
+                                rotate([0, 90, 0])
+                                    let($show_threads = true)
+                                    studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
+                                    $fn = 100);
+                    //leadscrew(2*torusHeight*3/5, (torusHeight+torusRadius)*2,(torusHeight+torusRadius)*.2,4);
+                    //cylinder(r = torusHeight * 3 / 5, h = (torusHeight + torusRadius) * 2, $fn = 100);
 
-                color("blue")
-                    rotate([0, 0, - 45])
-                        translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
-                            rotate([0, 90, 0])
-                                let (show_threads = true)
-                                studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
-                                $show_threads = true, $fn =
-                                100);
-            }
+                    color("blue")
+                        rotate([0, 0, - 45])
+                            translate([- (torusHeight + torusRadius) * 1.1, 0, 0])
+                                rotate([0, 90, 0])
+                                    let($show_threads = true)
+                                    studding(2 * torusHeight * 3 / 5, (torusHeight + torusRadius) * 2.2, center = false,
+                                    $show_threads = true, $fn =
+                                    100);
+                }
+            color("white")
+                translate(firstBoardTranslation)
+                    rotate(firstBoardRotation)
+                        buildInvertedFeet(definitivePositionBoards[0], true, torusHeight);
+            color("white")
+                translate(secondBoardTranslation)
+                    rotate(secondBoardRotation)
+                        buildInvertedFeet(definitivePositionBoards[1], true, torusHeight);
+            color("white")
+                translate(thirdBoardTranslation)
+                    rotate(thirdBoardRotation)
+                        buildInvertedFeet(definitivePositionBoards[2], true, torusHeight);
+            color("white")
+                translate(fourthBoardTranslation)
+                    rotate(fourthBoardRotation)
+                        buildInvertedFeet(definitivePositionBoards[3], true, torusHeight);
+        }
         color("white")
             translate(firstBoardTranslation)
                 rotate(firstBoardRotation)
-                    buildInvertedFeet(definitivePositionBoards[0], true, torusHeight);
+                    buildFeet(definitivePositionBoards[0], true, torusHeight);
         color("white")
             translate(secondBoardTranslation)
                 rotate(secondBoardRotation)
-                    buildInvertedFeet(definitivePositionBoards[1], true, torusHeight);
+                    buildFeet(definitivePositionBoards[1], true, torusHeight);
         color("white")
             translate(thirdBoardTranslation)
                 rotate(thirdBoardRotation)
-                    buildInvertedFeet(definitivePositionBoards[2], true, torusHeight);
+                    buildFeet(definitivePositionBoards[2], true, torusHeight);
         color("white")
             translate(fourthBoardTranslation)
                 rotate(fourthBoardRotation)
-                    buildInvertedFeet(definitivePositionBoards[3], true, torusHeight);
+                    buildFeet(definitivePositionBoards[3], true, torusHeight);
     }
-    // Second torus
+ /*   // Second torus
     // The height must be the one of the smallest board highest hole
     secondCircleHeight = definitivePositionBoards[3][1][3][0];
     difference() {
@@ -209,7 +240,7 @@ module buildToruses() {
     fourthCircleHeight = definitivePositionBoards[1][1][3][0];
     translate(([torusRadius + torusHeight, torusRadius + torusHeight, firstCircleHeight + torusHeight / 2 +
         fourthCircleHeight]))
-        torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+        torus(r1 = torusHeight, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
 }
 
 module buildFeet(board, lowHoles, torusHeight) {
