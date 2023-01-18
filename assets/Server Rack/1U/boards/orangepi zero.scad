@@ -30,8 +30,8 @@ module orangepi_zero_bracket() {
     echo("Tan is", tanOppositeAngle);
     oppositeAngle=90 - atan(tanOppositeAngle);
     echo("Angle is", oppositeAngle);
-    rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
-        drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+    //rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
+    //    drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
 
     }
 }
