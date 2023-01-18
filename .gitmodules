@@ -1,3 +1,6 @@
 [submodule "assets/LEGO.scad"]
 	path = assets/LEGO.scad
 	url = https://github.com/cfinke/LEGO.scad.git
+[submodule "assets/Round-Anything"]
+	path = assets/Round-Anything
+	url = https://github.com/Irev-Dev/Round-Anything.git
