@@ -1,0 +1,3 @@
+[submodule "assets/LEGO.scad"]
+	path = assets/LEGO.scad
+	url = https://github.com/cfinke/LEGO.scad.git
