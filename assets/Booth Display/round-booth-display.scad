@@ -98,6 +98,8 @@ fourthBoardTranslation = [(torusRadius * 2 - definitivePositionBoards[3].x.y) / 
             definitivePositionBoards[3].x.z - definitivePositionBoards[3].x.z, fourthBoardZTranslation];
 fourthBoardRotation = [180, 90, 270];
 
+buildBoards();
+
 module buildBoards() {
     translate(firstBoardTranslation)
         rotate(firstBoardRotation)
@@ -353,6 +355,7 @@ module feetNut(holeSize) {
         nut(M8_nut);
     }
 }
+
 module buildInvertedFeet(board, lowHoles, torusInsideRadius) {
     union() {
         echo("Board is", board);

@@ -56,6 +56,9 @@ module legs(heights, angles, startingHeight = 0, startingAngle = 0, torusRadius 
 }
 
 module leg(heights, startingHeight = 0, torusRadius = 5) {
+    feetHoleSize = (torusRadius * 3 / 5) / 2;
+    torusSize = torusRadius * 3 / 5;
+    echo("feetHoleSize=", feetHoleSize);
     color("DarkKhaki")
         union() {
             difference() {
@@ -82,13 +85,54 @@ module leg(heights, startingHeight = 0, torusRadius = 5) {
                     // The main hole
                     translate([0, heights[len(heights) - 1] / 2, currentHeight + startingHeight])
                         rotate([90, 0, 0])
-                            cylinder(r = torusRadius * 3 / 5, h = heights[len(heights) - 1], $fn = 100);
+                            union() {
+                                cylinder(r = feetHoleSize, h = heights[len(heights) - 1], $fn = 100);
+                                // We should also add a nut recess behind
+                                translate([0, 0, heights[len(heights) - 1] / 2 - torusRadius]) feetNutRecess(torusRadius
+                                    * 3 / 5);
+                            }
                     // We also have to remove the torus footprint
                     yTranslation = torusRadius;
                     translate([- heights[len(heights) - 1] / 2, - yTranslation, currentHeight + startingHeight])
                         rotate([90, 0, 90])
-                            cylinder(r = torusRadius * 3 / 5, h = heights[len(heights) - 1], $fn = 100);
+                            cylinder(r = torusSize, h = heights[len(heights) - 1], $fn = 100);
                 }
             }
         }
+}
+
+
+module feetNutRecess(realHoleSize) {
+    roundedHoleSize = roundToNearestHalf(realHoleSize);
+    holeSize = roundedHoleSize < realHoleSize ? roundedHoleSize : roundedHoleSize == realHoleSize? realHoleSize :
+                roundedHoleSize - .5 ;
+    echo("Real hole size is", realHoleSize);
+    echo("Computed hole size is", holeSize);
+    union() {
+        scale([1.1, 1.1, 1.1])
+            feetNut(holeSize);
+        feetNut(holeSize);
+    }
+}
+
+
+function roundToNearestHalf(number) = round(number * 2) / 2;
+
+module feetNut(holeSize) {
+
+    if (holeSize == 3) {
+        nut(M3_nut);
+    } else if (holeSize == 2) {
+        nut(M2_nut);
+    } else if (holeSize == 2.5) {
+        nut(M2p5_nut);
+    } else if (holeSize == 4) {
+        nut(M4_nut);
+    } else if (holeSize == 5) {
+        nut(M5_nut);
+    } else if (holeSize == 6) {
+        nut(M6_nut);
+    } else if (holeSize == 8) {
+        nut(M8_nut);
+    }
 }
