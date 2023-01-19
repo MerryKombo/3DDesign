@@ -159,6 +159,7 @@ module displayBoard() {
 // buildFeetInTorus(definitivePositionBoards, boardsTranslations, boardsRotations, false, torusInsideRadius);
 
 // The toruses
+// We could have a look at https://github.com/UBaer21/UB.scad/blob/main/Images/generator.png to get funnier torus
 module buildToruses() {
     firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (
         R5SSize.y

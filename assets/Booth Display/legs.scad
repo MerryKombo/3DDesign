@@ -1,0 +1,94 @@
+use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
+use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
+use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
+use <../Server Rack/1U/parts/board.scad>
+use <../Server Rack/1U/boards/friendlyelec R5s.scad>
+use <openscad-extra/torus.scad>
+include <NopSCADlib/utils/core/core.scad>
+use <NopSCADlib/utils/layout.scad>
+include <NopSCADlib/vitamins/rod.scad>
+include <NopSCADlib/vitamins/nuts.scad>
+use <../LEGO.scad/LEGO.scad>
+//include <BOSL2/std.scad>
+include <../Round-Anything/polyround.scad>
+
+/*radiiPoints = [
+        [- 4, 0, 1],
+        [5, 3, 1.5],
+        [0, 7, 0.1],
+        [8, 7, 10],
+        [20, 20, 0.8],
+        [10, 0, 10]
+    ];
+linear_extrude(3)polygon(polyRound(radiiPoints, 30));
+*/
+/*
+length = 78; r1 = 25; R = 65;
+r2 = floor(lookup($t, [[0, 5], [0.5, 30], [1, 5]]));
+egg(length, r1, r2, R, $fn = 180);
+color("black") text(str("r2=", r2), size = 8, halign = "center", valign = "center");
+*/
+
+startingHeight = 20;
+endingHeight = 20;
+// We're supposed to have the four heights, but the torus will collide, so we'll have to use less torus and make
+// some adapter brackets of some sort
+// unsortedHeights = [21.05, 23, 56, 22.57];
+unsortedHeights = [23, 56];
+angles = [60, 120, 180, 240];
+heights = quicksort(concat([0], unsortedHeights));
+
+function quicksort(list) = !(len(list) > 0) ? [] : let(
+    pivot = list[floor(len(list) / 2)],
+    lesser = [for (i = list) if (i < pivot) i],
+    equal = [for (i = list) if (i == pivot) i],
+    greater = [for (i = list) if (i > pivot) i]
+) concat(
+quicksort(lesser), equal, quicksort(greater)
+);
+
+echo("heights=", heights);
+legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
+
+// heights is a list of heights of the boards' holes
+module legs(heights, angles, startingHeight = 0, startingAngle = 0, torusRadius = 5) {
+    leg(heights, startingHeight, torusRadius);
+}
+
+module leg(heights, startingHeight = 0, torusRadius = 5) {
+    color("DarkKhaki")
+        union() {
+            difference() {
+                union() {
+                    // The base is a dummy cylinder
+                    translate([0, 0, startingHeight + torusRadius])
+                        cylinder(r = torusRadius, h = heights[len(heights) - 1] + endingHeight - torusRadius, $fn = 100)
+                            ;
+                    // With half a sphere on the top
+                    translate([0, 0, heights[len(heights) - 1] + startingHeight + endingHeight])
+                        sphere(r = torusRadius, $fn = 100);
+                    // With a torus on the bottom
+                    union() {
+                        translate([0, - startingHeight, startingHeight + torusRadius])
+                            rotate([0, - 90, 0])
+                                rotate([0, 0, 45])
+                                    torus(r1 = torusRadius, r2 = startingHeight, angle = 90, endstops = 0, $fn = 100);
+                    }
+                    translate([0, - startingHeight, torusRadius])
+                        sphere(r = torusRadius);
+                }
+                // We remove from the cylinder holes to attach to the torus
+                for (currentHeight = heights) {
+                    // The main hole
+                    translate([0, heights[len(heights) - 1] / 2, currentHeight + startingHeight])
+                        rotate([90, 0, 0])
+                            cylinder(r = torusRadius * 3 / 5, h = heights[len(heights) - 1], $fn = 100);
+                    // We also have to remove the torus footprint
+                    yTranslation = torusRadius;
+                    translate([- heights[len(heights) - 1] / 2, - yTranslation, currentHeight + startingHeight])
+                        rotate([90, 0, 90])
+                            cylinder(r = torusRadius * 3 / 5, h = heights[len(heights) - 1], $fn = 100);
+                }
+            }
+        }
+}
