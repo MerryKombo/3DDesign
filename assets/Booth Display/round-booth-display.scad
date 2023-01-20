@@ -3,6 +3,7 @@ use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s.scad>
+use <legs.scad>
 use <openscad-extra/torus.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
@@ -141,9 +142,7 @@ boardsRotations = [firstBoardRotation, secondBoardRotation, thirdBoardRotation, 
 echo("boardsRotations is ", boardsRotations);
 
 buildToruses();
-firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (
-    R5SSize.y
-    - R5SFeet[0].y) / 2]);
+
 echo("First circle height is ", firstCircleHeight);
 lasttorusInsideRadius = definitivePositionBoards[0][1][3][0];
 lastTorus = [torusRadius, torusInsideRadius, lasttorusInsideRadius];
@@ -160,18 +159,40 @@ module displayBoard() {
 }
 // buildFeetInTorus(definitivePositionBoards, boardsTranslations, boardsRotations, false, torusInsideRadius);
 
+firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (
+    R5SSize.y
+    - R5SFeet[0].y) / 2]);
+secondCircleHeight = definitivePositionBoards[3][1][3][0];
+thirdCircleHeight = definitivePositionBoards[0][1][3][0];
+fourthCircleHeight = definitivePositionBoards[1][1][3][0] - definitivePositionBoards[1][1][0][0];
+
+module buildLegs() {
+    unsortedHeights = [thirdCircleHeight, fourthCircleHeight];//[84, 52.5];
+    angles = [60, 120, 180, 240];
+    heights = quicksort(concat([0], unsortedHeights));
+    startingHeight = 20;
+
+    echo("heights=", heights);
+    translate([- torusRadius + torusInsideRadius * 4.4, - torusRadius + torusInsideRadius * 4.4,
+        0])
+        rotate([0, 0, - 45])
+            translate([0, 0, - startingHeight])
+                legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
+}
+
 // The toruses
 // We could have a look at https://github.com/UBaer21/UB.scad/blob/main/Images/generator.png to get funnier torus
 module buildToruses() {
-    firstCircleHeight = min([(nanoPiDuo2Size.y - nanoPiDuo2Feet[3].y) / 2, (mpiMQProSize.y - mpiMQProFeet[3].y) / 2, (
-        R5SSize.y
-        - R5SFeet[0].y) / 2]);
+
     echo("First circle height is ", firstCircleHeight);
     union() {
         difference() {
             translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, torusInsideRadius]))
                 difference() {
-                    torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+                    union() {
+                        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+                        buildLegs();
+                    }
                     color("green")
                         rotate([0, 0, 45])
                             translate([- (torusInsideRadius + torusRadius) * 1.1, 0, 0])
@@ -228,27 +249,33 @@ module buildToruses() {
                     buildFeet(definitivePositionBoards[3], true, torusInsideRadius);
         //buildLegos(torusRadius, torusInsideRadius);
     }
-    /*   // Second torus
-       // The height must be the one of the smallest board highest hole
-       secondCircleHeight = definitivePositionBoards[3][1][3][0];
-       difference() {
-           translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius / 2 +
-               secondCircleHeight]))
-               torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-       }
-       // Third torus
-       // The height must be the one of the other board highest hole
-       thirdCircleHeight = definitivePositionBoards[0][1][3][0];
-       translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius / 2 +
-           thirdCircleHeight]))
-           torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+    // Second torus
+    // The height must be the one of the smallest board highest hole
+    /*
+     difference() {
+         translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight +
+                 torusInsideRadius / 2 +
+             secondCircleHeight]))
+             torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+     }*/
+    // Third torus
+    // The height must be the one of the other board highest hole
+    echo("We'll address the board ", definitivePositionBoards[0][3]);
+    echo("Third circle height is ", thirdCircleHeight);
+    translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
+        / 2 +
+        thirdCircleHeight]))
+        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
 
-       // Fourth torus
-       // The height must be the one of the other board highest hole
-       fourthCircleHeight = definitivePositionBoards[1][1][3][0];
-       translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius / 2 +
-           fourthCircleHeight]))
-           torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
+    // Fourth torus
+    // The height must be the one of the other board highest hole
+
+    echo("We'll address the board ", definitivePositionBoards[1][3]);
+    echo("Fourth circle height is ", fourthCircleHeight);
+    translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
+        / 2 +
+        fourthCircleHeight]))
+        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
 }
 
 module buildLegos(torusRadius, torusInsideRadius) {
