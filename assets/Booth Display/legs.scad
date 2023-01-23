@@ -8,6 +8,8 @@ include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
 include <NopSCADlib/vitamins/rod.scad>
 include <NopSCADlib/vitamins/nuts.scad>
+include <NopSCADlib/vitamins/screw.scad>
+include <NopSCADlib/vitamins/screws.scad>
 use <../LEGO.scad/LEGO.scad>
 //include <BOSL2/std.scad>
 include <../Round-Anything/polyround.scad>
@@ -65,11 +67,11 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                 union() {
                     // The base is a dummy cylinder
                     translate([0, 0, startingHeight + torusRadius])
-                        cylinder(r = torusRadius, h = heights[len(heights) - 1] + endingHeight - torusRadius, $fn = 100)
+                        cylinder(r = torusRadius, h = heights[len(heights) - 1] - torusRadius, $fn = 100)
                             ;
                     // With half a sphere on the top
-                    translate([0, 0, heights[len(heights) - 1] + startingHeight + endingHeight])
-                        sphere(r = torusRadius, $fn = 100);
+                    //translate([0, 0, heights[len(heights) - 1] + startingHeight + endingHeight])
+                    //    sphere(r = torusRadius, $fn = 100);
                     // With a torus on the bottom
                     elbow(startingHeight, torusRadius);
                     // Would be nice to add a second torus on the top, aiming the center of the torus, with holes to host the display board
@@ -95,6 +97,7 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                 }
             }
         }
+    boltHelper(torusRadius, feetHoleSize);
 }
 
 module topElbow(startingHeight, torusRadius = 5, torusDiameter = 50) {
@@ -102,7 +105,26 @@ module topElbow(startingHeight, torusRadius = 5, torusDiameter = 50) {
         union() {
             rotate([180, 0, 0])
                 elbow(startingHeight, torusRadius);
-            cylinder(r = torusRadius, h = torusDiameter / 2, $fn = 100);
+            // The angle of the cone is found thanks to Thalès/. tan(bac) = bc/ac
+            coneHeight = torusDiameter / 2;
+            coneBaseWidth = torusRadius;
+            coneTopWidth = torusRadius / 2;
+            //angle = 90- atan(coneHeight / ((coneBaseWidth - coneTopWidth) / 2));
+            angle = 2 * atan(((coneBaseWidth - coneTopWidth) / 2) / coneHeight);
+            echo("The cone angle is :", angle);
+            /*translate([0, 0, - (coneBaseWidth - coneTopWidth) / 2])
+                rotate([angle, 0, 0])
+                    translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
+                        rotate([- 90, 0, 0])
+                            cylinder(r1 = coneBaseWidth, r2 = coneTopWidth, h = coneHeight, $fn = 100);*/
+
+            translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
+                union() {
+                    rotate([- 90, 0, 0])
+                        cylinder(r = coneBaseWidth, h = coneHeight, $fn = 100);
+                    translate([0, torusDiameter / 2, 0])
+                        sphere(r = coneBaseWidth, $fn = 100);
+                }
         }
 }
 
@@ -160,3 +182,29 @@ function nutHeight(holeSize) = (holeSize == 3) ?
                             nut_thickness(M4_nut) : (holeSize == 5) ?
                                     nut_thickness(M5_nut) : (holeSize == 6) ?
                                             nut_thickness(M6_nut) : nut_thickness(M8_nut);
+
+function screwName(holeSize) = (holeSize == 3) ?
+    M3_cap_screw : (holeSize == 2) ?
+            M2_cap_screw : (holeSize == 2.5) ?
+                    M2p5_cap_screw: (holeSize == 4) ?
+                            M4_cap_screw : (holeSize == 5) ?
+                                    M5_cap_screw : (holeSize == 6) ?
+                                            M6_cap_screw : M8_cap_screw;
+
+
+module boltHelper(torusInternalRadius, realHoleSize) {
+    difference() {
+        sphere(r = torusInternalRadius * 5 / 3);
+        translate([- torusInternalRadius * 5, 0, 0])
+            rotate([0, 90, 0])
+                cylinder(r = torusInternalRadius, h = torusInternalRadius * 10, $fn = 100);
+        translate([- torusInternalRadius * 5, 0, - torusInternalRadius * 2.5])
+            cube([torusInternalRadius * 10, torusInternalRadius * 10, torusInternalRadius * 5]);
+        echo("Screw name is ", screwName(realHoleSize));
+        translate([0, - torusInternalRadius * 4 / 3, 0])
+            rotate([90, 0, 0])
+                screw(screwName(realHoleSize*5/3), 30);
+        rotate([90, 0, 0])
+            cylinder(r = realHoleSize, h = torusInternalRadius * 10, $fn = 100);
+    }
+}
