@@ -142,6 +142,7 @@ boardsRotations = [firstBoardRotation, secondBoardRotation, thirdBoardRotation, 
 echo("boardsRotations is ", boardsRotations);
 
 buildToruses();
+displayBoard();
 
 echo("First circle height is ", firstCircleHeight);
 lasttorusInsideRadius = definitivePositionBoards[0][1][3][0];
@@ -153,9 +154,9 @@ module displayBoard() {
     translate([(torusRadius * 2 + torusInsideRadius * 2 - displayBoard.x.x) / 2, (torusRadius * 2 + torusInsideRadius *
         2 -
         displayBoard
-        .x.y) / 2, lasttorusInsideRadius + torusInsideRadius + displayBoard.x.z])
+        .x.y) / 2, lasttorusInsideRadius + torusInsideRadius + displayBoard.x.z+startingHeight+torusInsideRadius/1.5])
         board(displayBoard.x, displayBoard.y, displayBoard.z, displayBoard[3]);
-    torusToDisplayBracketAdapter(lastTorus, displayBoard);
+    //torusToDisplayBracketAdapter(lastTorus, displayBoard);
 }
 // buildFeetInTorus(definitivePositionBoards, boardsTranslations, boardsRotations, false, torusInsideRadius);
 
@@ -166,16 +167,34 @@ secondCircleHeight = definitivePositionBoards[3][1][3][0];
 thirdCircleHeight = definitivePositionBoards[0][1][3][0];
 fourthCircleHeight = definitivePositionBoards[1][1][3][0] - definitivePositionBoards[1][1][0][0];
 
+startingHeight = 20;
+
 module buildLegs() {
     unsortedHeights = [thirdCircleHeight, fourthCircleHeight];//[84, 52.5];
     angles = [60, 120, 180, 240];
     heights = quicksort(concat([0], unsortedHeights));
-    startingHeight = 20;
 
     echo("heights=", heights);
+    // First leg
     translate([- torusRadius + torusInsideRadius * 4.4, - torusRadius + torusInsideRadius * 4.4,
         0])
         rotate([0, 0, - 45])
+            translate([0, 0, - startingHeight])
+                legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
+    // Second leg
+    translate([torusRadius - torusInsideRadius * 4.4, - torusRadius + torusInsideRadius * 4.4, 0])
+        rotate([0, 0, 45])
+            translate([0, 0, - startingHeight])
+                legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
+    // Third leg
+    translate([- torusRadius + torusInsideRadius * 4.4, torusRadius - torusInsideRadius * 4.4,
+        0])
+        rotate([0, 0, - 135])
+            translate([0, 0, - startingHeight])
+                legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
+    // Fourth leg
+    translate([torusRadius - torusInsideRadius * 4.4, torusRadius - torusInsideRadius * 4.4, 0])
+        rotate([0, 0, 135])
             translate([0, 0, - startingHeight])
                 legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
 }
