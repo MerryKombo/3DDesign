@@ -1,15 +1,17 @@
-use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
 use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
-use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
-use <../Server Rack/1U/parts/board.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s.scad>
+use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
+use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
+use <../Server Rack/1U/parts/board.scad>
+use <inserts.scad>
 use <legs.scad>
 use <openscad-extra/torus.scad>
+use <../LEGO.scad/LEGO.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
-include <NopSCADlib/vitamins/rod.scad>
+include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/nuts.scad>
-use <../LEGO.scad/LEGO.scad>
+include <NopSCADlib/vitamins/rod.scad>
 
 // input : list of points
 // output : sorted by x vector of points
@@ -99,7 +101,11 @@ fourthBoardTranslation = [(torusRadius * 2 - definitivePositionBoards[3].x.y) / 
             definitivePositionBoards[3].x.z - definitivePositionBoards[3].x.z, fourthBoardZTranslation];
 fourthBoardRotation = [180, 90, 270];
 
-buildBoards();
+difference() {
+   // buildBoards();
+    /*translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, - torusInsideRadius]))
+        cylinder(r = torusRadius - torusInsideRadius, h = torusRadius * 2, $fn = 100);*/
+}
 
 module buildBoards() {
     translate(firstBoardTranslation)
@@ -141,8 +147,12 @@ echo("boardsTranslations is ", boardsTranslations);
 boardsRotations = [firstBoardRotation, secondBoardRotation, thirdBoardRotation, fourthBoardRotation];
 echo("boardsRotations is ", boardsRotations);
 
-buildToruses();
-displayBoard();
+difference() {
+    buildToruses();
+    /*translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, - torusInsideRadius]))
+        cylinder(r = torusRadius - torusInsideRadius, h = torusRadius * 2, $fn = 100);*/
+}
+// displayBoard();
 
 echo("First circle height is ", firstCircleHeight);
 lasttorusInsideRadius = definitivePositionBoards[0][1][3][0];
@@ -154,7 +164,8 @@ module displayBoard() {
     translate([(torusRadius * 2 + torusInsideRadius * 2 - displayBoard.x.x) / 2, (torusRadius * 2 + torusInsideRadius *
         2 -
         displayBoard
-        .x.y) / 2, lasttorusInsideRadius + torusInsideRadius + displayBoard.x.z+startingHeight+torusInsideRadius/1.5])
+        .x.y) / 2, lasttorusInsideRadius + torusInsideRadius + displayBoard.x.z + startingHeight + torusInsideRadius /
+        1.5])
         board(displayBoard.x, displayBoard.y, displayBoard.z, displayBoard[3]);
     //torusToDisplayBracketAdapter(lastTorus, displayBoard);
 }
@@ -204,69 +215,72 @@ module buildLegs() {
 module buildToruses() {
 
     echo("First circle height is ", firstCircleHeight);
-    union() {
-        difference() {
-            translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, torusInsideRadius]))
-                difference() {
-                    union() {
-                        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-                        buildLegs();
-                    }
-                    color("green")
-                        rotate([0, 0, 45])
-                            translate([- (torusInsideRadius + torusRadius) * 1.1, 0, 0])
-                                rotate([0, 90, 0])
-                                    let($show_threads = true)
-                                    studding(2 * torusInsideRadius * 3 / 5, (torusInsideRadius + torusRadius) * 2.2,
-                                    center = false,
-                                    $fn = 100);
-                    //leadscrew(2*torusInsideRadius*3/5, (torusInsideRadius+torusRadius)*2,(torusInsideRadius+torusRadius)*.2,4);
-                    //cylinder(r = torusInsideRadius * 3 / 5, h = (torusInsideRadius + torusRadius) * 2, $fn = 100);
+    difference() {
+        union() {
+            difference() {
+                translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, torusInsideRadius]))
+                    difference() {
+                        union() {
+                            torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+                            //buildLegs();
+                        }
+                        color("green")
+                            rotate([0, 0, 45])
+                                translate([- (torusInsideRadius + torusRadius) * 1.1, 0, 0])
+                                    rotate([0, 90, 0])
+                                        let($show_threads = true)
+                                        studding(2 * torusInsideRadius * 3 / 5, (torusInsideRadius + torusRadius) * 2.2,
+                                        center = false,
+                                        $fn = 100);
+                        //leadscrew(2*torusInsideRadius*3/5, (torusInsideRadius+torusRadius)*2,(torusInsideRadius+torusRadius)*.2,4);
+                        //cylinder(r = torusInsideRadius * 3 / 5, h = (torusInsideRadius + torusRadius) * 2, $fn = 100);
 
-                    color("blue")
-                        rotate([0, 0, - 45])
-                            translate([- (torusInsideRadius + torusRadius) * 1.1, 0, 0])
-                                rotate([0, 90, 0])
-                                    let($show_threads = true)
-                                    studding(2 * torusInsideRadius * 3 / 5, (torusInsideRadius + torusRadius) * 2.2,
-                                    center = false,
-                                    $show_threads = true, $fn =
-                                    100);
-                }
-            color("white")
+                        color("blue")
+                            rotate([0, 0, - 45])
+                                translate([- (torusInsideRadius + torusRadius) * 1.1, 0, 0])
+                                    rotate([0, 90, 0])
+                                        let($show_threads = true)
+                                        studding(2 * torusInsideRadius * 3 / 5, (torusInsideRadius + torusRadius) * 2.2,
+                                        center = false,
+                                        $show_threads = true, $fn =
+                                        100);
+                    }
+                color("yellow")
+                    translate(firstBoardTranslation)
+                        rotate(firstBoardRotation)
+                            buildInvertedFeet(definitivePositionBoards[0], true, torusInsideRadius);
+                color("yellow")
+                    translate(secondBoardTranslation)
+                        rotate(secondBoardRotation)
+                            buildInvertedFeet(definitivePositionBoards[1], true, torusInsideRadius);
+                color("yellow")
+                    translate(thirdBoardTranslation)
+                        rotate(thirdBoardRotation)
+                            buildInvertedFeet(definitivePositionBoards[2], true, torusInsideRadius);
+                color("yellow")
+                    translate(fourthBoardTranslation)
+                        rotate(fourthBoardRotation)
+                            buildInvertedFeet(definitivePositionBoards[3], true, torusInsideRadius);
+            }
+            color("MediumTurquoise")
                 translate(firstBoardTranslation)
                     rotate(firstBoardRotation)
-                        buildInvertedFeet(definitivePositionBoards[0], true, torusInsideRadius);
-            color("white")
+                        buildFeet(definitivePositionBoards[0], true, torusInsideRadius);
+            color("MediumTurquoise")
                 translate(secondBoardTranslation)
                     rotate(secondBoardRotation)
-                        buildInvertedFeet(definitivePositionBoards[1], true, torusInsideRadius);
-            color("white")
+                        buildFeet(definitivePositionBoards[1], true, torusInsideRadius);
+            color("MediumTurquoise")
                 translate(thirdBoardTranslation)
                     rotate(thirdBoardRotation)
-                        buildInvertedFeet(definitivePositionBoards[2], true, torusInsideRadius);
-            color("white")
+                        buildFeet(definitivePositionBoards[2], true, torusInsideRadius);
+            color("MediumTurquoise")
                 translate(fourthBoardTranslation)
                     rotate(fourthBoardRotation)
-                        buildInvertedFeet(definitivePositionBoards[3], true, torusInsideRadius);
+                        buildFeet(definitivePositionBoards[3], true, torusInsideRadius);
+            //buildLegos(torusRadius, torusInsideRadius);
         }
-        color("white")
-            translate(firstBoardTranslation)
-                rotate(firstBoardRotation)
-                    buildFeet(definitivePositionBoards[0], true, torusInsideRadius);
-        color("white")
-            translate(secondBoardTranslation)
-                rotate(secondBoardRotation)
-                    buildFeet(definitivePositionBoards[1], true, torusInsideRadius);
-        color("white")
-            translate(thirdBoardTranslation)
-                rotate(thirdBoardRotation)
-                    buildFeet(definitivePositionBoards[2], true, torusInsideRadius);
-        color("white")
-            translate(fourthBoardTranslation)
-                rotate(fourthBoardRotation)
-                    buildFeet(definitivePositionBoards[3], true, torusInsideRadius);
-        //buildLegos(torusRadius, torusInsideRadius);
+
     }
     // Second torus
     // The height must be the one of the smallest board highest hole
@@ -279,22 +293,22 @@ module buildToruses() {
      }*/
     // Third torus
     // The height must be the one of the other board highest hole
-    echo("We'll address the board ", definitivePositionBoards[0][3]);
+   /* echo("We'll address the board ", definitivePositionBoards[0][3]);
     echo("Third circle height is ", thirdCircleHeight);
     translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
         / 2 +
         thirdCircleHeight]))
-        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
 
     // Fourth torus
     // The height must be the one of the other board highest hole
 
-    echo("We'll address the board ", definitivePositionBoards[1][3]);
+   /* echo("We'll address the board ", definitivePositionBoards[1][3]);
     echo("Fourth circle height is ", fourthCircleHeight);
     translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
         / 2 +
         fourthCircleHeight]))
-        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
+        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
 }
 
 module buildLegos(torusRadius, torusInsideRadius) {
@@ -342,8 +356,12 @@ module buildFeet(board, lowHoles, torusInsideRadius) {
                         color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight
                             * 2
                         , $fn = 100);
-                        translate([0, 0, - .1])
-                            feetNutRecess(holeSize);
+                        /*translate([0, 0, - .1])
+                            feetNutRecess(holeSize);*/
+                        insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
+                        translate([0, 0, feetHeight])
+                        rotate([0, 0, 180])
+                            insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
                     }
                 secondFoot = feet[3];
                 echo("Second high foot", secondFoot);
@@ -352,8 +370,12 @@ module buildFeet(board, lowHoles, torusInsideRadius) {
                         color("red") cylinder(r = torusInsideRadius, h = feetHeight, $fn = 100);
                         color("blue") translate([0, 0, - feetHeight * .9]) cylinder(r = holeSize / 2, h = feetHeight * 2
                         , $fn = 100);
-                        translate([0, 0, - .1])
-                            feetNutRecess(holeSize);
+                        /*translate([0, 0, - .1])
+                            feetNutRecess(holeSize);*/
+                        insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
+                        translate([0, 0, feetHeight])
+                            rotate([0, 0, 180])
+                                insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
                     }
             } else {
                 firstFoot = feet[0];
