@@ -4,6 +4,7 @@ use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s.scad>
 use <openscad-extra/torus.scad>
+use <inserts.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
 include <NopSCADlib/vitamins/rod.scad>
@@ -36,7 +37,7 @@ endingHeight = 20;
 // We're supposed to have the four heights, but the torus will collide, so we'll have to use less torus and make
 // some adapter brackets of some sort
 // unsortedHeights = [21.05, 23, 56, 22.57];
-unsortedHeights = [84, 52.5];
+unsortedHeights = [84, 57.56];
 angles = [60, 120, 180, 240];
 heights = quicksort(concat([0], unsortedHeights));
 
@@ -52,16 +53,26 @@ quicksort(lesser), equal, quicksort(greater)
 echo("heights=", heights);
 legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
 
+color("white")
+    translate([0, 50 / 2, - 5 * 3])
+        union() {
+            cylinder(r = 3 / 2, h = 5 * 4, $fn = 100);
+            translate([0, 0, 5 * 3])
+                insert(insertName(3));
+        }
+
+
 // heights is a list of heights of the boards' holes
-module legs(heights, angles, startingHeight = 0, startingAngle = 0, torusRadius = 5, torusDiameter = 50) {
-    leg(heights, startingHeight, torusRadius, torusDiameter);
+module legs(heights, angles, startingHeight = 0, startingAngle = 0, torusRadius = 5, torusDiameter = 50, nutRatio = 1.05
+, topHoleSize = 3) {
+    leg(heights, startingHeight, torusRadius, torusDiameter, nutRatio = 1.05, topHoleSize = 3);
 }
 
-module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
+module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50, nutRatio = 1.05, topHoleSize = 3) {
     feetHoleSize = (torusRadius * 3 / 5);
     torusSize = torusRadius;
     echo("feetHoleSize=", feetHoleSize);
-  /*  color("DarkKhaki")
+    color("DarkKhaki")
         union() {
             difference() {
                 union() {
@@ -75,7 +86,7 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                     // With a torus on the bottom
                     elbow(startingHeight, torusRadius);
                     // Would be nice to add a second torus on the top, aiming the center of the torus, with holes to host the display board
-                    topElbow(startingHeight, torusRadius, torusDiameter);
+                    topElbow(startingHeight, torusRadius, torusDiameter, topHoleSize);
                 }
                 // We remove from the cylinder holes to attach to the torus
                 for (currentHeight = heights) {
@@ -87,7 +98,7 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                                 // We should also add a nut recess behind
                                 translate([0, 0, heights[len(heights) - 1] / 2 - torusRadius - nutHeight(feetHoleSize)])
                                     feetNutRecess(2 *
-                                        torusRadius * 3 / 5);
+                                        torusRadius * 3 / 5, nutRatio = nutRatio);
                             }
                     // We also have to remove the torus footprint
                     yTranslation = torusRadius;
@@ -96,35 +107,47 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                             cylinder(r = torusSize, h = heights[len(heights) - 1], $fn = 100);
                 }
             }
-        }*/
-    boltHelper(torusRadius, feetHoleSize);
+        }
+    // boltHelper(torusRadius, feetHoleSize);
 }
 
-module topElbow(startingHeight, torusRadius = 5, torusDiameter = 50) {
+module topElbow(startingHeight, torusRadius = 5, torusDiameter = 50, topHoleSize = 3) {
     translate([0, 0, heights[len(heights) - 1] + startingHeight + endingHeight + torusRadius])
-        union() {
-            rotate([180, 0, 0])
-                elbow(startingHeight, torusRadius);
-            // The angle of the cone is found thanks to Thalès/. tan(bac) = bc/ac
-            coneHeight = torusDiameter / 2;
-            coneBaseWidth = torusRadius;
-            coneTopWidth = torusRadius / 2;
-            //angle = 90- atan(coneHeight / ((coneBaseWidth - coneTopWidth) / 2));
-            angle = 2 * atan(((coneBaseWidth - coneTopWidth) / 2) / coneHeight);
-            echo("The cone angle is :", angle);
-            /*translate([0, 0, - (coneBaseWidth - coneTopWidth) / 2])
-                rotate([angle, 0, 0])
-                    translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
-                        rotate([- 90, 0, 0])
-                            cylinder(r1 = coneBaseWidth, r2 = coneTopWidth, h = coneHeight, $fn = 100);*/
+        difference() {
+            union() {
+                rotate([180, 0, 0])
+                    elbow(startingHeight, torusRadius);
+                // The angle of the cone is found thanks to Thalès/. tan(bac) = bc/ac
+                coneHeight = torusDiameter / 2;
+                coneBaseWidth = torusRadius;
+                coneTopWidth = torusRadius / 2;
+                //angle = 90- atan(coneHeight / ((coneBaseWidth - coneTopWidth) / 2));
+                angle = 2 * atan(((coneBaseWidth - coneTopWidth) / 2) / coneHeight);
+                echo("The cone angle is :", angle);
+                /*translate([0, 0, - (coneBaseWidth - coneTopWidth) / 2])
+                    rotate([angle, 0, 0])
+                        translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
+                            rotate([- 90, 0, 0])
+                                cylinder(r1 = coneBaseWidth, r2 = coneTopWidth, h = coneHeight, $fn = 100);*/
 
-            translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
-                union() {
-                    rotate([- 90, 0, 0])
-                        cylinder(r = coneBaseWidth, h = coneHeight, $fn = 100);
-                    translate([0, torusDiameter / 2, 0])
-                        sphere(r = coneBaseWidth, $fn = 100);
-                }
+                translate([0, torusDiameter / 2 - torusRadius, - torusRadius])
+                    union() {
+                        rotate([- 90, 0, 0])
+                            cylinder(r = coneBaseWidth, h = coneHeight, $fn = 100);
+                        translate([0, torusDiameter / 2, 0])
+                            sphere(r = coneBaseWidth, $fn = 100);
+                    }
+                // We add a top insert hole to allow the display board to be inserted
+                translate([0, torusDiameter / 2, - torusRadius * 2])
+                    insertBlock(topHoleSize, torusRadius * 2);
+            }
+            color("white")
+                translate([0, torusDiameter / 2, - torusRadius * 3])
+                    union() {
+                        cylinder(r = topHoleSize / 2, h = torusRadius * 4, $fn = 100);
+                        translate([0, 0, torusRadius * 3])
+                        insert(insertName(topHoleSize));
+                    }
         }
 }
 
@@ -140,14 +163,14 @@ module elbow(startingHeight, torusRadius = 5) {
     }
 }
 
-module feetNutRecess(realHoleSize) {
+module feetNutRecess(realHoleSize, nutRatio = 1.05) {
     roundedHoleSize = roundToNearestHalf(realHoleSize);
     holeSize = roundedHoleSize < realHoleSize ? roundedHoleSize : roundedHoleSize == realHoleSize? realHoleSize :
                 roundedHoleSize - .5 ;
     echo("Real hole size is", realHoleSize);
     echo("Computed hole size is", holeSize);
     union() {
-        scale([1.1, 1.1, 1.1])
+        scale([nutRatio, nutRatio, nutRatio])
             feetNut(holeSize);
         feetNut(holeSize);
     }
@@ -207,4 +230,15 @@ module boltHelper(torusInternalRadius, realHoleSize) {
         rotate([90, 0, 0])
             cylinder(r = realHoleSize, h = torusInternalRadius * 10, $fn = 100);
     }
+}
+
+module insertBlock(realHoleSize = 3, height = 20) {
+    roundedHoleSize = roundToNearestHalf(realHoleSize);
+    holeSize = roundedHoleSize < realHoleSize ? roundedHoleSize : roundedHoleSize == realHoleSize? realHoleSize :
+                roundedHoleSize - .5 ;
+    echo("Real hole size is", realHoleSize);
+    echo("Computed hole size is", holeSize);
+    echo("Block height is", height);
+    echo("Boss size is", insertName(holeSize));
+    insert_boss(insertName(holeSize), z = height, wall = 2);
 }
