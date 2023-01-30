@@ -13,6 +13,11 @@ include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/nuts.scad>
 include <NopSCADlib/vitamins/rod.scad>
 
+// TODO
+// Don't use the perfect size for the inserts, as if there ever is the slightest difference, it will be a problem to screw the boards in.
+// Use one size smaller, like 2.5 for 3, 2 for 2.5, but... 2 for 2 (and tea for two) ???
+// This will let us some margins, and we can always use a drill to make the hole bigger if needed.
+
 // input : list of points
 // output : sorted by x vector of points
 function quicksortVectorByX(vec) = !(len(vec) > 0) ? [] : let(
