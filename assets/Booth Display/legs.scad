@@ -61,7 +61,7 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
     feetHoleSize = (torusRadius * 3 / 5);
     torusSize = torusRadius;
     echo("feetHoleSize=", feetHoleSize);
-    color("DarkKhaki")
+  /*  color("DarkKhaki")
         union() {
             difference() {
                 union() {
@@ -96,7 +96,7 @@ module leg(heights, startingHeight = 0, torusRadius = 5, torusDiameter = 50) {
                             cylinder(r = torusSize, h = heights[len(heights) - 1], $fn = 100);
                 }
             }
-        }
+        }*/
     boltHelper(torusRadius, feetHoleSize);
 }
 
@@ -203,7 +203,7 @@ module boltHelper(torusInternalRadius, realHoleSize) {
         echo("Screw name is ", screwName(realHoleSize));
         translate([0, - torusInternalRadius * 4 / 3, 0])
             rotate([90, 0, 0])
-                screw(screwName(realHoleSize*5/3), 30);
+                screw(screwName(realHoleSize * 5 / 3), 30);
         rotate([90, 0, 0])
             cylinder(r = realHoleSize, h = torusInternalRadius * 10, $fn = 100);
     }
