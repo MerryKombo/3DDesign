@@ -53,15 +53,6 @@ quicksort(lesser), equal, quicksort(greater)
 echo("heights=", heights);
 legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
 
-color("white")
-    translate([0, 50 / 2, - 5 * 3])
-        union() {
-            cylinder(r = 3 / 2, h = 5 * 4, $fn = 100);
-            translate([0, 0, 5 * 3])
-                insert(insertName(3));
-        }
-
-
 // heights is a list of heights of the boards' holes
 module legs(heights, angles, startingHeight = 0, startingAngle = 0, torusRadius = 5, torusDiameter = 50, nutRatio = 1.05
 , topHoleSize = 3) {
