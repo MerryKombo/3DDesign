@@ -72,7 +72,9 @@ module bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
                 cylinder(r = baseSize / 2, h = baseHeight, $fn = 100);
                 translate([0, 0, (totalHeight - baseHeight) / 2]) cylinder(r = footSize / 2, h = baseHeight, $fn = 100);
             }
-            translate([0, 0, totalHeight - baseHeight]) cylinder(r = footSize / 2, h = baseHeight, $fn = 100);
+            color("red")
+                translate([0, 0, 0])
+                cylinder(r = footSize / 2, h = totalHeight, $fn = 100);
         }
         color("red") translate([0, 0, - 0.5]) cylinder(r = holeSize / 2, h = totalHeight + 1, $fn = 100);
     }
