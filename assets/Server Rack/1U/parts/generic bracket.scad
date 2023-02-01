@@ -74,7 +74,7 @@ module bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
             }
             color("red")
                 translate([0, 0, 0])
-                cylinder(r = footSize / 2, h = totalHeight, $fn = 100);
+                    cylinder(r = footSize / 2, h = totalHeight, $fn = 100);
         }
         color("red") translate([0, 0, - 0.5]) cylinder(r = holeSize / 2, h = totalHeight + 1, $fn = 100);
     }
@@ -220,10 +220,11 @@ module bracket_link(points, thickness, height) {
     // original
     atan = atan(horizontalSide / verticalSide);
     union() {
-        color("blue") translate([bottomPoints[0].x, 0, height * 2]) rotate([270, 0, - atan]) translate([0, 0, holeSize /
-            2]) cylinder(h
+        color("blue") translate([bottomPoints[0].x, bottomPoints[0].y, height * 2]) rotate([270, 0, - atan]) translate([
+            0, 0, holeSize /
+                2]) cylinder(h
         = length, r = thickness / 2, center = false, $fn = 100);
-        color("green") translate([bottomPoints[1][0], 0, height * 2])
+        color("green") translate([bottomPoints[1][0], bottomPoints[0].y, height * 2])
             /*translate([horizontalSide + gap, 0, height * 2])*/ rotate([270, 0, atan]) translate([0, 0, holeSize
                 / 2]
             ) cylinder(h = length, r = thickness / 2, center = false, $fn = 100);
