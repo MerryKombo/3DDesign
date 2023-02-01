@@ -1,0 +1,15 @@
+feet = [[0,0,0], [45.96,0,0], [0,45.96,0], [45.96,45.96,0]];
+size = [48, 46, 2];
+holeSize = 2.5;
+baseSize = 9;
+footSize = 5;
+baseHeight = 3;
+totalHeight = 7;
+linkThickness = 3;
+linkHeight = 2;
+verifierPlateThickness = 0.4;
+drillTemplateThickness = 1;
+drillTemplateGuideHeight = 20;
+hotShoeHeightClearance = 5;
+lengthFromBoardHarnessToEars = 20;
+earsHoleDiameter = 4;
