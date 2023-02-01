@@ -107,7 +107,7 @@ fourthBoardTranslation = [(torusRadius * 2 - definitivePositionBoards[3].x.y) / 
 fourthBoardRotation = [180, 90, 270];
 
 difference() {
-   // buildBoards();
+    // buildBoards();
     /*translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, - torusInsideRadius]))
         cylinder(r = torusRadius - torusInsideRadius, h = torusRadius * 2, $fn = 100);*/
 }
@@ -215,6 +215,13 @@ module buildLegs() {
                 legs(heights, angles, startingHeight, torusRadius = 5, $fn = 180);
 }
 
+module checkLegsHolesDistance() {
+    translate([-torusRadius/3,torusRadius/3,thirdCircleHeight+torusInsideRadius*4])
+        rotate([0, 0, 45])
+            rotate([90, 0, 0])
+                cylinder(r = torusInsideRadius, h = torusRadius, $fn = 100);
+}
+
 // The toruses
 // We could have a look at https://github.com/UBaer21/UB.scad/blob/main/Images/generator.png to get funnier torus
 module buildToruses() {
@@ -227,7 +234,8 @@ module buildToruses() {
                     difference() {
                         union() {
                             torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
-                            //buildLegs();
+                            buildLegs();
+                            checkLegsHolesDistance();
                         }
                         color("green")
                             rotate([0, 0, 45])
@@ -298,22 +306,22 @@ module buildToruses() {
      }*/
     // Third torus
     // The height must be the one of the other board highest hole
-   /* echo("We'll address the board ", definitivePositionBoards[0][3]);
-    echo("Third circle height is ", thirdCircleHeight);
-    translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
-        / 2 +
-        thirdCircleHeight]))
-        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
+    /* echo("We'll address the board ", definitivePositionBoards[0][3]);
+     echo("Third circle height is ", thirdCircleHeight);
+     translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
+         / 2 +
+         thirdCircleHeight]))
+         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
 
     // Fourth torus
     // The height must be the one of the other board highest hole
 
-   /* echo("We'll address the board ", definitivePositionBoards[1][3]);
-    echo("Fourth circle height is ", fourthCircleHeight);
-    translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
-        / 2 +
-        fourthCircleHeight]))
-        torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
+    /* echo("We'll address the board ", definitivePositionBoards[1][3]);
+     echo("Fourth circle height is ", fourthCircleHeight);
+     translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
+         / 2 +
+         fourthCircleHeight]))
+         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
 }
 
 module buildLegos(torusRadius, torusInsideRadius) {
@@ -365,8 +373,9 @@ module buildFeet(board, lowHoles, torusInsideRadius) {
                             feetNutRecess(holeSize);*/
                         insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
                         translate([0, 0, feetHeight])
-                        rotate([0, 0, 180])
-                            insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
+                            rotate([0, 0, 180])
+                                insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal =
+                                false);
                     }
                 secondFoot = feet[3];
                 echo("Second high foot", secondFoot);
@@ -380,7 +389,8 @@ module buildFeet(board, lowHoles, torusInsideRadius) {
                         insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
                         translate([0, 0, feetHeight])
                             rotate([0, 0, 180])
-                                insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal = false);
+                                insert_hole(insertName(roundToNearestHalf(holeSize)), counterbore = 0, horizontal =
+                                false);
                     }
             } else {
                 firstFoot = feet[0];
