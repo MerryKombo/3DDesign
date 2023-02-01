@@ -1,4 +1,4 @@
-include <../Server Rack/1U/boards/orangepi zero dimensions.scad>
+include <fake top board dimensions.scad>
 include <boards adapter utils.scad>
 feet2 = [[6.3,3,0], [44-7.7,3,0], [6.3,33,0], [44-7.7,33,0]];
 size2 = [44, 36, 1.5];
@@ -21,11 +21,11 @@ boards = [feet,feet2];
 biggestBoard = getTheBiggest(boards);
 
 echo ("The biggest board is the #", biggestBoard);
-positionTopBoard(0, [10,10], feet, feet2);
+/*positionTopBoard(0, [10,10], feet, feet2);
 positionTopBoard(1, [0,0], feet, feet2);
 positionTopBoard(2, [0,0], feet, feet2);
-positionTopBoard(3, [0,0], feet, feet2);
-centeredTopBoard = positionTopBoard(4, [0,-5.39], feet, feet2);
+positionTopBoard(3, [0,0], feet, feet2);*/
+centeredTopBoard = positionTopBoard(4, [0,0], feet, feet2);
 centeredBoards = [centeredTopBoard, feet2];
 echo("Nearest points", getNearestPoints(getAllPoints(centeredTopBoard, feet2)));
 draw_mesh(centeredBoards);
