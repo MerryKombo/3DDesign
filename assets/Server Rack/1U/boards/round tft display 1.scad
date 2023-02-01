@@ -26,19 +26,21 @@ module round_tft_display_1_feet() {
 
 module round_tft_display_1_bracket() {
     union() {
-    bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
-    tanOppositeAngle=(feet[1].x-feet[0].x)/(feet[3].y-feet[1].y);
-    echo("Tan is", tanOppositeAngle);
-    oppositeAngle=90 - atan(tanOppositeAngle);
-    echo("Angle is", oppositeAngle);
-        
-        diagonal = sqrt(feet[3].x^2+feet[3].y^2);
-        labelLength = (diagonal / 2) - baseSize / 2 - linkThickness / 2;
-        
-    rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
-        //drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+        bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+        tanOppositeAngle = (feet[1].x - feet[0].x) / (feet[3].y - feet[1].y);
+        echo("Tan is", tanOppositeAngle);
+        oppositeAngle = 90 - atan(tanOppositeAngle);
+        echo("Angle is", oppositeAngle);
 
-            drawLabel(label, baseSize, labelLength, plateHeight, linkHeight / 2, feet);
+        diagonal = sqrt(feet[3].x^2 + feet[3].y^2);
+        labelLength = (diagonal / 2) - baseSize / 2 - linkThickness *1.5;
+        labelHeight = baseSize / 3;
+
+        translate([feet[0].x + linkThickness + labelHeight*.8, feet[0].y, 0])
+            rotate([0, 0, oppositeAngle]) translate([0, 0, baseHeight - plateHeight])
+                //drawLabel(label, baseSize, plateHeight, linkHeight, feet);
+
+                drawLabel(label, labelHeight, labelLength, plateHeight, linkHeight / 2, feet);
     }
 }
 
