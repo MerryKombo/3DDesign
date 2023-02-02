@@ -17,8 +17,8 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     fake_top_board_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) fake_top_board_vertical_bracket();*/
 
-//fake_top_board_bracket();
-fake_top_board_dimensions_verifier();
+fake_top_board_bracket();
+//fake_top_board_dimensions_verifier();
 
 module fake_top_board_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
