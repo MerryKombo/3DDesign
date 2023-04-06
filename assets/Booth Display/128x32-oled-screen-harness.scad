@@ -40,10 +40,10 @@ reinforcementY = 5;
 reinforcementFootLength = 1.11;
 reinforcementFootHeight = 0.8;
 
-//bottom();
-//top();
+// bottom();
+// top();
 
-assembly();
+// assembly();
 
 module assembly() {
     union() {
@@ -75,11 +75,19 @@ module top() {
     color("olive")
         union() {
             difference() {
-                cube(size = [topWidth, topHeight, topDepth]);
+                union() {
+                    cube(size = [topWidth, topHeight, topDepth]);
+                    translate([0, 0, topDepth])
+                        difference() {
+                            cube(size = [topWidth, topHeight, reinforcementDepth]);
+                            translate([5,5,0])
+                            cube(size = [topWidth-10, topHeight-10, reinforcementDepth+.1]);
+                        }
+                }
                 translate([holeX, holeY, - .05]) cube(size = [holeWidth, holeHeight, topDepth + 0.1]);
                 screwHoles();
             }
-            translate([reinforcementX, reinforcementY, 0])
+            translate([reinforcementX, reinforcementY, topDepth])
                 union() {
                     cube(size = [reinforcementWidth, reinforcementHeight, reinforcementDepth]);
                     translate([reinforcementWidth, 0, 0])

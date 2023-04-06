@@ -231,5 +231,8 @@ module insertBlock(realHoleSize = 3, height = 20) {
     echo("Computed hole size is", holeSize);
     echo("Block height is", height);
     echo("Boss size is", insertName(holeSize));
+    echo("insert_boss_radius(type, wall)	", insert_boss_radius(insertName(holeSize), wall=2));
     insert_boss(insertName(holeSize), z = height, wall = 2);
 }
+
+function insertRadius(realHoleSize) = insert_boss_radius(insertName(realHoleSize), wall=2);
