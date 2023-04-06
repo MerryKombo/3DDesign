@@ -1,10 +1,10 @@
 topWidth = 48.55;
 topHeight = 22.5;
-topDepth = 0.4;
+topDepth = 0.8;
 
 bottomDepth = 3.6;
 bottomFirstRecessDepth = 1.84;
-bottomFirstRecessWidth = 38.55;
+bottomFirstRecessWidth = 39;//38.55;
 bottomFirstRecessHeight = 12.5;
 bottomFirstRecessX = (topWidth - bottomFirstRecessWidth) / 2;
 bottomFirstRecessY = (topHeight - bottomFirstRecessHeight) / 2;
@@ -18,7 +18,8 @@ bottomSecondRecessY = bottomFirstRecessY;
 bottomThirdRecessDepth = bottomDepth;
 bottomThirdRecessWidth = 2.6;
 bottomThirdRecessHeight = 12.5;
-bottomThirdRecessX = 5;
+bottomThirdRecessX = (topWidth - bottomFirstRecessWidth) / 2;  //5;
+echo("bottomThirdRecessX: ", bottomThirdRecessX);
 bottomThirdRecessY = bottomFirstRecessY;
 
 holeWidth = 24.38;
@@ -40,7 +41,9 @@ reinforcementFootLength = 1.11;
 reinforcementFootHeight = 0.8;
 
 //bottom();
-top();
+//top();
+
+assembly();
 
 module assembly() {
     union() {
