@@ -107,7 +107,7 @@ fourthBoardTranslation = [(torusRadius * 2 - definitivePositionBoards[3].x.y) / 
 fourthBoardRotation = [180, 90, 270];
 
 difference() {
-    // buildBoards();
+     buildBoards();
     /*translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, - torusInsideRadius]))
         cylinder(r = torusRadius - torusInsideRadius, h = torusRadius * 2, $fn = 100);*/
 }
@@ -306,22 +306,22 @@ module buildToruses() {
      }*/
     // Third torus
     // The height must be the one of the other board highest hole
-    /* echo("We'll address the board ", definitivePositionBoards[0][3]);
+     echo("We'll address the board ", definitivePositionBoards[0][3]);
      echo("Third circle height is ", thirdCircleHeight);
      translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
          / 2 +
          thirdCircleHeight]))
-         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
+         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
 
     // Fourth torus
     // The height must be the one of the other board highest hole
 
-    /* echo("We'll address the board ", definitivePositionBoards[1][3]);
+     echo("We'll address the board ", definitivePositionBoards[1][3]);
      echo("Fourth circle height is ", fourthCircleHeight);
      translate(([torusRadius + torusInsideRadius, torusRadius + torusInsideRadius, firstCircleHeight + torusInsideRadius
          / 2 +
          fourthCircleHeight]))
-         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);*/
+         torus(r1 = torusInsideRadius, r2 = torusRadius, angle = 360, endstops = 0, $fn = 100);
 }
 
 module buildLegos(torusRadius, torusInsideRadius) {
