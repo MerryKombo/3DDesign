@@ -1,4 +1,6 @@
-include <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
+//include <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
+include <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
+include <../Server Rack/1U/boards/>
 include <128x32-oled-screen-harness.scad>
 include <NopSCADlib/vitamins/inserts.scad>
 use <legs.scad>
@@ -15,7 +17,7 @@ distanceBetweenSBCHoles = feet[3][1] - feet[0][1];
 distanceBetweenScreenHoles = screwDistance;
 
 differenceBetweenHoles = (screwDistance - distanceBetweenSBCHoles) / 2;
-armLength = 20;
+armLength = 04.2;
 
 newFeet = [[0, 0, 0], [distanceBetweenScreenHoles, 0, 0], [differenceBetweenHoles, armLength, 0], [
         distanceBetweenScreenHoles - differenceBetweenHoles, armLength, 0]];
