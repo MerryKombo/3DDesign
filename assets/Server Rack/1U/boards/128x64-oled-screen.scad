@@ -17,7 +17,7 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     128x64_oled_screen_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) 128x64_oled_screen_vertical_bracket();*/
 
-128x64_oled_screen_bracket();
+// 128x64_oled_screen_bracket();
 
 module 128x64_oled_screen_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;

@@ -17,7 +17,7 @@ translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(
     round_tft_display_1_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) round_tft_display_1_vertical_bracket();*/
 
-round_tft_display_1_bracket();
+// round_tft_display_1_bracket();
 // round_tft_display_1_dimensions_verifier();
 
 module round_tft_display_1_feet() {
