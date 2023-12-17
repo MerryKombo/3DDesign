@@ -12,4 +12,4 @@ ports:
 
 # This will make it so that on workspace start it will run a file called `app.py`
 tasks:
-  - command:
+  - command: openscad
