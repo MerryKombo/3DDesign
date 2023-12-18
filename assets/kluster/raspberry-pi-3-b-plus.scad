@@ -1,7 +1,7 @@
 include <SBC_Model_Framework/sbc_models.scad>
 
-module sbc() {
-    // sbc("rpi3b+");
+module k_sbc() {
+    sbc("rpi3b+");
     sbc_model = ["rpi3b+"];
     s = search(sbc_model, sbc_data);
 
@@ -12,5 +12,10 @@ module sbc() {
     pcbsize_z = sbc_data[s[0]][3];
     pcbcorner_radius = sbc_data[s[0]][4];
     sbc_topmax_component_z = sbc_data[s[0]][5];
-    cube([pcbsize_x, pcbsize_y, sbc_topmax_component_z + pcbsize_z]);
+    // cube([pcbsize_x, pcbsize_y, sbc_topmax_component_z + pcbsize_z]);
+    echo("pcbsize_x: ", pcbsize_x);
+    echo("pcbsize_y: ", pcbsize_y);
+    echo("pcbsize_z: ", pcbsize_z);
+    echo("pcbcorner_radius: ", pcbcorner_radius);
+    echo("sbc_topmax_component_z: ", sbc_topmax_component_z);
 }
