@@ -13,8 +13,3 @@ ports:
 # This will make it so that on workspace start it will run a file called `app.py`
 tasks:
   - command: openscad
-    init: true
-    openMode: split-right
-    root: true
-# Install all the necessary openSCAD libraries from GitHub... But first, get to know where they're store under Linux.
-# How exciting this will be!
