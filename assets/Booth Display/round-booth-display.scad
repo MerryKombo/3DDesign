@@ -5,7 +5,7 @@ use <../Server Rack/1U/boards/mangopi mq-pro dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
 use <inserts.scad>
 use <legs.scad>
-use <openscad-extra/torus.scad>
+use <openscad-extra/src/torus.scad>
 use <../LEGO.scad/LEGO.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
