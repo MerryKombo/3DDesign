@@ -1,4 +1,3 @@
-
 /**
  * This function creates an array of coordinates for the feet of the bracket.
  *
@@ -29,20 +28,31 @@ function createFeet(holes, i = 0, result = []) =
  * Finally, it draws a hole through the foot using the translate and cylinder functions.
  */
 module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize) {
-    // Draw the base of the foot
-    color("red")
-        translate(foot)
-            cube([baseSize, baseSize, baseHeight], center = true);
+    echo("drawFoot: ", foot);
+    echo("baseSize: ", baseSize);
+    echo("baseHeight: ", baseHeight);
+    echo("topHeight: ", topHeight);
+    echo("totalHeight: ", totalHeight);
+    echo("holeSize: ", holeSize);
 
-    // Draw the top of the foot
-    color("green")
-        translate([foot[0], foot[1], baseHeight + topHeight / 2])
-            cube([baseSize, baseSize, topHeight], center = true);
+    translate(foot)
+        difference() {
+            hull() {
+                // Draw the base of the foot
+                color("red")
+                    // cube([baseSize, baseSize, baseHeight], center = true);
+                    cylinder(h = baseHeight, r = baseSize / 2, center = true, $fn = 100);
 
-    // Draw the hole through the foot
-    color("black")
-        translate([foot[0], foot[1], totalHeight / 2])
-            cylinder(h = totalHeight, r = holeSize / 2, center = true);
+                // Draw the top of the foot
+                color("green")
+                    translate([0, 0, baseHeight / 2 + topHeight / 2])
+                        // cube([baseSize * 0.7, baseSize * 0.7, topHeight], center = true);
+                        cylinder(h = topHeight, r = baseSize * 0.7 / 2, center = true, $fn = 100);
+            }
+            // Draw the hole through the foot
+            color("black")
+                cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+        }
 }
 
 /**
@@ -77,7 +87,7 @@ module drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize)
  */
 module drawLinks(feet, linkHeight, linkThickness) {
     // Calculate the midpoint between the first pair of diagonally opposed feet
-    midpoint1 = [(feet[0][0] + feet[3][0]) / 2, (feet[0][1] + feet[3][1]) / 2, linkHeight];
+    midpoint1 = [(feet[0][0] + feet[3][0]) / 2, (feet[0][1] + feet[3][1]) / 2, linkHeight - linkThickness * 1.5];
     echo("Midpoint 1: ", midpoint1); // Echo the midpoint1
 
     // Calculate the distance between the first pair of diagonally opposed feet
@@ -92,11 +102,11 @@ module drawLinks(feet, linkHeight, linkThickness) {
 
     // Draw the link between the first pair of diagonally opposed feet
     translate(midpoint1)
-        rotate([0, 0, angle1+90])
+        rotate([0, 0, angle1 + 90])
             cube([linkThickness, distance1, linkThickness], center = true);
 
     // Calculate the midpoint between the second pair of diagonally opposed feet
-    midpoint2 = [(feet[1][0] + feet[2][0]) / 2, (feet[1][1] + feet[2][1]) / 2, linkHeight];
+    midpoint2 = [(feet[1][0] + feet[2][0]) / 2, (feet[1][1] + feet[2][1]) / 2, linkHeight - linkThickness * 1.5];
     echo("Midpoint 2: ", midpoint2); // Echo the midpoint2
 
     // Calculate the distance between the second pair of diagonally opposed feet
@@ -110,7 +120,7 @@ module drawLinks(feet, linkHeight, linkThickness) {
 
     // Draw the link between the second pair of diagonally opposed feet
     translate(midpoint2)
-        rotate([0, 0, angle2+90])
+        rotate([0, 0, angle2 + 90])
             cube([linkThickness, distance2, linkThickness], center = true);
 }
 
@@ -131,11 +141,22 @@ module drawLinks(feet, linkHeight, linkThickness) {
  */
 module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight) {
     topHeight = totalHeight - baseHeight;
-    drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize);
-
-    drawLinks(feet, linkHeight, linkThickness);
+    difference() {
+        union() {
+            drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize);
+            drawLinks(feet, linkHeight, linkThickness);
+        }
+        // Draw a hole in each foot after the feet and links are drawn
+        for (i = [0 : len(feet) - 1]) {
+            foot = feet[i];
+            x = foot[0];
+            y = foot[1];
+            translate([x, y, totalHeight / 2]) {
+                cylinder(h = totalHeight, r = holeSize / 2, center = true, $fn = 100);
+            }
+        }
+    }
 }
-
 
 /**
  * This module draws a cylinder through a specified hole and adds the hole number on top of the cylinder.
@@ -158,7 +179,7 @@ module drawCylinderThroughHole(holes, hole_number) {
 
     // Draw a cylinder centered on the hole
     translate([x, y, size / 2]) {
-        cylinder(h = size, r = size / 2, center = true);
+        cylinder(h = size, r = size / 2, center = true, $fn = 100);
     }
 
     // Add the hole number on top of the cylinder

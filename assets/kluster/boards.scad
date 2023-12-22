@@ -27,7 +27,7 @@ module ensureBoardsFit(fan_diameter, board_width) {
  * The board is then translated to this position and rotated to face outwards from the center of the fan.
  * Finally, the fan is placed at the center of the arrangement.
  */
-module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, holes) {
+module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, boardThickness, holes) {
     // Calculate the angle between each board
     angle_step = 360 / num_boards;
     // Calculate the radius of the fan
@@ -58,9 +58,14 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
                                             feet = createFeet(holes);
                                             echo("feet: ", feet);
                                             holeSize = holes[0][2];
-                                            translate([0, 0, 10])
-                                                bracket_bracket(feet, holeSize, holeSize * 2, holeSize, holeSize * 2,
-                                                holeSize, holeSize);
+                                            baseSize = holeSize + 4;
+                                            baseHeight = holeSize * 2;
+                                            totalHeight = baseHeight * 1.5;
+                                            linkThickness = holeSize;
+                                            linkHeight = baseHeight;
+                                            translate([0, 0, baseHeight / 2 - totalHeight])
+                                                bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight,
+                                                linkThickness, linkHeight);
                                             //bracket_bracket(feet, holeSize, baseSize,     baseHeight, totalHeight,  linkThickness, linkHeight);
 
                                         }

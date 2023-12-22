@@ -73,7 +73,7 @@ union() {
     // translate([pcbsize_y, 0, 0])
     // rotate([0, -90, 90])
     // k_sbc();
-    arrangeBoardsAndFan(8, 140, pcbsize_y, pcbsize_x, holes);
+    arrangeBoardsAndFan(8, 140, pcbsize_y, pcbsize_x, pcbsize_z, holes);
 
     // Calculate the radius of the fan
     radius = fan_diameter / 2 - pcbsize_y;
