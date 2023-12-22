@@ -1,4 +1,4 @@
-FROM debian:sid-20221205-slim
+FROM debian:bookworm-20231218-slim
 
 ARG user=openscad
 ARG group=openscad
@@ -57,8 +57,8 @@ ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scri
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
-# Install fonts
-RUN cd /tmp && curl -O https://media.fontsgeek.com/download/zip/i/s/isonorm-3098_5MJ6L.zip && unzip iso*zip && \
+# Install fonts \
+RUN cd /tmp && curl -O https://media.fontsgeek.com/download/zip/i/s/isonorm-3098-regular_gcUil.zip && unzip iso*zip && \
     rm iso*.zip && find . -name Isonorm\ 3098\ Regular.otf -exec cp {} /usr/local/share/fonts \; && \
     rm -fr Isonorm\ 3098\ Regular/Isonorm
 
