@@ -76,11 +76,12 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && curl -L https://github.com/boltsparts/BOLTS_archive/releases/download/v0.4.1/boltsfc_0.4.1.tar.gz | tar xz \
     && git clone https://github.com/rcolyer/threads-scad.git \
     && git clone https://github.com/thehans/funcutils.git \
-    && git clone https://github.com/tallakt/bladegen.git && mv bladegen\libraries/bladegen/* bladegen \
+    && git clone https://github.com/tallakt/bladegen.git && mv bladegen/libraries/bladegen/* bladegen \
     && git clone https://github.com/JustinSDK/dotSCAD.git && cd dotSCAD && for dir in *; do [ "$dir" = "src" ] \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
-    && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && for dir in *; do [ "$dir" = "src" ] \
-    && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src
+    && cd .. && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && for dir in *; do [ "$dir" = "src" ] \
+    && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
+    && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git
 
 # TODO
 # Create a entrypoint script to start the default parsing/rendering process
