@@ -1,6 +1,8 @@
 include <NopSCADlib/vitamins/inserts.scad>
 use <../Booth Display/inserts.scad>;
 include <utils.scad>;
+include <NopSCADlib/vitamins/screw.scad>
+include <NopSCADlib/vitamins/screws.scad>
 
 /**
  * This module draws "ears" around the torus.
@@ -35,7 +37,7 @@ module drawEars(outerRadius, earSize, numEars, hole = false) {
 module reinforcementUnit(length, width, thickness) {
     //cube([length, width, thickness], center = true);
     rotate([0, 90, 0])
-    cylinder(r = width / 2, h = length, center = true, $fn = 100);
+        cylinder(r = width / 2, h = length, center = true, $fn = 100);
 }
 
 module createReinforcement(outerRadius, innerRadius, finThickness, numEars) {
@@ -66,24 +68,40 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
     echo("Building torus with outer radius = ", outerRadius, ", inner radius = ", innerRadius, ", earSize = ", earSize,
     ", and number of ears = ", numEars);
     // Draw the main body of the torus
-    color("white")
-        union() {
-            difference() {
-                rotate_extrude($fn = 100/*numEars*/)
-                    translate([outerRadius / 2, 0, 0])
-                        circle(r = innerRadius, $fn = 100);
+    //color("white")
+    union() {
+        difference() {
+            union() {
+                difference() {
+                    rotate_extrude($fn = 100/*numEars*/)
+                        translate([outerRadius / 2, 0, 0])
+                            circle(r = innerRadius, $fn = 100);
 
-                // Remove the ears
-                drawEars(outerRadius, earSize, numEars);
+                    // Remove the ears
+                    drawEars(outerRadius, earSize, numEars);
+                }
+                // Draw the ears
+                drawEars(outerRadius, earSize, numEars, hole = true);
+                // Create the reinforcements
+                for (i = [0 : numEars - 1]) {
+                    rotate([0, 0, i * 360 / numEars])
+                        createReinforcement(outerRadius, innerRadius, finThickness, numEars);
+                }
             }
-            // Draw the ears
-            drawEars(outerRadius, earSize, numEars, hole = true);
-            // Create the reinforcements
-            for (i = [0 : numEars - 1]) {
-                rotate([0, 0, i * 360 / numEars])
-                    createReinforcement(outerRadius, innerRadius, finThickness, numEars);
-            }
+            color("black")
+            translate([0, 0, innerRadius])
+                insert(insertName(3));
+
+            translate([0, 0, innerRadius])
+                screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
         }
+        difference() {
+            translate([0, 0, - innerRadius])
+                insert_boss(insertName(3), z = innerRadius * 2, wall = 2);
+            translate([0, 0, innerRadius])
+            screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+        }
+    }
 }
 
 /**
