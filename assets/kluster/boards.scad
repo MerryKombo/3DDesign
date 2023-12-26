@@ -27,7 +27,8 @@ module ensureBoardsFit(fan_diameter, board_width) {
  * The board is then translated to this position and rotated to face outwards from the center of the fan.
  * Finally, the fan is placed at the center of the arrangement.
  */
-module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, boardThickness, holes) {
+module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, boardThickness, holes, showSBC = false)
+{
     // Calculate the angle between each board
     angle_step = 360 / num_boards;
     // Calculate the radius of the fan
@@ -49,7 +50,9 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
                                 rotate([0, 0, 90])
                                     rotate([0, 90, 0])
                                         union() {
-                                            k_sbc();
+                                            if (showSBC) {
+                                                k_sbc();
+                                            }
                                             for (i = [0 : len(holes) - 1]) {
                                                 drawCylinderThroughHole(holes, i);
                                             }
@@ -75,9 +78,17 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
         translate([0, 0, 12.5]) base_fan();
 
         // Add a cylinder at the center of the arrangement
+        holeSize = holes[0][2];
+        baseSize = holeSize + 4;
+        baseHeight = holeSize * 2;
+        totalHeight = baseHeight * 1.5;
+        linkThickness = holeSize;
+        linkHeight = baseHeight;
         translate([0, 0, 25])
-
-            centerCylinder(radius, 0.4, board_width, board_height, 8);
+            createCylinders(radius = radius, board_width = board_width, num_boards = num_boards, cylinder_height =
+            getBoardSize().x, cylinder_radius = getHoleSize() / 2);
+        //        createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards = numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2);
+        //centerCylinder(radius, 0.4, board_width, board_height, 8);
         //centerTorus(radius/2, radius/4);
         //tree();
         //coral(10, 20, 0, 2,0.123);
