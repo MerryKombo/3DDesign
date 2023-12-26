@@ -5,8 +5,7 @@ include <utils.scad>;
 union() {
     torusBaseRadius = getTorusSize();
     arrangeBoardsAndFan(numberOfBoards, fan_diameter, pcbsize_y, pcbsize_x, pcbsize_z, holes);
-    buildBase(outerRadius = fan_diameter * 1.1, innerRadius = baseHeight, earSize = earSize, numEars = numberOfBoards,
-    baseHeight = baseHeight);
+    buildBase(outerRadius = fan_diameter * 1.1, innerRadius = baseHeight, earSize = earSize, numEars = numberOfBoards, baseHeight = baseHeight);
     // Calculate the radius of the fan
     radius = fan_diameter / 2 - pcbsize_y;
     // centerCylinder(radius, 0.4, pcbsize_y, pcbsize_x,8);
