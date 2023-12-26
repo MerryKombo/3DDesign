@@ -1,7 +1,5 @@
 include <torus.scad>;
 include <raspberry-pi-3-b-plus.scad>;
-include <torus.scad>;
-include <raspberry-pi-3-b-plus.scad>;
 
 sbc_model = ["rpi3b+"];
 s = search(sbc_model, sbc_data);
@@ -78,4 +76,5 @@ earSize = 10;
 
 function getTorusSize() = fan_diameter * 1.1;
 function getFanDiameter() = fan_diameter;
-function getBoardSize() = [pcbsize_x, pcbsize_y, pcbsize_z]; // Replace [84, 57.56] with the actual size of the board
+function getBoardSize() = [pcbsize_x, pcbsize_y, pcbsize_z];
+function getHoleSize() = sbc_data[s[0]][9];
