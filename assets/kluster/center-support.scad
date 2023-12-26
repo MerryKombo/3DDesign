@@ -1,3 +1,7 @@
+include <utils.scad>;
+include <NopSCADlib/vitamins/inserts.scad>
+use <../Booth Display/inserts.scad>;
+
 /**
  * This module creates a torus (donut shape) in OpenSCAD.
  *
@@ -12,6 +16,46 @@ module centerTorus(radius, tube_radius) {
     rotate_extrude($fn = 100)
         translate([radius, 0, 0])
             circle(r = tube_radius);
+}
+
+module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1) {
+    echo("Creating cylinders");
+    echo("Radius: ", radius);
+    echo("Board width: ", board_width);
+    echo("Number of boards: ", num_boards);
+    echo("Cylinder height: ", cylinder_height);
+    echo("Cylinder radius: ", cylinder_radius);
+    translate([0, 0, cylinder_height / 2])
+        union() {
+            // Create a torus at the bottom of the cylinders
+            translate([0, 0, - cylinder_height / 2 + cylinder_radius])
+                rotate_extrude($fn = 100/*numEars*/)
+                    translate([radius, 0, 0])
+                        circle(r = cylinder_radius, $fn = 100);
+            angle_step = 360 / num_boards;
+            insertSize = 2 * PI * radius / num_boards;
+            for (i = [0 : num_boards - 1]) {
+                angle = i * angle_step;
+                x = radius * cos(angle);
+                y = radius * sin(angle);
+                translate([x, y, 0])
+                    union() {
+                        cylinder(h = cylinder_height, r = cylinder_radius, center = true, $fn = 100);
+                        // Calculate the sides
+                        hypotenuse = insertSize;
+                        adjacent = cos(angle) * hypotenuse;
+                        opposite = sin(angle) * hypotenuse;
+                        translate([-adjacent, -opposite, 0])
+                            rotate([0, 90, angle])
+                                insert_boss(insertName(2), z = insertSize, wall = 1);
+                    }
+            }
+            // Create a torus at the top of the cylinders
+            translate([0, 0, cylinder_height / 2 - cylinder_radius])
+                rotate_extrude($fn = 100/*numEars*/)
+                    translate([radius, 0, 0])
+                        circle(r = cylinder_radius, $fn = 100);
+        }
 }
 
 module centerCylinder(radius, wall_thickness, board_width, board_height, num_boards) {
@@ -68,3 +112,6 @@ module branch(length, angle, thickness) {
             branch(length * 0.8, angle - 45, thickness * 0.8);
     }
 }
+
+createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards =
+numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2);
