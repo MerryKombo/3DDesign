@@ -17,7 +17,18 @@ module centerTorus(radius, tube_radius) {
         translate([radius, 0, 0])
             circle(r = tube_radius);
 }
-
+/**
+ * This module creates a set of cylinders arranged in a circular pattern, with a torus at the top and bottom.
+ *
+ * @param radius The distance from the center of the circle to the center of each cylinder.
+ * @param board_width The width of the board that the cylinders are attached to.
+ * @param num_boards The number of boards that the cylinders are attached to.
+ * @param cylinder_height The height of each cylinder. Default is 10.
+ * @param cylinder_radius The radius of each cylinder. Default is 1.
+ *
+ * The function works by first creating a torus at the bottom of the cylinders. Then, it calculates the angle step and insert size.
+ * It then creates each cylinder and its corresponding insert boss in a loop. After all cylinders are created, it creates a torus at the top.
+ */
 module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1) {
     echo("Creating cylinders");
     echo("Radius: ", radius);
@@ -33,22 +44,30 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                     translate([radius, 0, 0])
                         circle(r = cylinder_radius, $fn = 100);
             angle_step = 360 / num_boards;
-            insertSize = 2 * PI * radius / num_boards;
+            insertSize = 2 * PI * radius / num_boards + cylinder_radius;
             for (i = [0 : num_boards - 1]) {
                 angle = i * angle_step;
                 x = radius * cos(angle);
                 y = radius * sin(angle);
+                // Calculate the sides
+                hypotenuse = insertSize - cylinder_radius;
+                adjacent = cos(angle) * hypotenuse ;
+                opposite = sin(angle) * hypotenuse;
                 translate([x, y, 0])
-                    union() {
-                        cylinder(h = cylinder_height, r = cylinder_radius, center = true, $fn = 100);
-                        // Calculate the sides
-                        hypotenuse = insertSize;
-                        adjacent = cos(angle) * hypotenuse;
-                        opposite = sin(angle) * hypotenuse;
-                        translate([-adjacent, -opposite, 0])
-                            rotate([0, 90, angle])
-                                insert_boss(insertName(2), z = insertSize, wall = 1);
+                union() {
+                    difference() {
+                        union() {
+                            cylinder(h = cylinder_height, r = cylinder_radius, center = true, $fn = 100);
+                        }
+                        //translate([- adjacent, - opposite, 0])
+                        rotate([0, 90, angle])
+                            cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center = true, $fn = 100
+                            );
                     }
+                    translate([- adjacent, - opposite, 0])
+                        rotate([0, 90, angle])
+                            insert_boss(insertName(2), z = insertSize, wall = 1);
+                }
             }
             // Create a torus at the top of the cylinders
             translate([0, 0, cylinder_height / 2 - cylinder_radius])
