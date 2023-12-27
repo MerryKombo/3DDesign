@@ -28,6 +28,7 @@ RUN groupadd -g ${gid} ${group} \
 # Clean up the apt cache to reduce the image size
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    coreutils \
     curl \
     git \
     gnupg \
