@@ -3,7 +3,7 @@ use <../Server Rack/1U/boards/friendlyelec nanopi duo2 dimensions.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s dimensions.scad>
 use <../Server Rack/1U/parts/board.scad>
 use <../Server Rack/1U/boards/friendlyelec R5s.scad>
-use <openscad-extra/src/torus.scad>
+use <openscad-extra/torus.scad>
 include <NopSCADlib/utils/core/core.scad>
 use <NopSCADlib/utils/layout.scad>
 include <NopSCADlib/vitamins/inserts.scad>
