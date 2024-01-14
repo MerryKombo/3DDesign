@@ -86,7 +86,8 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
         linkHeight = baseHeight;
         translate([0, 0, 25])
             createCylinders(radius = radius, board_width = board_width, num_boards = num_boards, cylinder_height =
-            getBoardSize().x, cylinder_radius = getHoleSize() / 2);
+            getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [getHole(holeNumber = 1).x, getHole
+            (holeNumber = 3).x]);
         //        createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards = numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2);
         //centerCylinder(radius, 0.4, board_width, board_height, 8);
         //centerTorus(radius/2, radius/4);

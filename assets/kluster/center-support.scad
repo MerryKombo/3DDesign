@@ -1,5 +1,7 @@
 include <utils.scad>;
 include <NopSCADlib/vitamins/inserts.scad>
+include <NopSCADlib/vitamins/screw.scad>
+include <NopSCADlib/vitamins/screws.scad>
 use <../Booth Display/inserts.scad>;
 
 /**
@@ -62,9 +64,11 @@ position)
                     translate([- adjacent, - opposite, 0])
                         rotate([0, 90, angle])
                             cylinder(h = radius, r = cylinder_radius, center = false, $fn = 100);
-                screwHeadRadius = screw_head_radius(insertName(3));
+                screwHeadRadius = screw_head_radius(M3_cap_screw);
+                echo("Screw radius: ", screwRadius);
+                echo("Screw head radius: ", screwHeadRadius);
                 color("white")
-                    cylinder(h = 2 * screwHeadRadius, r = screwHeadRadius, center = true, $fn = 100);
+                    cylinder(h = 2 * cylinder_radius, r = screwHeadRadius, center = true, $fn = 100);
             }
         }
 }
@@ -90,55 +94,70 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
     echo("Cylinder height: ", cylinder_height);
     echo("Cylinder radius: ", cylinder_radius);
     echo("Insert heights: ", insertHeights);
-    translate([0, 0, cylinder_height / 2])
-        union() {
-            createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-            getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
-            angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "top");
-            angle_step = 360 / num_boards;
-            insertSize = 2 * PI * radius / num_boards + cylinder_radius;
-            for (i = [0 : num_boards - 1]) {
-                angle = i * angle_step;
-                x = radius * cos(angle);
-                y = radius * sin(angle);
-                // Calculate the sides
-                hypotenuse = insertSize - cylinder_radius;
-                adjacent = cos(angle) * hypotenuse ;
-                opposite = sin(angle) * hypotenuse;
-                translate([x, y, 0])
-                    union() {
-                        difference() {
-                            union() {
-                                cylinder(h = cylinder_height + pedestal, r = cylinder_radius, center = true, $fn = 100);
-                            }
-                            // Create a hole within the cylinder for the insert
-                            translate([0, 0, insertHeights[0] - cylinder_height / 2])
-                                rotate([0, 90, angle])
-                                    cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center = true,
-                                    $fn = 100);
+    difference() {
+        translate([0, 0, cylinder_height / 2])
+            union() {
+                createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
+                getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "top");
+                angle_step = 360 / num_boards;
+                insertSize = 2 * PI * radius / num_boards + cylinder_radius;
+                for (i = [0 : num_boards - 1]) {
+                    angle = i * angle_step;
+                    x = radius * cos(angle);
+                    y = radius * sin(angle);
+                    // Calculate the sides
+                    hypotenuse = insertSize - cylinder_radius;
+                    adjacent = cos(angle) * hypotenuse ;
+                    opposite = sin(angle) * hypotenuse;
+                    translate([x, y, 0])
+                        union() {
+                            difference() {
+                                union() {
+                                    cylinder(h = cylinder_height + pedestal, r = cylinder_radius, center = true, $fn =
+                                    100);
+                                }
+                                // Create a hole within the cylinder for the insert
+                                color("black")
+                                    translate([0, 0, insertHeights[0] - cylinder_height / 2])
+                                        rotate([0, 90, angle])
+                                            cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center =
+                                            true,
+                                            $fn = 100);
 
-                            translate([0, 0, insertHeights[1] - cylinder_height / 2])
-                                rotate([0, 90, angle])
-                                    cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center = true,
-                                    $fn = 100);
+                                color("grey")
+                                    translate([0, 0, insertHeights[1] - cylinder_height / 2])
+                                        rotate([0, 90, angle])
+                                            cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center =
+                                            true,
+                                            $fn = 100);
+                            }
+                            // Create a boss for the insert
+                            color("grey")
+                                translate([0, 0, insertHeights[0] - cylinder_height / 2])
+                                    translate([- adjacent, - opposite, 0])
+                                        rotate([0, 90, angle])
+                                            insert_boss(insertName(2), z = insertSize, wall = 1);
+                            // Create a boss for the insert
+                            color("grey")
+                                translate([0, 0, insertHeights[1] - cylinder_height / 2])
+                                    translate([- adjacent, - opposite, 0])
+                                        rotate([0, 90, angle])
+                                            insert_boss(insertName(2), z = insertSize, wall = 1);
                         }
-                        // Create a boss for the insert
-                        translate([0, 0, insertHeights[0] - cylinder_height / 2])
-                            translate([- adjacent, - opposite, 0])
-                                rotate([0, 90, angle])
-                                    insert_boss(insertName(2), z = insertSize, wall = 1);
-                        // Create a boss for the insert
-                        translate([0, 0, insertHeights[1] - cylinder_height / 2])
-                            translate([- adjacent, - opposite, 0])
-                                rotate([0, 90, angle])
-                                    insert_boss(insertName(2), z = insertSize, wall = 1);
-                    }
-            }
-            createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-            getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
-            angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom
+                }
+                createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
+                getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom
             ");
-        }
+            }
+        screwRadius = screw_radius(M3_cap_screw);
+        screwHeadRadius = screw_head_radius(M3_cap_screw);
+        echo("Screw radius: ", screwRadius);
+        echo("Screw head radius: ", screwHeadRadius);
+        color("white")
+            cylinder(r = screwRadius, h = (cylinder_height + pedestal) * 2, center = true, $fn = 100);
+    }
 }
 
 /**
