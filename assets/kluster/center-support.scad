@@ -42,7 +42,7 @@ module createTorusAndCylinders(radius, cylinder_height, pedestal, cylinder_radiu
 position)
 {
     // Determine the translation based on the position
-    z_translation = position == "top" ? (cylinder_height + pedestal) / 2 - cylinder_radius : - (cylinder_height +
+    z_translation = position == "top" ? (cylinder_height + pedestal) / 2 - cylinder_radius : -(cylinder_height +
         pedestal) / 2 + cylinder_radius;
 
     translate([0, 0, z_translation])
@@ -61,7 +61,7 @@ position)
                 adjacent = cos(angle) * hypotenuse ;
                 opposite = sin(angle) * hypotenuse;
                 color("black")
-                    translate([- adjacent, - opposite, 0])
+                    translate([-adjacent, -opposite, 0])
                         rotate([0, 90, angle])
                             cylinder(h = radius, r = cylinder_radius, center = false, $fn = 100);
                 screwHeadRadius = screw_head_radius(M3_cap_screw);
@@ -81,6 +81,8 @@ position)
  * @param num_boards The number of boards that the cylinders are attached to.
  * @param cylinder_height The height of each cylinder. Default is 10.
  * @param cylinder_radius The radius of each cylinder. Default is 1.
+ * @param insertHeights An array containing the heights of the inserts. Default is [0, board_width].
+ * @param pedestal The height of the pedestal on which the cylinders are placed. Default is 10.
  *
  * The function works by first creating a torus at the bottom of the cylinders. Then, it calculates the angle step and insert size.
  * It then creates each cylinder and its corresponding insert boss in a loop. After all cylinders are created, it creates a torus at the top.
@@ -98,7 +100,7 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
         translate([0, 0, cylinder_height / 2])
             union() {
                 createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-                getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "top");
                 angle_step = 360 / num_boards;
                 insertSize = 2 * PI * radius / num_boards + cylinder_radius;
@@ -112,11 +114,29 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                     opposite = sin(angle) * hypotenuse;
                     translate([x, y, 0])
                         union() {
+                            /**
+                             * This block of code creates a difference between a cylinder and two holes.
+                             * The cylinder represents the main body of the object, while the holes represent the spaces for the inserts.
+                             * The difference operation subtracts the holes from the cylinder, creating the final shape of the object.
+                             */
                             difference() {
+                                /**
+                                 * This block of code creates a cylinder.
+                                 * The height of the cylinder is the sum of the cylinder height and the pedestal height.
+                                 * The radius of the cylinder is specified by the 'cylinder_radius' parameter.
+                                 * The cylinder is centered, and the number of fragments used to approximate the cylinder is 100.
+                                 */
                                 union() {
                                     cylinder(h = cylinder_height + pedestal, r = cylinder_radius, center = true, $fn =
                                     100);
                                 }
+                                /**
+                                 * This block of code creates a hole within the cylinder for the first insert.
+                                 * The hole is colored black for visualization purposes.
+                                 * The hole is translated to the correct position within the cylinder, rotated to the correct angle, and then created.
+                                 * The radius of the hole is determined by the 'insert_hole_radius' function, and the height of the hole is twice the insert size.
+                                 * The hole is centered, and the number of fragments used to approximate the hole is 100.
+                                 */
                                 // Create a hole within the cylinder for the insert
                                 color("black")
                                     translate([0, 0, insertHeights[0] - cylinder_height / 2])
@@ -124,7 +144,13 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                                             cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center =
                                             true,
                                             $fn = 100);
-
+                                /**
+                                 * This block of code creates a hole within the cylinder for the second insert.
+                                 * The hole is colored grey for visualization purposes.
+                                 * The hole is translated to the correct position within the cylinder, rotated to the correct angle, and then created.
+                                 * The radius of the hole is determined by the 'insert_hole_radius' function, and the height of the hole is twice the insert size.
+                                 * The hole is centered, and the number of fragments used to approximate the hole is 100.
+                                */
                                 color("grey")
                                     translate([0, 0, insertHeights[1] - cylinder_height / 2])
                                         rotate([0, 90, angle])
@@ -134,27 +160,76 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                             }
                             // Create a boss for the insert
                             color("grey")
+                                /**
+                                 * This block of code translates the coordinate system to the position of the first insert.
+                                 * The translation is done in the z-axis by the difference between the first insert height and half the cylinder height.
+                                 * Then, it translates the coordinate system in the x and y axes by the negative values of the adjacent and opposite sides of the triangle formed by the insert size and the cylinder radius.
+                                 * After the translation, it rotates the coordinate system by 90 degrees in the y-axis and by the angle of the current board in the z-axis.
+                                 * Finally, it creates the boss for the first insert with the specified insert size and a wall thickness of 1.
+                                */
                                 translate([0, 0, insertHeights[0] - cylinder_height / 2])
-                                    translate([- adjacent, - opposite, 0])
+                                    translate([-adjacent, -opposite, 0])
                                         rotate([0, 90, angle])
                                             insert_boss(insertName(2), z = insertSize, wall = 1);
                             // Create a boss for the insert
                             color("grey")
+                                /**
+                                 * This block of code translates the coordinate system to the position of the second insert.
+                                 * The translation is done in the z-axis by the difference between the second insert height and half the cylinder height.
+                                 * Then, it translates the coordinate system in the x and y axes by the negative values of the adjacent and opposite sides of the triangle formed by the insert size and the cylinder radius.
+                                 * After the translation, it rotates the coordinate system by 90 degrees in the y-axis and by the angle of the current board in the z-axis.
+                                 * Finally, it creates the boss for the second insert with the specified insert size and a wall thickness of 1.
+                                */
                                 translate([0, 0, insertHeights[1] - cylinder_height / 2])
-                                    translate([- adjacent, - opposite, 0])
+                                    translate([-adjacent, -opposite, 0])
                                         rotate([0, 90, angle])
                                             insert_boss(insertName(2), z = insertSize, wall = 1);
                         }
                 }
+                /**
+                 * This line of code calls the 'createTorusAndCylinders' module to create a torus and a set of cylinders arranged in a circular pattern at the bottom of the cylinders.
+                 *
+                 * @param radius The distance from the center of the circle to the center of each cylinder. It is calculated as half the difference between the torus size and the y dimension of the board size.
+                 * @param cylinder_height The height of each cylinder. It is equal to the x dimension of the board size.
+                 * @param pedestal The height of the pedestal on which the cylinders are placed. It is passed from the parent module.
+                 * @param cylinder_radius The radius of each cylinder. It is calculated as half the hole size.
+                 * @param num_boards The number of boards that the cylinders are attached to. It is defined by the variable 'numberOfBoards'.
+                 * @param angle_step The angle between each board. It is calculated as 360 divided by the number of boards.
+                 * @param insertName The name of the insert to be used. It is determined by the 'insertName' function with an argument of 3.
+                 * @param position The position of the torus and cylinders. It is set to "bottom".
+                 *
+                 * The function works by calling the 'createTorusAndCylinders' module with the specified parameters.
+                */
                 createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-                getBoardSize().x, pedestal = 25, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom
             ");
             }
+        /**
+         * This line of code calculates the radius of the M3 cap screw using the 'screw_radius' function.
+         * The result is stored in the 'screwRadius' variable.
+        */
         screwRadius = screw_radius(M3_cap_screw);
+
+        /**
+         * This line of code calculates the head radius of the M3 cap screw using the 'screw_head_radius' function.
+         * The result is stored in the 'screwHeadRadius' variable.
+        */
         screwHeadRadius = screw_head_radius(M3_cap_screw);
+
+        /**
+         * These lines of code print the values of 'screwRadius' and 'screwHeadRadius' to the console.
+         * This is useful for debugging and verifying that the correct values are being used.
+        */
         echo("Screw radius: ", screwRadius);
         echo("Screw head radius: ", screwHeadRadius);
+
+        /**
+         * This block of code creates a white cylinder.
+         * The radius of the cylinder is equal to the screw radius.
+         * The height of the cylinder is twice the sum of the cylinder height and the pedestal height.
+         * The cylinder is centered, and the number of fragments used to approximate the cylinder is 100.
+         */
         color("white")
             cylinder(r = screwRadius, h = (cylinder_height + pedestal) * 2, center = true, $fn = 100);
     }
@@ -180,14 +255,14 @@ module centerCylinder(radius, wall_thickness, board_width, board_height, num_boa
             // Outer cylinder
             cylinder(r = radius, h = 85, center = true, $fn = 100);
             // Inner cylinder
-            translate([0, 0, - 5])
+            translate([0, 0, -5])
                 cylinder(r = radius - wall_thickness, h = 95, center = true, $fn = 100);
             // Subtract a rectangular prism for each board
             for (i = [0 : num_boards - 1]) {
                 angle = i * angle_step;
                 x = (radius - wall_thickness / 2) * cos(angle);
                 y = (radius - wall_thickness / 2) * sin(angle);
-                translate([x, y, - 5])
+                translate([x, y, -5])
                     rotate([0, 0, angle])
                         cube([board_width, wall_thickness, 95], center = true);
             }
@@ -276,4 +351,4 @@ module branch(length, angle, thickness) {
  */
 createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards =
 numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [getHole(
-holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = 25);
+holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = 0/**25*/);

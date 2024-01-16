@@ -97,3 +97,4 @@ function getHole(holeNumber = 0) = holes[holeNumber];
 function getFanHeight() = 25;
 function getDiagonalDistance() = sqrt(2) * distanceBetweenFanHoles;
 function getFinThickness() = 5;
+function getPedestalHeightForCenterSupport() = 20;

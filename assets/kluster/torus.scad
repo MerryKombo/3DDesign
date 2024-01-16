@@ -133,7 +133,7 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
                     cylinder(r = innerRadius, h = innerRadius * 2, center = true, $fn = 100);
             color("black")
                 translate([0, 0, innerRadius])
-                    cylinder(r = getHoleSize, h = innerRadius * 4, center = true, $fn = 100);
+                    cylinder(r = getHoleSize(), h = innerRadius * 4, center = true, $fn = 100);
         }
     }
 }

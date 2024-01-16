@@ -85,16 +85,13 @@ showFan = false)
         totalHeight = baseHeight * 1.5;
         linkThickness = holeSize;
         linkHeight = baseHeight;
-        translate([0, 0, 25])
-            createCylinders(radius = radius, board_width = board_width, num_boards = num_boards, cylinder_height =
-            getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [getHole(holeNumber = 1).x, getHole
-            (holeNumber = 3).x]);
-        //        createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards = numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2);
-        //centerCylinder(radius, 0.4, board_width, board_height, 8);
-        //centerTorus(radius/2, radius/4);
-        //tree();
-        //coral(10, 20, 0, 2,0.123);
-
+        // The problem is the connectors are at the right place, but the center support hangs too low and goes too high...
+        translate([0, 0, getPedestalHeightForCenterSupport() + getFanHeight()])
+            createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y,
+            num_boards =
+            numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [
+                getHole(
+                holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = getPedestalHeightForCenterSupport()/**25*/);
     }
 }
 
