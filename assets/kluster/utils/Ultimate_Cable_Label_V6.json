@@ -1,0 +1,27 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "12V": {
+            "$fn": "40",
+            "cable_dia": "1.6000000000000001",
+            "font": "isonorm 3098",
+            "groove": "1",
+            "nose": "0.75",
+            "size": "7.9999999999999947",
+            "text": "+5V",
+            "wall": "1",
+            "wiggle": "0.10000000000000001"
+        },
+        "PWM": {
+            "$fn": "40",
+            "cable_dia": "1.3999999999999999",
+            "font": "Isonorm 3098",
+            "groove": "1",
+            "nose": "0.75",
+            "size": "6.5",
+            "text": "Tach",
+            "wall": "1",
+            "wiggle": "0.10000000000000001"
+        }
+    }
+}

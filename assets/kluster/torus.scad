@@ -1,6 +1,7 @@
 include <NopSCADlib/vitamins/inserts.scad>
 use <../Booth Display/inserts.scad>;
 include <utils.scad>;
+include <base-fan.scad>;
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
 
@@ -16,13 +17,13 @@ include <NopSCADlib/vitamins/screws.scad>
  * and the cube function is used to draw the "ear".
  */
 module drawEars(outerRadius, earSize, numEars, hole = false) {
-    holeSize = 3;
+    holeSize = getHoleSize();//3;
     for (i = [0 : numEars - 1]) {
         rotate([0, 0, i * 360 / numEars])
             translate([outerRadius / 2, 0, 0])
                 union() {
                     difference() {
-                        %cube([earSize, earSize, earSize], center = true);
+                        cube([earSize, earSize, earSize], center = true);
                         if (hole) {
                             color("black")
                                 cylinder(r = holeSize / 2, h = earSize + 1, center = true, $fn = 100);
@@ -30,6 +31,34 @@ module drawEars(outerRadius, earSize, numEars, hole = false) {
                         }
                     }
                     insert_boss(insertName(holeSize), z = earSize, wall = 2);
+                }
+    }
+}
+
+module drawEarsForFan(outerRadius, earSize, numEars, hole = false) {
+    holeSize = 4;
+    for (i = [0 : numEars - 1]) {
+        rotate([0, 0, i * 360 / numEars])
+            translate([outerRadius / 2, 0, getFanHeight() / 2 + earSize / 2])
+                difference() {
+                    hull() {
+                        difference() {
+                            //cube([earSize, earSize, earSize / 2], center = true);
+                            cylinder(r = earSize / 2, h = earSize / 2, center = true, $fn = 100);
+                            if (hole) {
+                                color("black")
+                                    cylinder(r = holeSize / 2, h = earSize + 1, center = true, $fn = 100);
+                            }
+                        }
+                        translate([-getTorusInnerRadius() * 2, 0, 0])
+                            reinforcementUnit(length = getTorusInnerRadius() * 2, width = getFinThickness(), thickness =
+                            getFinThickness());
+                    }
+
+                    if (hole) {
+                        color("black")
+                            cylinder(r = holeSize / 2, h = earSize + 1, center = true, $fn = 100);
+                    }
                 }
     }
 }
@@ -88,21 +117,34 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
                         createReinforcement(outerRadius, innerRadius, finThickness, numEars);
                 }
             }
-            color("black")
-            translate([0, 0, innerRadius])
-                insert(insertName(3));
+            color("red")
+                translate([0, 0, innerRadius])
+                    insert(insertName(3));
 
             translate([0, 0, innerRadius])
                 screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
         }
         difference() {
-            translate([0, 0, - innerRadius])
-                insert_boss(insertName(3), z = innerRadius * 2, wall = 2);
-            translate([0, 0, innerRadius])
-            screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+            // translate([0, 0, -innerRadius])
+            //    insert_boss(insertName(3), z = innerRadius * 2, wall = 2);
+            color("red")
+                translate([0, 0, 0])
+                    //  screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+                    cylinder(r = innerRadius, h = innerRadius * 2, center = true, $fn = 100);
+            color("black")
+                translate([0, 0, innerRadius])
+                    cylinder(r = getHoleSize, h = innerRadius * 4, center = true, $fn = 100);
         }
     }
 }
+
+// Function to calculate the angle for the base of the torus.
+// This function calculates the angle based on the ear translation and the outer radius of the torus.
+// The angle is calculated using the atan function, which returns the arctangent of the quotient of its arguments.
+// Returns: The calculated angle.
+function calculateAngle(outerRadius) = atan(((getTorusSize() - getFanDiameter()) / 2 - (getBoardSize().z)) / (
+    outerRadius / 2));
+
 
 /**
  * This module builds the base of the torus.
@@ -115,15 +157,39 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
  *
  * The function works by translating the torus down by the height of the base, then calling the buildTorus module to build the torus.
  */
-module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight) {
+module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan = false) {
     earTranslation = (getTorusSize() - getFanDiameter()) / 2 - (getBoardSize().z);
     echo("buildBase: earTranslation = ", earTranslation);
     echo("earTranslation / outerRadius = ", earTranslation / (outerRadius / 1));
     angle = atan(earTranslation / (outerRadius / 2));// already in degrees * (180 / PI);
     echo("angle = ", angle);
-    rotate([0, 0, angle])
-        translate([0, 0, 25 - baseHeight])
-            buildTorus(outerRadius, innerRadius, earSize, numEars);
+    union() {
+        rotate([0, 0, angle])
+            difference() {
+                union() {
+                    translate([0, 0, 25 - baseHeight])
+                        buildTorus(outerRadius, innerRadius, earSize, numEars, finThickness = getFinThickness());
+                    if (showFan)
+                    base_fan();
+                    //buildTorusEarsForFan();
+                    drawEarsForFan(outerRadius = getDiagonalDistance(), earSize = getTorusInnerRadius() * 2, numEars = 4
+                    ,
+                    hole =
+                    true);
+                }
+
+                color("black")
+                    for (i = [0 : numEars - 1]) {
+                        rotate([0, 0, i * 360 / numEars])
+                            translate([outerRadius / 2, 0, 0])
+                                cylinder(r = getHoleSize() / 2, h = 100, center = true, $fn = 100);
+                    }
+                // couper en dessous pour être sûr
+                color("red")
+                    translate([0, 0, getFanHeight() - getTorusInnerRadius() * 3])
+                        cylinder(r = outerRadius, h = innerRadius, center = false, $fn = 100);
+            }
+    }
 }
 
 buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight);

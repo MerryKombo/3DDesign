@@ -65,7 +65,7 @@ position)
                         rotate([0, 90, angle])
                             cylinder(h = radius, r = cylinder_radius, center = false, $fn = 100);
                 screwHeadRadius = screw_head_radius(M3_cap_screw);
-                echo("Screw radius: ", screwRadius);
+                // echo("Screw radius: ", screwRadius);
                 echo("Screw head radius: ", screwHeadRadius);
                 color("white")
                     cylinder(h = 2 * cylinder_radius, r = screwHeadRadius, center = true, $fn = 100);

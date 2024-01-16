@@ -27,7 +27,8 @@ module ensureBoardsFit(fan_diameter, board_width) {
  * The board is then translated to this position and rotated to face outwards from the center of the fan.
  * Finally, the fan is placed at the center of the arrangement.
  */
-module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, boardThickness, holes, showSBC = false)
+module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, boardThickness, holes, showSBC = false,
+showFan = false)
 {
     // Calculate the angle between each board
     angle_step = 360 / num_boards;
@@ -46,7 +47,7 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
                 rotate([0, 0, angle])
                     translate([board_width, 0, 0])
                         rotate([0, 0, 180])
-                            rotate([0, - 180, 0])
+                            rotate([0, -180, 0])
                                 rotate([0, 0, 90])
                                     rotate([0, 90, 0])
                                         union() {
@@ -75,7 +76,7 @@ module arrangeBoardsAndFan(num_boards, fan_diameter, board_width, board_height, 
         }
 
         // Place the fan at the center of the arrangement
-        translate([0, 0, 12.5]) base_fan();
+        if (showFan) translate([0, 0, 12.5]) base_fan();
 
         // Add a cylinder at the center of the arrangement
         holeSize = holes[0][2];
@@ -124,7 +125,7 @@ module arrangeBoardsInSquare(num_boards_x, num_boards_y, board_width, board_heig
     for (i = [0 : num_boards_x - 1]) {
         for (j = [0 : num_boards_y - 1]) {
             translate([i * board_width, j * board_height, 0])
-                rotate([0, - 90, 0]) // Rotate the boards to stand up
+                rotate([0, -90, 0]) // Rotate the boards to stand up
                     k_sbc();
         }
     }

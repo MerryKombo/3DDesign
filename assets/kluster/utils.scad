@@ -1,5 +1,6 @@
 use <torus.scad>;
 include <raspberry-pi-3-b-plus.scad>;
+include <base-fan.scad>;
 
 sbc_model = ["rpi3b+"];
 s = search(sbc_model, sbc_data);
@@ -74,8 +75,25 @@ baseHeight = 5;
 numberOfBoards = 8;
 earSize = 10;
 
-function getTorusSize() = fan_diameter * 1.1;
+// Function to calculate the distance between fan holes diagonally.
+// This function uses the Pythagorean theorem to calculate the diagonal distance.
+// The theorem states that in a right-angled triangle, the square of the length of the hypotenuse (the side opposite the right angle)
+// is equal to the sum of the squares of the lengths of the other two sides.
+// In this case, both sides of the triangle are equal to `distanceBetweenFanHoles`, so the formula simplifies to `c = sqrt(2) * a`.
+// Returns: The diagonal distance between the fan holes.
+function getDistanceBetweenFanHoles() = sqrt(2) * distanceBetweenFanHoles;
+
+// Function to calculate the size of the torus.
+// This function multiplies the fan diameter by 1.1 to get the size of the torus.
+// Returns: The size of the torus.
+// todo, use the distance between fan holes instead of the fan diameter...
+// for the time being, lots of things seem to be linked to hardcoded fan diameter... so it does not work
+function getTorusSize() = fan_diameter + getTorusInnerRadius() * 2;// * 1.1; // getDistanceBetweenFanHoles();
+function getTorusInnerRadius() = baseHeight;
 function getFanDiameter() = fan_diameter;
 function getBoardSize() = [pcbsize_x, pcbsize_y, pcbsize_z];
 function getHoleSize() = sbc_data[s[0]][9];
-function getHole(holeNumber=0) = holes[holeNumber];
+function getHole(holeNumber = 0) = holes[holeNumber];
+function getFanHeight() = 25;
+function getDiagonalDistance() = sqrt(2) * distanceBetweenFanHoles;
+function getFinThickness() = 5;
