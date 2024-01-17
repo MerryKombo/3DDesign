@@ -45,31 +45,54 @@ position)
     z_translation = position == "top" ? (cylinder_height + pedestal) / 2 - cylinder_radius : -(cylinder_height +
         pedestal) / 2 + cylinder_radius;
 
+    type = insertName(3);
+    echo("Insert type: ", type);
+    insertHeight = insert_hole_length(type) * 3 / 2    ;
+    echo("Insert height: ", insertHeight);
+    insertZTranslation = position == "top" ? -insertHeight + cylinder_radius : insertHeight;
+    echo("Insert z translation: ", insertZTranslation);
     translate([0, 0, z_translation])
         union() {
-            color("white")
-                rotate_extrude($fn = 100/*numEars*/)
-                    translate([radius, 0, 0])
-                        circle(r = cylinder_radius, $fn = 100);
+            difference() {
+                union() {
+                    // Create a torus at the specified position of the cylinders
+                    color("white")
+                        rotate_extrude($fn = 100/*numEars*/)
+                            translate([radius, 0, 0])
+                                circle(r = cylinder_radius, $fn = 100);
 
-            // Create each cylinder and its corresponding insert boss in a loop
-            for (i = [0 : num_boards - 1]) {
-                angle = i * angle_step;
-                x = radius * cos(angle);
-                y = radius * sin(angle);
-                hypotenuse = radius;
-                adjacent = cos(angle) * hypotenuse ;
-                opposite = sin(angle) * hypotenuse;
-                color("black")
-                    translate([-adjacent, -opposite, 0])
-                        rotate([0, 90, angle])
-                            cylinder(h = radius, r = cylinder_radius, center = false, $fn = 100);
-                screwHeadRadius = screw_head_radius(M3_cap_screw);
-                // echo("Screw radius: ", screwRadius);
-                echo("Screw head radius: ", screwHeadRadius);
-                color("white")
-                    cylinder(h = 2 * cylinder_radius, r = screwHeadRadius, center = true, $fn = 100);
+                    // Create each cylinder and its corresponding insert boss in a loop
+                    for (i = [0 : num_boards - 1]) {
+                        angle = i * angle_step;
+                        x = radius * cos(angle);
+                        y = radius * sin(angle);
+                        hypotenuse = radius;
+                        adjacent = cos(angle) * hypotenuse ;
+                        opposite = sin(angle) * hypotenuse;
+                        color("black")
+                            translate([-adjacent, -opposite, 0])
+                                rotate([0, 90, angle])
+                                    cylinder(h = radius, r = cylinder_radius, center = false, $fn = 100);
+                        screwHeadRadius = screw_head_radius(M3_cap_screw);
+                        // echo("Screw radius: ", screwRadius);
+                        echo("Screw head radius: ", screwHeadRadius);
+                        // color("white")
+                        // %cylinder(h = 2 * cylinder_radius, r = screwHeadRadius, center = true, $fn = 100);
+                    }
+                }
+
+                translate([0, 0, insertZTranslation])
+                    union() {
+                        translate([0, 0, insertHeight])
+                            insert(type);
+                        cylinder(h = cylinder_height, r = insert_screw_diameter(type), center = true, $fn = 100);
+                    }
             }
+
+            translate([0, 0, insertZTranslation])
+                union() {
+                    insert_boss(type, z = insertHeight, wall = 2);
+                }
         }
 }
 
@@ -202,8 +225,7 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                 */
                 createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
                 getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
-                angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom
-            ");
+                angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom");
             }
         /**
          * This line of code calculates the radius of the M3 cap screw using the 'screw_radius' function.
@@ -230,8 +252,8 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
          * The height of the cylinder is twice the sum of the cylinder height and the pedestal height.
          * The cylinder is centered, and the number of fragments used to approximate the cylinder is 100.
          */
-        color("white")
-            cylinder(r = screwRadius, h = (cylinder_height + pedestal) * 2, center = true, $fn = 100);
+        // color("white")
+        //    cylinder(r = screwRadius, h = (cylinder_height + pedestal) * 2, center = true, $fn = 100);
     }
 }
 
@@ -351,4 +373,4 @@ module branch(length, angle, thickness) {
  */
 createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards =
 numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [getHole(
-holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = 0/**25*/);
+holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = 10/**25*/);
