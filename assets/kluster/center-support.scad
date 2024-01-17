@@ -38,7 +38,7 @@ module centerTorus(radius, tube_radius) {
  * After that, it calculates the angle step and insert size.
  * It then creates each cylinder and its corresponding insert boss in a loop.
  */
-module createTorusAndCylinders(radius, cylinder_height, pedestal, cylinder_radius, num_boards, angle_step, insertName,
+module createCenterSupportCap(radius, cylinder_height, pedestal, cylinder_radius, num_boards, angle_step, insertName,
 position)
 {
     // Determine the translation based on the position
@@ -114,7 +114,7 @@ position)
  * The function works by first creating a torus at the bottom of the cylinders. Then, it calculates the angle step and insert size.
  * It then creates each cylinder and its corresponding insert boss in a loop. After all cylinders are created, it creates a torus at the top.
  */
-module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1, insertHeights = [0,
+module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1, insertHeights = [0,
     board_width], pedestal = 10) {
     echo("Creating cylinders");
     echo("Radius: ", radius);
@@ -126,7 +126,7 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
     difference() {
         translate([0, 0, cylinder_height / 2])
             union() {
-                createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
+                createCenterSupportCap(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
                 getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "top");
                 angle_step = 360 / num_boards;
@@ -214,7 +214,7 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                         }
                 }
                 /**
-                 * This line of code calls the 'createTorusAndCylinders' module to create a torus and a set of cylinders arranged in a circular pattern at the bottom of the cylinders.
+                 * This line of code calls the 'createCenterSupportCap' module to create a torus and a set of cylinders arranged in a circular pattern at the bottom of the cylinders.
                  *
                  * @param radius The distance from the center of the circle to the center of each cylinder. It is calculated as half the difference between the torus size and the y dimension of the board size.
                  * @param cylinder_height The height of each cylinder. It is equal to the x dimension of the board size.
@@ -225,9 +225,9 @@ module createCylinders(radius, board_width, num_boards, cylinder_height = 10, cy
                  * @param insertName The name of the insert to be used. It is determined by the 'insertName' function with an argument of 3.
                  * @param position The position of the torus and cylinders. It is set to "bottom".
                  *
-                 * The function works by calling the 'createTorusAndCylinders' module with the specified parameters.
+                 * The function works by calling the 'createCenterSupportCap' module with the specified parameters.
                 */
-                createTorusAndCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
+                createCenterSupportCap(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
                 getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom");
             }
@@ -363,7 +363,7 @@ module branch(length, angle, thickness) {
     }
 }
 /**
- * This line of code calls the 'createCylinders' module to create a set of cylinders arranged in a circular pattern, with a torus at the top and bottom.
+ * This line of code calls the 'createCenterSupport' module to create a set of cylinders arranged in a circular pattern, with a torus at the top and bottom.
  *
  * @param radius The distance from the center of the circle to the center of each cylinder. It is calculated as half the difference between the torus size and the board size.
  * @param board_width The width of the board that the cylinders are attached to. It is equal to the y dimension of the board size.
@@ -373,8 +373,8 @@ module branch(length, angle, thickness) {
  * @param insertHeights An array containing the x dimensions of the first and third holes.
  * @param pedestal The height of the pedestal on which the cylinders are placed. It is set to 25.
  *
- * The function works by calling the 'createCylinders' module with the specified parameters.
+ * The function works by calling the 'createCenterSupport' module with the specified parameters.
  */
-createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards =
+createCenterSupport(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y, num_boards =
 numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [getHole(
 holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = 10/**25*/);

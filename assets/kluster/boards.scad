@@ -86,12 +86,11 @@ showFan = false)
         linkThickness = holeSize;
         linkHeight = baseHeight;
         // The problem is the connectors are at the right place, but the center support hangs too low and goes too high...
-        translate([0, 0, getPedestalHeightForCenterSupport() + getFanHeight()])
-            createCylinders(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y,
-            num_boards =
-            numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2, insertHeights = [
-                getHole(
-                holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal = getPedestalHeightForCenterSupport()/**25*/);
+        translate([0, 0, /*getPedestalHeightForCenterSupport() + */getFanHeight() + getTorusInnerRadius() * 2])
+            createCenterSupport(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, board_width = getBoardSize().y,
+            num_boards = numberOfBoards, cylinder_height = getBoardSize().x, cylinder_radius = getHoleSize() / 2,
+            insertHeights = [getHole(holeNumber = 1).x, getHole(holeNumber = 3).x], pedestal =
+            getPedestalHeightForCenterSupport()/**25*/);
     }
 }
 
