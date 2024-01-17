@@ -81,8 +81,10 @@ module kubernetesLogo() {
     rotate([0, 0, 90])
         rotate([0, 90, 0])
             scale([.03, .03, .03])
-                linear_extrude(height = standFeetThickness(), center = true, scale = 1.2)
-                    import(file = "./logo.svg", center = true, dpi = 96);
+                linear_extrude(height = 10, center = true, scale = 1.2)
+                    // Trick found here: https://www.baszerr.eu/doku.php?id=blog:2022:04:07:2022-04-07_-_importing_svg_in_openscad
+                    offset(0.01)
+                        import(file = "./logo.svg", center = true, dpi = 96);
 }
 
 // The `stand` module creates a stand for the PSU with the specified length, width, and height.
@@ -141,7 +143,7 @@ module stand(length, width, height) {
 union() {
     // translate([0, 0, getStandHeight()])
     //     psu();
-    stand(squarePSULength(), squarePSULength(), getStandHeight());
+   // stand(squarePSULength(), squarePSULength(), getStandHeight());
     length = squarePSULength();
     width = squarePSULength();
     x = length + standMargins() * 2 + standWallThickness() * 2;
@@ -152,5 +154,6 @@ union() {
     yTranslation = (x - width) / 2;
     echo("yTranslation", yTranslation);
     echo("standFeetThickness", standFeetThickness());
-    //feetCutout(x, y, getStandHeight());
+    // feetCutout(x, y, getStandHeight());
+  kubernetesLogo();
 }
