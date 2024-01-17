@@ -49,8 +49,11 @@ position)
     echo("Insert type: ", type);
     insertHeight = insert_hole_length(type) * 3 / 2    ;
     echo("Insert height: ", insertHeight);
-    insertZTranslation = position == "top" ? -insertHeight + cylinder_radius : insertHeight;
+    insertZTranslation = position == "top" ? -insertHeight + cylinder_radius : insertHeight - cylinder_radius;
     echo("Insert z translation: ", insertZTranslation);
+    // we have to rotate the insert boss if the position is bottom
+    insertRotation = position == "top" ? 0: 180;
+    echo("Insert rotation: ", insertRotation);
     translate([0, 0, z_translation])
         union() {
             difference() {
@@ -80,19 +83,20 @@ position)
                         // %cylinder(h = 2 * cylinder_radius, r = screwHeadRadius, center = true, $fn = 100);
                     }
                 }
-
                 translate([0, 0, insertZTranslation])
-                    union() {
-                        translate([0, 0, insertHeight])
-                            insert(type);
-                        cylinder(h = cylinder_height, r = insert_screw_diameter(type), center = true, $fn = 100);
-                    }
+                    rotate([0, insertRotation, 0])
+                        union() {
+                            translate([0, 0, insertHeight])
+                                insert(type);
+                            cylinder(h = cylinder_height, r = insert_screw_diameter(type), center = true, $fn = 100);
+                        }
             }
 
             translate([0, 0, insertZTranslation])
-                union() {
-                    insert_boss(type, z = insertHeight, wall = 2);
-                }
+                rotate([0, insertRotation, 0])
+                    union() {
+                        insert_boss(type, z = insertHeight, wall = 2);
+                    }
         }
 }
 
