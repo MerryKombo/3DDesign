@@ -147,13 +147,8 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                              * The difference operation subtracts the holes from the cylinder, creating the final shape of the object.
                              */
                             difference() {
-                                /**
-                                 * This block of code creates a cylinder.
-                                 * The height of the cylinder is the sum of the cylinder height and the pedestal height.
-                                 * The radius of the cylinder is specified by the 'cylinder_radius' parameter.
-                                 * The cylinder is centered, and the number of fragments used to approximate the cylinder is 100.
-                                 */
                                 union() {
+                                    color("Beige")
                                     cylinder(h = cylinder_height + pedestal, r = cylinder_radius, center = true, $fn =
                                     100);
                                 }
@@ -186,7 +181,7 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                             $fn = 100);
                             }
                             // Create a boss for the insert
-                            color("grey")
+                            color("DimGray")
                                 /**
                                  * This block of code translates the coordinate system to the position of the first insert.
                                  * The translation is done in the z-axis by the difference between the first insert height and half the cylinder height.
@@ -199,7 +194,7 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                         rotate([0, 90, angle])
                                             insert_boss(insertName(2), z = insertSize, wall = 1);
                             // Create a boss for the insert
-                            color("grey")
+                            color("DarkSlateGray")
                                 /**
                                  * This block of code translates the coordinate system to the position of the second insert.
                                  * The translation is done in the z-axis by the difference between the second insert height and half the cylinder height.
