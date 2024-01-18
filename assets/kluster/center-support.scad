@@ -42,8 +42,7 @@ module createCenterSupportCap(radius, cylinder_height, pedestal, cylinder_radius
 position)
 {
     // Determine the translation based on the position
-    z_translation = position == "top" ? (cylinder_height + pedestal) / 2 - cylinder_radius : -(cylinder_height +
-        pedestal) / 2 + cylinder_radius;
+    z_translation = position == "top" ? (cylinder_height + pedestal) - cylinder_radius : cylinder_radius;
 
     type = insertName(3);
     echo("Insert type: ", type);
@@ -114,7 +113,8 @@ position)
  * The function works by first creating a torus at the bottom of the cylinders. Then, it calculates the angle step and insert size.
  * It then creates each cylinder and its corresponding insert boss in a loop. After all cylinders are created, it creates a torus at the top.
  */
-module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1, insertHeights = [0,
+module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10, cylinder_radius = 1, insertHeights = [
+    0,
     board_width], pedestal = 10) {
     echo("Creating cylinders");
     echo("Radius: ", radius);
@@ -123,11 +123,28 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
     echo("Cylinder height: ", cylinder_height);
     echo("Cylinder radius: ", cylinder_radius);
     echo("Insert heights: ", insertHeights);
+    // The flower boss should be higher than the center insert boss, and allow for the board to
+    // sit confortably. Depending on the size of the board and on the placement of the holes, we
+    // could need some room to accomodate for the hanging part of the board behind the last row
+    // of holes.
+    // So... What about calculating the size of the hanging part, and make it a bare minimum?
+    // Then we could compare it to the height of the center insert boss, and use the maximum.
+    // The length of the board can be found in pcbsize_x, in raspberry-pi-3-b-plus.scad. It is
+    // 85mm. The highest hole coordinate should be found in holes[3][0]. holes is defined in
+    // utils.scad. "holes: ", [[3.5, 3.5, 3], [3.5, 52.5, 3], [61.5, 3.5, 3], [61.5, 52.5, 3]]
+    // The hanging part would then be 85 - 61.5 = 23.5mm. The center insert boss should be at
+    // least 23.5mm high. We should then center the two insert flowers depending on that.
+    pcbHangingLength = pcbsize_x - holes[3][0];
+    echo("PCB hanging length: ", pcbHangingLength);
+    realPedestal = max(pedestal, pcbHangingLength);
+    echo("Real pedestal: ", realPedestal);
+
     difference() {
-        translate([0, 0, cylinder_height / 2])
+        // We have to translate to  cylinder_height / 2 because the cylinders are created centered...
+        translate([0, 0, 0/*cylinder_height / 2*/])
             union() {
                 createCenterSupportCap(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-                getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                getBoardSize().x, realPedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "top");
                 angle_step = 360 / num_boards;
                 insertSize = 2 * PI * radius / num_boards + cylinder_radius;
@@ -149,8 +166,8 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                             difference() {
                                 union() {
                                     color("Beige")
-                                    cylinder(h = cylinder_height + pedestal, r = cylinder_radius, center = true, $fn =
-                                    100);
+                                        cylinder(h = cylinder_height + realPedestal, r = cylinder_radius, center = false
+                                        , $fn = 100);
                                 }
                                 /**
                                  * This block of code creates a hole within the cylinder for the first insert.
@@ -161,7 +178,7 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                  */
                                 // Create a hole within the cylinder for the insert
                                 color("black")
-                                    translate([0, 0, insertHeights[0] - cylinder_height / 2])
+                                    translate([0, 0, insertHeights[0] + realPedestal])
                                         rotate([0, 90, angle])
                                             cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center =
                                             true,
@@ -174,13 +191,14 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                  * The hole is centered, and the number of fragments used to approximate the hole is 100.
                                 */
                                 color("grey")
-                                    translate([0, 0, insertHeights[1] - cylinder_height / 2])
+                                    translate([0, 0, insertHeights[1] + realPedestal])
                                         rotate([0, 90, angle])
                                             cylinder(r = insert_hole_radius(insertName(2)), h = insertSize * 2, center =
                                             true,
                                             $fn = 100);
                             }
-                            // Create a boss for the insert
+
+                            // Create a boss for the insert on the lower part
                             color("DimGray")
                                 /**
                                  * This block of code translates the coordinate system to the position of the first insert.
@@ -189,11 +207,11 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                  * After the translation, it rotates the coordinate system by 90 degrees in the y-axis and by the angle of the current board in the z-axis.
                                  * Finally, it creates the boss for the first insert with the specified insert size and a wall thickness of 1.
                                 */
-                                translate([0, 0, insertHeights[0] - cylinder_height / 2])
+                                translate([0, 0, insertHeights[0] + realPedestal])
                                     translate([-adjacent, -opposite, 0])
                                         rotate([0, 90, angle])
                                             insert_boss(insertName(2), z = insertSize, wall = 1);
-                            // Create a boss for the insert
+                            // Create a boss for the insert on the upper part
                             color("DarkSlateGray")
                                 /**
                                  * This block of code translates the coordinate system to the position of the second insert.
@@ -202,7 +220,7 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                                  * After the translation, it rotates the coordinate system by 90 degrees in the y-axis and by the angle of the current board in the z-axis.
                                  * Finally, it creates the boss for the second insert with the specified insert size and a wall thickness of 1.
                                 */
-                                translate([0, 0, insertHeights[1] - cylinder_height / 2])
+                                translate([0, 0, insertHeights[1] + realPedestal])
                                     translate([-adjacent, -opposite, 0])
                                         rotate([0, 90, angle])
                                             insert_boss(insertName(2), z = insertSize, wall = 1);
@@ -223,7 +241,7 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
                  * The function works by calling the 'createCenterSupportCap' module with the specified parameters.
                 */
                 createCenterSupportCap(radius = (getTorusSize() / 2 - getBoardSize().y) / 2, cylinder_height =
-                getBoardSize().x, pedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
+                getBoardSize().x, realPedestal, cylinder_radius = getHoleSize() / 2, num_boards = numberOfBoards,
                 angle_step = 360 / numberOfBoards, insertName = insertName(3), position = "bottom");
             }
         /**
