@@ -4,7 +4,7 @@ include <utils.scad>;
 
 union() {
     torusBaseRadius = getTorusSize();
-    arrangeBoardsAndFan(numberOfBoards, fan_diameter, pcbsize_y, pcbsize_x, pcbsize_z, holes, showSBC = false, showFan =
+    arrangeBoardsAndFan(numberOfBoards, fan_diameter, pcbsize_y, pcbsize_x, pcbsize_z, holes, showSBC = true, showFan =
     false);
     buildBase(outerRadius = getTorusSize(), innerRadius = getTorusInnerRadius(), earSize = earSize, numEars =
     numberOfBoards, baseHeight = baseHeight, showFan=false);
