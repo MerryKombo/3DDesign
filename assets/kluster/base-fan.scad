@@ -48,33 +48,50 @@ module fanFoot() {
     echo("Insert boss radius: ", insertBossRadius);
     footDimensions = [10, 30, 30];
     footPoints = [[footDimensions[0], 0, 0], //0,
-            [footDimensions[1] - footDimensions[0], 0, 0], //1
+            [0, footDimensions[2], 0], //1
             [footDimensions[1], footDimensions[2], 0], //2
-            [0, footDimensions[2], 0], //3
+            [footDimensions[1] - footDimensions[0], 0, 0], //1
             [footDimensions[0], 0, footDimensions[1]], //4
-            [footDimensions[1] - footDimensions[0], 0, footDimensions[1]], //5
+            [0, footDimensions[2], footDimensions[1]], //5
             [footDimensions[1], footDimensions[2], footDimensions[1]], //6
-            [0, footDimensions[2], footDimensions[1]]]; //7
+            [footDimensions[1] - footDimensions[0], 0, footDimensions[1]]];
     echo("Foot points: ", footPoints);
-    footFaces = [[0, 1, 2, 3], // bottom
-            [4, 5, 6, 7], // top
-            [0, 1, 5, 4], // front
-            [2, 3, 7, 6], // back
-            [0, 3, 7, 4], // left
-            [1, 2, 6, 5]]; // right
+    footFaces = [
+        // bottom
+            [0, 1, 2, 3],
+        // front
+            [0, 3, 7, 4],
+        // top
+            [4, 5, 6, 7],
+        // left
+            [0, 1, 5, 4],
+        // right
+            [2, 3, 7, 6],
+        // back
+            [1, 2, 6, 5]];
+
     echo("Foot faces: ", footFaces);
     union() {
         difference() {
-            polyhedron(points = footPoints, faces = footFaces);
+            hull()
+                polyhedron(points = footPoints, faces = footFaces);
 
-            translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge, 0])
+            translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge - insertBossRadius, 0])
                 translate([insertBossRadius, insertBossRadius, footDimensions[2] - insertHeight])
                     union() {
-                        translate([0, 0, insertHeight]) insert(type);
-                        insert_boss(type, z = insertHeight, wall = wall);
+                        color("red")
+                            translate([0, 0, insertHeight]) insert(type);
+                        color("purple")
+                            insert_boss(type, z = insertHeight * 2, wall = wall);
+                        color("black")
+                            translate([0, 0, -insertHeight * 3 + .01])
+                                cylinder(h = insertHeight * 4, d = 3, $fn = 100);
                     }
         }
-        translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge, 0])
+        //color("green")
+          //  translate([footDimensions[2] / 2 - 1, 0, footDimensions[2]])
+            //    cube([2, 7.42, 2], center = false);
+        translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge - insertBossRadius, 0])
             translate([insertBossRadius, insertBossRadius, footDimensions[2] - insertHeight])
                 insert_boss(type, z = insertHeight, wall = wall);
     }
@@ -100,7 +117,7 @@ module base_fan() {
         }
 }
 
-// base_fan();
+//base_fan();
 // fanFeet();
 fanFoot();
 
