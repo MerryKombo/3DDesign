@@ -72,25 +72,35 @@ module fanFoot() {
 
     echo("Foot faces: ", footFaces);
     union() {
-        difference() {
-            hull()
-                polyhedron(points = footPoints, faces = footFaces);
+        intersection() {
+            difference() {
+                hull()
+                    polyhedron(points = footPoints, faces = footFaces);
 
-            translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge - insertBossRadius, 0])
-                translate([insertBossRadius, insertBossRadius, footDimensions[2] - insertHeight])
-                    union() {
-                        color("red")
-                            translate([0, 0, insertHeight]) insert(type);
-                        color("purple")
-                            insert_boss(type, z = insertHeight * 2, wall = wall);
-                        color("black")
-                            translate([0, 0, -insertHeight * 3 + .01])
-                                cylinder(h = insertHeight * 4, d = 3, $fn = 100);
-                    }
+                translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge - insertBossRadius, 0])
+                    translate([insertBossRadius, insertBossRadius, footDimensions[2] - insertHeight])
+                        union() {
+                            color("red")
+                                translate([0, 0, insertHeight]) insert(type);
+                            color("purple")
+                                insert_boss(type, z = insertHeight * 2, wall = wall);
+                            color("black")
+                                translate([0, 0, -insertHeight * 3 + .01])
+                                    cylinder(h = insertHeight * 4, d = 3, $fn = 100);
+                        }
+                // Remove a rounded chunk, corresponding to the fan blades footprint.
+                color("green")
+                    translate([footDimensions[1] / 2, getFanDiameter() / 2 + footDimensions[2] * .8, -footDimensions[2]
+                        / 2]
+                    )
+                        cylinder(h = footDimensions[2] * 2, d = getFanDiameter(), $fn = 100);
+            }
+            biggerBlueCylinderDiameter = getFanDiameter() + footDimensions[1];
+            color("blue")
+                translate([footDimensions[1] / 2, biggerBlueCylinderDiameter / 2, -footDimensions[2] / 2]
+                )
+                    cylinder(h = footDimensions[2] * 2, d = biggerBlueCylinderDiameter, $fn = 100);
         }
-        //color("green")
-          //  translate([footDimensions[2] / 2 - 1, 0, footDimensions[2]])
-            //    cube([2, 7.42, 2], center = false);
         translate([footDimensions[2] / 2 - insertBossRadius, holeCenterFromEdge - insertBossRadius, 0])
             translate([insertBossRadius, insertBossRadius, footDimensions[2] - insertHeight])
                 insert_boss(type, z = insertHeight, wall = wall);
