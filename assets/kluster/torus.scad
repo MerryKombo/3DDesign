@@ -35,6 +35,35 @@ module drawEars(outerRadius, earSize, numEars, hole = false) {
     }
 }
 
+module drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize) {
+    difference() {
+        hull() {
+            difference() {
+                cylinder(r = earSize / 2, h = earSize / 2, center = true, $fn = 100);
+                if (hole) {
+                    color("black")
+                        cylinder(r = holeSize / 2, h = earSize + 1, center = true, $fn = 100);
+                }
+            }
+
+        }
+
+        if (hole) {
+            color("black")
+                cylinder(r = holeSize / 2, h = earSize + 1, center = true, $fn = 100);
+        }
+    }
+}
+
+module drawFanEarsAdapter(outerRadius, earSize, numEars, adapterHeight = 10, hole = false) {
+    holeSize = 4;
+    for (i = [0 : numEars - 1]) {
+        rotate([0, 0, i * 360 / numEars])
+            translate([outerRadius / 2, 0, getFanHeight() / 2 + earSize / 2 - adapterHeight])
+                drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize);
+    }
+}
+
 module drawEarsForFan(outerRadius, earSize, numEars, hole = false) {
     holeSize = 4;
     for (i = [0 : numEars - 1]) {
@@ -192,4 +221,6 @@ module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan
     }
 }
 
-buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight);
+//buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight);
+//drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize)
+drawEarWithAdapterShim(outerRadius = getTorusSize(), earSize = earSize, adapterHeight = 10, hole = true, holeSize = 4);
