@@ -2,7 +2,7 @@ include <SBC_Model_Framework/sbc_models.scad>
 include <NopSCADlib/utils/core/core.scad>
 include <utils.scad>
 
-// sbc("rpi3b+");
+sbc("rpi3b+");
 sbc_model = ["rpi3b+"];
 s = search(sbc_model, sbc_data);
 
@@ -40,14 +40,14 @@ module k_sbc() {
     echo("sbc_topmax_component_z: ", sbc_topmax_component_z);
 }
 
-module label() {
+module label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8) {
     // The model of the board
     model = "RPi 3B+";
-    text = "Dami-1";
+    text = custom_text;
     echo("model: ", model);
     echo("text: ", text);
     // The size of the text
-    text_size = 5;
+    text_size = custom_font_size;
     echo("text_size: ", text_size);
     // The font of the text
     font = "Isonorm 3098";
@@ -65,10 +65,10 @@ module label() {
     echo("shift_back: ", shift_back);
 
     // The thickness of the text
-    text_thickness = .8;
+    text_thickness = custom_text_thickness;
     echo("text_thickness: ", text_thickness);
     // The thickness of the plate
-    plateThickness = .4;
+    plateThickness = custom_plate_thickness;
     echo("plateThickness: ", plateThickness);
     // The position of the text
     text_position = [0, 0, plateThickness];
@@ -107,4 +107,4 @@ module label() {
                 cylinder(h = 4, r = getHoleSize() / 2, center = true);
     }
 }
-// translate([7.1904 / 2, -22.6088 / 2, -.4])     rotate([0, 0, 90])         label();
+translate([7.1904 / 2, -22.6088 / 2, -.4])     rotate([0, 0, 90])         label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8);
