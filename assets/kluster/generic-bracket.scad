@@ -318,11 +318,16 @@ module drawSmallFootTopNut(foot, baseSize, baseHeight, holeSize) {
     echo("baseSize: ", baseSize);
     echo("baseHeight: ", baseHeight);
     echo("holeSize: ", holeSize);
-
+    high_M2_nut = ["high_M2_nut", 2, 4.9, baseHeight * 4, 2.4, M2_washer, M2_nut_trap_depth, 0];
     high_M3_nut = ["high_M3_nut", 3, 6.4, baseHeight * 4, 4, M3_washer, M3_nut_trap_depth, 0];
-    translate([0, 0, 0])
-        translate(foot)
-            nut(type = high_M3_nut, nyloc = false, brass = false, nylon = false);
+    if (holeSize == 2)
+        translate([0, 0, 0])
+            translate(foot)
+                nut(type = high_M2_nut, nyloc = false, brass = false, nylon = false);
+    else
+        translate([0, 0, 0])
+            translate(foot)
+                nut(type = high_M3_nut, nyloc = false, brass = false, nylon = false);
 }
 
 /**
@@ -517,7 +522,7 @@ module drawCylinderThroughHole(holes, hole_number) {
  * The cylinders for the "ear" are translated along the Y-axis by the baseHeight for each subsequent cylinder.
  * The cylinders for the hole are translated along the Y-axis by the baseHeight and along the Z-axis by a fraction of the baseHeight for each subsequent cylinder.
  */
-module verticalSupportEar(baseHeight, baseSize, holeSize) {
+module verticalSupportEar(baseHeight, baseSize, holeSize, hullWithCylinder = true) {
     rotate([90, 0, 0])
         difference() {
             color("red")
@@ -527,9 +532,10 @@ module verticalSupportEar(baseHeight, baseSize, holeSize) {
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
                     translate([0, baseHeight * 2, 0])
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
-                    rotate([-90, 0, 0])
-                        translate([baseHeight / 2 + holeSize, 0, baseHeight])
-                            cylinder(h = 3 * baseHeight, r = holeSize, center = true, $fn = 100);
+                    if (hullWithCylinder)
+                        rotate([-90, 0, 0])
+                            translate([baseHeight / 2 + holeSize, 0, baseHeight])
+                                cylinder(h = 3 * baseHeight, r = holeSize, center = true, $fn = 100);
                 }
             color("black")
                 hull() {
@@ -608,6 +614,71 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
     }
 }
 
+/**
+ * This module creates an interior support structure in a 3D model.
+ *
+ * @param baseHeight The height of the base of the support structure.
+ * @param holeSize The diameter of the hole in the support structure.
+ * @param baseSize The size of the base of the support structure.
+ *
+ * The function works by first creating a hull that combines a cylinder and an "ear" (created by the verticalSupportEar module).
+ * The cylinder is created inside a difference operation, which also includes a larger cylinder.
+ * The "ear" is translated and rotated to the correct position.
+ * The function then subtracts a union of cylinders and a nut from the hull.
+ * The cylinders are translated and rotated to the correct positions, and the nut is created using the nut function.
+ * Finally, the function subtracts a union of a hull and a nut from the hull.
+ * The hull is created by combining cylinders, and the nut is created using the drawSmallFootTopNut module.
+ * The hull and the nut are translated and rotated to the correct positions.
+ */
+module interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9) {
+    difference() {
+        hull() {
+            translate([-baseHeight / 4, 0, 0])
+                rotate([90, 0, 90])
+                    difference() {
+                        color("red")
+                            cylinder(h = baseHeight / 2, r = holeSize, center = true, $fn = 100);
+                        color("black")
+                            cylinder(h = baseHeight, r = holeSize / 2, center = true, $fn = 100);
+                    }
+            translate([baseSize / 2, baseSize / 2, -baseHeight])
+                verticalSupportEar(baseHeight, baseSize, holeSize, hullWithCylinder = false);
+        }
+
+        translate([-baseHeight / 4, 0, 0])
+            rotate([90, 0, 90])
+                union() {
+                    color("black")
+                        cylinder(h = baseHeight * 8, r = holeSize / 2, center = true, $fn = 100);
+                    color("red")
+                    translate([0, 0, baseHeight / 2])
+                        cylinder(h = baseHeight / 2, r = holeSize, center = true, $fn = 100);
+                    translate([0, 0, baseHeight / 4])
+                        nut(type = M3_nut, nyloc = false, brass = false, nylon = false);
+                }
+
+        translate([baseSize / 2, baseSize / 2, -baseHeight])
+            rotate([90, 0, 0])
+                union() {
+                    color("black")
+                        hull() {
+                            translate([0, 0, -1])
+                                cylinder(h = baseHeight * 2, r = 1, center = true, $fn = 100);
+                            translate([0, baseHeight, -baseHeight / 5])
+                                cylinder(h = baseHeight * 2, r = 1, center = true, $fn = 100);
+                            translate([0, baseHeight * 2, -baseHeight / 5])
+                                cylinder(h = baseHeight * 2, r = 1, center = true, $fn = 100);
+                        }
+                    color("grey")
+                        translate([0, 0, holeSize / 2])
+                            hull() {
+                                translate([0, baseHeight * 2, 0])
+                                    drawSmallFootTopNut([0, 0, 0], baseSize, baseHeight, holeSize = 2);
+                                drawSmallFootTopNut([0, 0, 0], baseSize, baseHeight, holeSize = 2);
+                            }
+                }
+    }
+}
 
 include <raspberry-pi-3-b-plus.scad>;
 sbc_model = ["rpi3b+"];
@@ -619,7 +690,7 @@ holes = [
         [sbc_data[s[0]][16], sbc_data[s[0]][17], sbc_data[s[0]][18]]
     ];
 
-//drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
-//bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3, linkHeight = 6, insertBoss = true) ;
-exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3)
-;
+// drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
+// bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3, linkHeight = 6, insertBoss = true) ;
+// exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3);
+interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
