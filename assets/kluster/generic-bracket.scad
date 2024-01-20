@@ -211,7 +211,7 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
     translate(foot)
         union() {
             difference() {
-                union() {
+                hull() {
                     //color("green")
                     union() {
                         // Draw the base of the foot
@@ -228,6 +228,7 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
                         // or not, depends on the final design
                         // we should maybe add a parameter to the function to decide whether to add a boss or not
                         if (insertBoss)
+                        // TODO: change holeSize to 2.5, as it will give us room to play with the screw, if the print is not perfect
                             union() {
                                 color("blue")
                                     translate([0, 0, -totalHeight / 2 + baseHeight / 4])
@@ -502,9 +503,111 @@ module drawCylinderThroughHole(holes, hole_number) {
     }
 }
 
-module exteriorVerticalSupport() {
- // The support
+/**
+ * This module creates an "ear" for a vertical support structure in a 3D model.
+ *
+ * @param baseHeight The height of the base of the "ear".
+ * @param baseSize The size of the base of the "ear".
+ * @param holeSize The diameter of the hole in the "ear".
+ *
+ * The function works by first rotating the coordinate system by 90 degrees around the X-axis.
+ * It then uses the difference operation to subtract a hull (representing the hole) from another hull (representing the "ear").
+ * The "ear" is created by combining three cylinders using the hull operation.
+ * The hole is created by combining three cylinders using the hull operation.
+ * The cylinders for the "ear" are translated along the Y-axis by the baseHeight for each subsequent cylinder.
+ * The cylinders for the hole are translated along the Y-axis by the baseHeight and along the Z-axis by a fraction of the baseHeight for each subsequent cylinder.
+ */
+module verticalSupportEar(baseHeight, baseSize, holeSize) {
+    rotate([90, 0, 0])
+        difference() {
+            color("red")
+                hull() {
+                    cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
+                    translate([0, baseHeight, 0])
+                        cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
+                    translate([0, baseHeight * 2, 0])
+                        cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
+                    rotate([-90, 0, 0])
+                        translate([baseHeight / 2 + holeSize, 0, baseHeight])
+                            cylinder(h = 3 * baseHeight, r = holeSize, center = true, $fn = 100);
+                }
+            color("black")
+                hull() {
+                    translate([0, 0, -1])
+                        cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+                    translate([0, baseHeight, -baseHeight / 5])
+                        cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+                    translate([0, baseHeight * 2, -baseHeight / 5])
+                        cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+                }
+        }
 }
+
+/**
+ * This module creates a foot for a vertical support structure in a 3D model.
+ *
+ * @param size An array representing the dimensions of the foot in the form [width, length, height]. Default is [6, 20, 6].
+ * @param zPosition The z-coordinate for the position of the foot in the 3D model. Default is 43.
+ * @param holeSize The diameter of the hole in the foot. Default is 3.
+ *
+ * The function works by first translating the coordinate system to the location of the foot.
+ * It then uses the difference operation to subtract a hull (representing the hole) from another hull (representing the foot).
+ * The foot is created by combining a rounded cube and two cylinders using the hull operation.
+ * The hole is created by combining two cylinders using the hull operation.
+ */
+module verticalSupportFoot(size = [6, 20, 6], zPosition = 43, holeSize = 3) {
+    difference() {
+        translate([0, -10, -zPosition])
+            color("green")
+                hull() {
+                    rounded_cube_xz(size, r = size.x / 6, xy_center = true, z_center = true);
+                    translate([0, size.y / 2, 0])
+                        cylinder(h = size.z, r = size.x / 2, center = true, $fn = 100);
+                    translate([0, -size.y / 2, 0])
+                        cylinder(h = size.z, r = size.x / 2, center = true, $fn = 100);
+                }
+        color("black")
+            hull() {
+                translate([0, -size.y, -zPosition])
+                    cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
+                translate([0, -size.z, -zPosition])
+                    cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
+            }
+    }
+}
+
+module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHeight = 6, holeSize = 3) {
+    // The support will be vertical, based on a cylinder and connected to the two "twin" feet on the left of the bracket
+    // bytwo links. Each of these links will be a simple cylinder, with a hole in the middle to allow for a screw to go
+    // through. The support will be connected to the feet by a screw and a nut.
+    // The support will be approximately the same size as the board 85. This value can be found in the variable named
+    // pcbsize_x in utils.scad.
+    // The support will have a base that will connect to the base (built by the buildBase module in torus.scad) of the
+    // model. The connection will be made through an oblong hole, to allow for some fine tuning of the position of the
+    // support.
+    //translate([0, 0, supportHeight / 2])
+    union() {
+        // The support will be vertical, based on a cylinder
+        cylinder(h = supportHeight, r = holeSize, center = true, $fn = 100);
+
+        translate([-holeSize * 2, 0, -supportHeight / 2 + feet[0].x])
+            verticalSupportEar(baseHeight, baseSize, holeSize);
+        translate([-holeSize * 2, 0, -supportHeight / 2 + feet[2].x])
+            verticalSupportEar(baseHeight, baseSize, holeSize);
+        // Connected to the two "twin" feet on the left of the bracket by two links
+        echo("feet: ", feet);
+        echo("feet[0]: ", feet[0]);
+        echo("feet[0][0].z: ", feet[0].x);
+        translate([-holeSize * 2, 0, -supportHeight / 2 + feet[0].x])
+            verticalSupportEar(baseHeight, baseSize, holeSize);
+
+
+        // The support will have a base that will connect to the base of the model
+        // The connection will be made through an oblong hole, to allow for some fine tuning of the position of the support
+        verticalSupportFoot(size = [6, 20, 6], zPosition = supportHeight / 2, holeSize = holeSize);
+    }
+}
+
 
 include <raspberry-pi-3-b-plus.scad>;
 sbc_model = ["rpi3b+"];
@@ -517,5 +620,6 @@ holes = [
     ];
 
 //drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
-bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3
-, linkHeight = 6, insertBoss = true) ;
+//bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3, linkHeight = 6, insertBoss = true) ;
+exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3)
+;
