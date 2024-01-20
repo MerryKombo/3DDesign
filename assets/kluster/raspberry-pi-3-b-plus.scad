@@ -2,7 +2,7 @@ include <SBC_Model_Framework/sbc_models.scad>
 include <NopSCADlib/utils/core/core.scad>
 include <utils.scad>
 
-sbc("rpi3b+");
+// sbc("rpi3b+");
 sbc_model = ["rpi3b+"];
 s = search(sbc_model, sbc_data);
 
@@ -107,4 +107,26 @@ module label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thicknes
                 cylinder(h = 4, r = getHoleSize() / 2, center = true);
     }
 }
-translate([7.1904 / 2, -22.6088 / 2, -.4])     rotate([0, 0, 90])         label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8);
+// translate([7.1904 / 2, -22.6088 / 2, -.4])     rotate([0, 0, 90])         label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8);
+
+module fosdemLabels() {
+    machines = [
+            ["Dami", "3B+", 3],
+            ["Dami", "3B", 5],
+            ["Goun", "3B+", 3]
+        ];
+
+    for (machine = [0 : len(machines) - 1]) {
+        owner = machines[machine][0];
+        type = machines[machine][1];
+        count = machines[machine][2];
+
+        for (i = [1 : count]) {
+            label_text = str(owner, "-", type, "-", i);
+            translate([10 * i, -46.5 * machine, -.4]) // Adjusted values here
+                rotate([0, 0, 90])
+                    label(custom_text = label_text, custom_font_size = 5, custom_plate_thickness = 0.4,
+                    custom_text_thickness = 0.8);
+        }
+    }
+}
