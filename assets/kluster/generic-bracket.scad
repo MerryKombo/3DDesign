@@ -37,7 +37,7 @@ module elbow_rotate_extrude(radius, angle = 90) {
  */
 module drawHole(insertRadius, bracketRadius, holeSize) {
     rotate([0, 90, 0])
-        translate([0, - insertRadius, bracketRadius])
+        translate([0, -insertRadius, bracketRadius])
             color("white")
                 union() {
                     cylinder(h = 3 * bracketRadius, r = holeSize / 2, center = true, $fn = 100);
@@ -91,12 +91,12 @@ module earElbow(bracketRadius, insertRadius, angle = 90, holeSize = 3, footTrans
                 //rotate([- 13, 0, 0])
                 // color("MediumPurple")
                 //translate([0, - 4.45, 0.22])
-                translate([0, - earTranslation, 0])
+                translate([0, -earTranslation, 0])
                     difference() {
                         hull() {
                             color("cyan")
                                 translate([0, bracketRadius, 0])
-                                    rotate([0, 0, - 90])
+                                    rotate([0, 0, -90])
                                         //translate([0, 0, - 2 * insertRadius])
                                         elbow_rotate_extrude(radius = insertRadius, angle = angle);
                             color("green")
@@ -110,7 +110,7 @@ module earElbow(bracketRadius, insertRadius, angle = 90, holeSize = 3, footTrans
                             //       screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
                         }
                         //drawHole(insertRadius, bracketRadius, holeSize);
-                        translate([bracketRadius * 2, - 0, 0])
+                        translate([bracketRadius * 2, -0, 0])
                             rotate([0, 90, insertRadius])
                                 union() {
                                     color("black")
@@ -120,8 +120,8 @@ module earElbow(bracketRadius, insertRadius, angle = 90, holeSize = 3, footTrans
                                 }
                     }
             }
-            translate([0, - earTranslation, 0])
-                translate([bracketRadius * 2, - 0, 0])
+            translate([0, -earTranslation, 0])
+                translate([bracketRadius * 2, -0, 0])
                     rotate([0, 90, insertRadius])
                         union() {
                             color("black")
@@ -130,8 +130,8 @@ module earElbow(bracketRadius, insertRadius, angle = 90, holeSize = 3, footTrans
                                 cylinder(h = screwHeadHeight * 10, r = screwRadius, center = true, $fn = 100);
                         }
         }
-        translate([0, - earTranslation, 0])
-            translate([insertRadius, - 0, 0])
+        translate([0, -earTranslation, 0])
+            translate([insertRadius, -0, 0])
                 rotate([0, 90, 0])
                     screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
         // Check the distance from the PCB to the middle of the screw
@@ -227,7 +227,7 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
                 if (insertElbow) {
                     echo("inserting elbow");
                     insertRadius = insert_boss_radius(insertName(holeSize), wall = 2 * extrusion_width);
-                    translate([baseHeight / 3, - baseHeight / 2, 0])
+                    translate([baseHeight / 3, -baseHeight / 2, 0])
                         rotate([0, 0, 0])
                             earElbow(bracketRadius = baseHeight / 2, insertRadius = insertRadius, angle = 90, holeSize =
                             holeSize, footTranslation = foot.x);
@@ -263,18 +263,6 @@ module drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize)
         }
     }
 }
-
-
-include <raspberry-pi-3-b-plus.scad>;
-sbc_model = ["rpi3b+"];
-s = search(sbc_model, sbc_data);
-holes = [
-        [sbc_data[s[0]][7], sbc_data[s[0]][8], sbc_data[s[0]][9]],
-        [sbc_data[s[0]][10], sbc_data[s[0]][11], sbc_data[s[0]][12]],
-        [sbc_data[s[0]][13], sbc_data[s[0]][14], sbc_data[s[0]][15]],
-        [sbc_data[s[0]][16], sbc_data[s[0]][17], sbc_data[s[0]][18]]
-    ];
-drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
 
 /**
  * This module draws links between pairs of diagonally opposed feet.
@@ -353,8 +341,8 @@ module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkTh
             foot = feet[i];
             x = foot[0];
             y = foot[1];
-            translate([x, y, totalHeight / 2]) {
-                cylinder(h = totalHeight, r = holeSize / 2, center = true, $fn = 100);
+            translate([x, y, totalHeight / 4]) {
+                cylinder(h = totalHeight*2, r = holeSize / 2, center = true, $fn = 100);
             }
         }
     }
@@ -402,3 +390,18 @@ module drawCylinderThroughHole(holes, hole_number) {
             }
     }
 }
+
+
+include <raspberry-pi-3-b-plus.scad>;
+sbc_model = ["rpi3b+"];
+s = search(sbc_model, sbc_data);
+holes = [
+        [sbc_data[s[0]][7], sbc_data[s[0]][8], sbc_data[s[0]][9]],
+        [sbc_data[s[0]][10], sbc_data[s[0]][11], sbc_data[s[0]][12]],
+        [sbc_data[s[0]][13], sbc_data[s[0]][14], sbc_data[s[0]][15]],
+        [sbc_data[s[0]][16], sbc_data[s[0]][17], sbc_data[s[0]][18]]
+    ];
+
+//drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
+bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3
+, linkHeight = 6) ;
