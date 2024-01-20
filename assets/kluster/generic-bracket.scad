@@ -4,6 +4,7 @@ include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
 use <../Booth Display/inserts.scad>;
+include <NopSCADlib/utils/layout.scad>
 include <utils.scad>
 
 /**
@@ -180,18 +181,24 @@ function createFeet(holes, i = 0, result = []) =
         createFeet(holes, i + 1, concat(result, [[holes[i][0], holes[i][1], 0]]));
 
 /**
- * This module draws a foot of the bracket.
+ * This module draws a foot with optional insert boss and elbow.
  *
- * @param foot An array representing the x and y coordinates of the foot.
- * @param baseSize The size of the base of the foot.
+ * @param foot An array representing the x, y, and z coordinates of the foot.
+ * @param baseSize The diameter of the base of the foot.
  * @param baseHeight The height of the base of the foot.
  * @param topHeight The height of the top of the foot.
  * @param totalHeight The total height of the foot.
- * @param holeSize The size of the hole in the foot.
+ * @param holeSize The diameter of the hole in the foot.
+ * @param insertBoss A boolean value indicating whether to insert a boss in the foot. Defaults to false.
+ * @param insertElbow A boolean value indicating whether to insert an elbow in the foot. Defaults to false.
  *
- * The function works by first drawing the base of the foot using the translate and cube functions.
- * It then draws the top of the foot in a similar way, but with a different height.
- * Finally, it draws a hole through the foot using the translate and cylinder functions.
+ * The function works by first echoing the parameters for debugging purposes.
+ * It then uses the translate function to move the coordinate system to the location of the foot.
+ * Inside a union operation, it uses the difference operation to subtract a cylinder (representing the hole) from another union operation.
+ * This union operation includes a base and a top of the foot, and optionally an insert boss and an elbow.
+ * The base and the top of the foot are cylinders, and the insert boss and the elbow are created using the insert_boss and earElbow modules, respectively.
+ * If insertBoss is true, an insert boss is added to the foot.
+ * If insertElbow is true, an elbow is added to the foot.
  */
 module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss = false, insertElbow = false) {
     echo("drawFoot: ", foot);
@@ -202,10 +209,11 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
     echo("holeSize: ", holeSize);
 
     translate(foot)
-        difference() {
-            union() {
-                color("red")
-                    hull() {
+        union() {
+            difference() {
+                union() {
+                    //color("green")
+                    union() {
                         // Draw the base of the foot
                         color("red")
                             // cube([baseSize, baseSize, baseHeight], center = true);
@@ -220,27 +228,104 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
                         // or not, depends on the final design
                         // we should maybe add a parameter to the function to decide whether to add a boss or not
                         if (insertBoss)
-                            color("blue")
-                                insert_boss(insertName(holeSize), z = totalHeight);
-
+                            union() {
+                                color("blue")
+                                    translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+                                        insert_boss(insertName(holeSize), z = totalHeight);
+                                color("yellow")
+                                    translate([0, 0, insert_length(type = insertName(holeSize))])
+                                        insert(type = insertName(holeSize));
+                            }
                     }
-                if (insertElbow) {
-                    echo("inserting elbow");
-                    insertRadius = insert_boss_radius(insertName(holeSize), wall = 2 * extrusion_width);
-                    translate([baseHeight / 3, -baseHeight / 2, 0])
-                        rotate([0, 0, 0])
-                            earElbow(bracketRadius = baseHeight / 2, insertRadius = insertRadius, angle = 90, holeSize =
-                            holeSize, footTranslation = foot.x);
+                    if (insertElbow) {
+                        echo("inserting elbow");
+                        insertRadius = insert_boss_radius(insertName(holeSize), wall = 2 * extrusion_width);
+                        translate([baseHeight / 3, -baseHeight / 2, 0])
+                            rotate([0, 0, 0])
+                                earElbow(bracketRadius = baseHeight / 2, insertRadius = insertRadius, angle = 90,
+                                holeSize =
+                                holeSize, footTranslation = foot.x);
+                    }
                 }
+
+                if (insertBoss)
+                    union() {
+                        color("blue")
+                            translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+                                insert_boss(insertName(holeSize), z = totalHeight);
+                        color("yellow")
+                            translate([0, 0, insert_length(type = insertName(holeSize))])
+                                insert(type = insertName(holeSize));
+                    }
+                // Draw the hole through the foot
+                color("black")
+                    cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
             }
-            // Draw the hole through the foot
-            color("black")
-                cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+            if (insertBoss)
+                union() {
+                    color("blue")
+                        translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+                            insert_boss(insertName(holeSize), z = totalHeight);
+                }
         }
 }
 
 /**
- * This module draws all the feet of the bracket.
+ * This module draws a smaller version of a foot, which only includes the base and a hole.
+ *
+ * @param foot An array representing the x, y, and z coordinates of the foot.
+ * @param baseSize The diameter of the base of the foot.
+ * @param baseHeight The height of the base of the foot.
+ * @param holeSize The diameter of the hole in the foot.
+ *
+ * The function works by first echoing the parameters for debugging purposes.
+ * It then uses the translate function to move the coordinate system to the location of the foot.
+ * Finally, it uses the difference operation to subtract a cylinder (representing the hole) from another cylinder (representing the base of the foot).
+ */
+module drawSmallFoot(foot, baseSize, baseHeight, holeSize) {
+    echo("smallFoot: ", foot);
+    echo("baseSize: ", baseSize);
+    echo("baseHeight: ", baseHeight);
+    echo("holeSize: ", holeSize);
+    translate([0, 0, -baseHeight / 2])
+        translate(foot)
+            difference() {
+                // Draw the base of the foot
+                color("red")
+                    cylinder(h = baseHeight, r = baseSize / 2, center = true, $fn = 100);
+
+                // Draw the hole through the foot
+                color("black")
+                    cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+            }
+}
+
+/**
+ * This module draws a nut on top of a small foot.
+ *
+ * @param foot An array representing the x and y coordinates of the foot.
+ * @param baseSize The size of the base of the foot.
+ * @param baseHeight The height of the base of the foot.
+ * @param holeSize The size of the hole in the foot.
+ *
+ * The function works by first defining the parameters for a high M3 nut.
+ * It then uses the translate function to move the coordinate system to the location of the foot.
+ * Finally, it uses the nut function to draw the nut.
+ */
+module drawSmallFootTopNut(foot, baseSize, baseHeight, holeSize) {
+    echo("smallFoot: ", foot);
+    echo("baseSize: ", baseSize);
+    echo("baseHeight: ", baseHeight);
+    echo("holeSize: ", holeSize);
+
+    high_M3_nut = ["high_M3_nut", 3, 6.4, baseHeight * 4, 4, M3_washer, M3_nut_trap_depth, 0];
+    translate([0, 0, 0])
+        translate(foot)
+            nut(type = high_M3_nut, nyloc = false, brass = false, nylon = false);
+}
+
+/**
+ * This module draws all the feet for a bracket.
  *
  * @param feet An array of arrays, where each sub-array represents the coordinates of a foot.
  * @param baseSize The size of the base of each foot.
@@ -248,18 +333,43 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
  * @param topHeight The height of the top of each foot.
  * @param totalHeight The total height of each foot.
  * @param holeSize The size of the hole in each foot.
+ * @param insertBoss A boolean value indicating whether to insert a boss in the foot. Defaults to false.
  *
- * The function works by iterating over the feet array. For each foot, it calls the drawFoot module
- * with the appropriate parameters to draw the foot at the correct position.
+ * The function works by iterating over the feet array. For each foot, it draws the foot using the drawFoot module.
+ * If the foot is the first or third foot, it also draws a twin foot on its right using the drawSmallFoot module.
+ * If the foot is the second or fourth foot, it also draws a twin foot on its left using the drawSmallFoot module.
+ * Finally, it draws a top nut on each twin foot using the drawSmallFootTopNut module.
  */
-module drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize) {
+module drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss = false) {
     for (i = [0 : len(feet) - 1]) {
-        if (i == 0) {
-            drawFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss = false, insertElbow =
-            true);
-        } else {
-            drawFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss = false, insertElbow =
-            false);
+        difference() {
+            union() {
+                if (i == 0) {
+                    drawFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss, insertElbow =
+                    false);
+                } else {
+                    drawFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss, insertElbow =
+                    false);
+                }
+                // If the foot is #1 or 3, then draw a twin foot on its right, so we can attach it to the center support
+                if (i == 1 || i == 3) {
+                    echo("Drawing right twin foot");
+                    //drawSmallFoot(foot, baseSize, baseHeight, holeSize)
+                    drawSmallFoot(foot = [feet[i][0], feet[i][1] + (baseSize + holeSize) / 2, feet[i][2]], baseSize =
+                    baseSize, baseHeight = baseHeight / 2, holeSize = holeSize);
+                }
+                // If the foot is #0 or 2, then draw a twin foot on its left, so we can attach it to the center support
+                if (i == 0 || i == 2) {
+                    echo("Drawing left twin foot");
+                    //drawSmallFoot(foot, baseSize, baseHeight, holeSize)
+                    drawSmallFoot(foot = [feet[i][0], feet[i][1] - (baseSize + holeSize) / 2, feet[i][2]], baseSize =
+                    baseSize, baseHeight = baseHeight / 2, holeSize = holeSize);
+                }
+            }
+            drawSmallFootTopNut(foot = [feet[i][0], feet[i][1] + (baseSize + holeSize) / 2, feet[i][2]], baseSize =
+            baseSize, baseHeight = baseHeight / 2, holeSize = holeSize);
+            drawSmallFootTopNut(foot = [feet[i][0], feet[i][1] - (baseSize + holeSize) / 2, feet[i][2]], baseSize =
+            baseSize, baseHeight = baseHeight / 2, holeSize = holeSize);
         }
     }
 }
@@ -329,11 +439,12 @@ module drawLinks(feet, linkHeight, linkThickness) {
  * It then calls the drawAllFeet module to draw all the feet of the bracket.
  * Finally, it calls the drawLinks module to draw links between pairs of diagonally opposed feet.
  */
-module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight) {
+module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight, insertBoss = false)
+{
     topHeight = totalHeight - baseHeight;
     difference() {
         union() {
-            drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize);
+            drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss);
             drawLinks(feet, linkHeight, linkThickness);
         }
         // Draw a hole in each foot after the feet and links are drawn
@@ -342,7 +453,7 @@ module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkTh
             x = foot[0];
             y = foot[1];
             translate([x, y, totalHeight / 4]) {
-                cylinder(h = totalHeight*2, r = holeSize / 2, center = true, $fn = 100);
+                cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
             }
         }
     }
@@ -391,6 +502,9 @@ module drawCylinderThroughHole(holes, hole_number) {
     }
 }
 
+module exteriorVerticalSupport() {
+ // The support
+}
 
 include <raspberry-pi-3-b-plus.scad>;
 sbc_model = ["rpi3b+"];
@@ -404,4 +518,4 @@ holes = [
 
 //drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
 bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3
-, linkHeight = 6) ;
+, linkHeight = 6, insertBoss = true) ;
