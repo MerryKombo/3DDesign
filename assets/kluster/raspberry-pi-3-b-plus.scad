@@ -107,6 +107,7 @@ module label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thicknes
                 cylinder(h = 4, r = getHoleSize() / 2, center = true);
     }
 }
+
 // translate([7.1904 / 2, -22.6088 / 2, -.4])     rotate([0, 0, 90])         label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8);
 
 module fosdemLabels() {
