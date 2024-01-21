@@ -592,6 +592,7 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
     // model. The connection will be made through an oblong hole, to allow for some fine tuning of the position of the
     // support.
     //translate([0, 0, supportHeight / 2])
+    // TODO: we should shave the cylinder along the ear holes, because it does not fit flush against the board ears.
     union() {
         // The support will be vertical, based on a cylinder
         cylinder(h = supportHeight, r = holeSize, center = true, $fn = 100);
