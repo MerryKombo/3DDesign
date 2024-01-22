@@ -109,8 +109,7 @@ module label(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thicknes
 }
 
 
-module labelWithACrook(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness
-= 0.8) {
+module labelWithACrook(custom_text = "Dami-1", custom_font_size = 5, custom_plate_thickness = 0.4, custom_text_thickness = 0.8) {
     // The model of the board
     model = "RPi 3B+";
     text = custom_text;
@@ -214,4 +213,4 @@ module fosdemLabels() {
     }
 }
 
-fosdemLabels();
+// fosdemLabels();
