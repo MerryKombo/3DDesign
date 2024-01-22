@@ -271,6 +271,72 @@ module drawFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize, in
         }
 }
 
+module insertBossFootPrint(holeSize, totalHeight, baseHeight) {
+    insertBossRadius = insert_boss_radius(insertName(holeSize), wall = 2);
+    hull() {
+        color("blue")
+            translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+                insert_boss(insertName(holeSize), z = totalHeight);
+        color("white")
+            translate([0, 0, insert_length(type = insertName(holeSize))])
+                insert(type = insertName(holeSize));
+        //translate([0, 0, baseHeight / 2])
+        //    cylinder(h = baseHeight, r = insertBossRadius, center = true, $fn = 100);
+    }
+}
+
+module insertBoss(holeSize, totalHeight, baseHeight) {
+    insertBossRadius = insert_boss_radius(insertName(holeSize), wall = 2);
+    color("blue")
+        translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+            insert_boss(insertName(holeSize), z = totalHeight);
+}
+
+module drawSimplerFoot(foot, baseSize, baseHeight, topHeight, totalHeight, holeSize = 3, insertBoss = false, insertElbow
+= false) {
+    echo("drawFoot: ", foot);
+    echo("baseSize: ", baseSize);
+    echo("baseHeight: ", baseHeight);
+    echo("topHeight: ", topHeight);
+    echo("totalHeight: ", totalHeight);
+    echo("holeSize: ", holeSize);
+
+    translate(foot)
+        union() {
+            difference() {
+                union() {
+                    //color("green")
+                    hull() {
+                        // Draw the base of the foot
+                        color("red")
+                            cylinder(h = baseHeight, r = baseSize / 2, center = true, $fn = 100);
+
+                        // Draw the top of the foot
+                        //color("green")
+                        //  translate([0, 0, baseHeight / 2 + topHeight / 2])
+                        //    cylinder(h = topHeight, r = baseSize * 0.7 / 2, center = true, $fn = 100);
+                        if (insertBoss) {
+                            insertBossFootPrint(holeSize = holeSize, totalHeight = totalHeight, baseHeight = baseHeight)
+                            ;
+                        }
+                    }
+                }
+
+                if (insertBoss)
+                insertBossFootPrint(holeSize = holeSize, totalHeight = totalHeight, baseHeight = baseHeight);
+                // Draw the hole through the foot
+                //color("black")
+                //  cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+            }
+            /*if (insertBoss)
+                union() {
+                    color("blue")
+                        translate([0, 0, -totalHeight / 2 + baseHeight / 4])
+                            insert_boss(insertName(holeSize), z = totalHeight);
+                }*/
+        }
+}
+
 /**
  * This module draws a smaller version of a foot, which only includes the base and a hole.
  *
@@ -299,6 +365,53 @@ module drawSmallFoot(foot, baseSize, baseHeight, holeSize) {
                 color("black")
                     cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
             }
+}
+
+
+module drawSmallHollowEar(foot, baseSize, baseHeight, holeSize, left = false) {
+    echo("smallFoot: ", foot);
+    echo("baseSize: ", baseSize);
+    echo("baseHeight: ", baseHeight);
+    echo("holeSize: ", holeSize);
+    translate([0, 0, baseHeight / 2])
+        translate(foot)
+            rotate([90, 0, 0])
+                union() {
+                    difference() {
+                        // The main shape of the foot
+                        color("red")
+                            hull() {
+                                translate([-baseSize * 1.5, 0, 0])
+                                    cylinder(h = baseHeight, r = holeSize / 2 + 2, center = true, $fn = 100);
+                                translate([baseSize * 1.5
+                                    , 0, 0])
+                                    cylinder(h = baseHeight, r = holeSize / 2 + 2, center = true, $fn = 100);
+                            }
+                        // Draw the hole through the foot
+                        color("black")
+                            hull() {
+                                translate([-baseSize * 1.5, 0, 0])
+                                    cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+                                translate([baseSize * 1.5, 0, 0])
+                                    cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+                            }
+                    }
+                    // Now I'd like to add a shape that mimics the existing foot, and that hulls with the center of the shape we've just created
+                    color("green")
+                        hull() {
+                            if (left) {
+                                cylinder(h = baseHeight, r = holeSize / 2 + 2, center = true, $fn = 100);
+                                translate([0, 0, -baseHeight * 2])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = baseHeight, r = baseSize / 2, center = true, $fn = 100);
+                            } else {
+                                cylinder(h = baseHeight, r = holeSize / 2 + 2, center = true, $fn = 100);
+                                translate([0, 0, baseHeight * 2])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = baseHeight, r = baseSize / 2, center = true, $fn = 100);
+                            }
+                        }
+                }
 }
 
 /**
@@ -380,6 +493,65 @@ module drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize,
     }
 }
 
+
+module drawAllFeetWithHollowEars(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss = false) {
+    for (i = [0 : len(feet) - 1]) {
+        difference() {
+            union() {
+                // drawFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss, insertElbow =                 false);
+                // If the foot is #1 or 3, then draw a twin foot on its right, so we can attach it to the center support
+                if (i == 1 || i == 3) {
+                    echo("Drawing right twin foot");
+                    union() {
+                        difference() {
+                            union() {
+                                drawSimplerFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize = 2.5,
+                                insertBoss, insertElbow = false);
+                                drawSmallHollowEar(foot = [feet[i][0], feet[i][1] + (baseSize + holeSize) / 2, feet[i][2
+                                ]],
+                                baseSize = baseSize, baseHeight = baseHeight / 2, holeSize = 2);
+                            }
+                            if (insertBoss) {
+                                translate(feet[i])
+                                    insertBossFootPrint(holeSize = holeSize, totalHeight = totalHeight, baseHeight =
+                                    baseHeight);
+                            }
+                        }
+                        if (insertBoss) {
+                            translate(feet[i])
+                                insertBoss(holeSize = holeSize, totalHeight = totalHeight, baseHeight = baseHeight);
+                        }
+                    }
+                }
+                // If the foot is #0 or 2, then draw a twin foot on its left, so we can attach it to the outer support
+                if (i == 0 || i == 2) {
+                    echo("Drawing left twin foot");
+                    union() {
+                        difference() {
+                            union() {
+                                drawSimplerFoot(feet[i], baseSize, baseHeight, topHeight, totalHeight, holeSize = 2.5,
+                                insertBoss, insertElbow = false);
+                                drawSmallHollowEar(foot = [feet[i][0], feet[i][1] - (baseSize + holeSize) / 2, feet[i][2
+                                ]], baseSize = baseSize, baseHeight = baseHeight / 2, holeSize = holeSize, left = true);
+                            }
+                            if (insertBoss) {
+                                translate(feet[i])
+                                    insertBossFootPrint(holeSize = holeSize, totalHeight = totalHeight, baseHeight =
+                                    baseHeight);
+                            }
+                        }
+
+                        if (insertBoss) {
+                            translate(feet[i])
+                                insertBoss(holeSize = holeSize, totalHeight = totalHeight, baseHeight = baseHeight);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * This module draws links between pairs of diagonally opposed feet.
  *
@@ -451,6 +623,28 @@ module bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkTh
     difference() {
         union() {
             drawAllFeet(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss);
+            drawLinks(feet, linkHeight, linkThickness);
+        }
+        // Draw a hole in each foot after the feet and links are drawn
+        for (i = [0 : len(feet) - 1]) {
+            foot = feet[i];
+            x = foot[0];
+            y = foot[1];
+            translate([x, y, totalHeight / 4]) {
+                cylinder(h = totalHeight * 2, r = holeSize / 2, center = true, $fn = 100);
+            }
+        }
+    }
+}
+
+
+module bracketWithHollowEars(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight, insertBoss =
+false)
+{
+    topHeight = totalHeight - baseHeight;
+    difference() {
+        union() {
+            drawAllFeetWithHollowEars(feet, baseSize, baseHeight, topHeight, totalHeight, holeSize, insertBoss);
             drawLinks(feet, linkHeight, linkThickness);
         }
         // Draw a hole in each foot after the feet and links are drawn
@@ -593,6 +787,7 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
     // support.
     //translate([0, 0, supportHeight / 2])
     // TODO: we should shave the cylinder along the ear holes, because it does not fit flush against the board ears.
+    // TODO: we also have to rotate the foot 90 degrees or so, so that the hole is on the side of the foot, not on the top. We could also call it done, and design a shim to go between the foot and the support.
     union() {
         // The support will be vertical, based on a cylinder
         cylinder(h = supportHeight, r = holeSize, center = true, $fn = 100);
@@ -632,6 +827,7 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
  * The hull and the nut are translated and rotated to the correct positions.
  */
 module interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9) {
+    // TODO: this version is super cool looking, but it pushes the board too far away from the base, so we need to make another version that is more compact, and aligns with the existing ears of the harness, and not come out of the base. We won't have room for 8 boards otherwise.
     difference() {
         hull() {
             translate([-baseHeight / 4, 0, 0])
@@ -652,8 +848,8 @@ module interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9) {
                     color("black")
                         cylinder(h = baseHeight * 8, r = holeSize / 2, center = true, $fn = 100);
                     color("red")
-                    translate([0, 0, baseHeight / 2])
-                        cylinder(h = baseHeight / 2, r = holeSize, center = true, $fn = 100);
+                        translate([0, 0, baseHeight / 2])
+                            cylinder(h = baseHeight / 2, r = holeSize, center = true, $fn = 100);
                     translate([0, 0, baseHeight / 4])
                         nut(type = M3_nut, nyloc = false, brass = false, nylon = false);
                 }
@@ -681,6 +877,102 @@ module interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9) {
     }
 }
 
+// Let's draw a bracket as small as possible for the Raspberry Pi 3 B+
+module smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2,
+holeDistanceFromEdge = 3.5) {
+    pcbThicknessPlusMargin = pcbsize_z * 2;
+    echo("pcbThicknessPlusMargin: ", pcbThicknessPlusMargin);
+    difference() {
+        union() {
+            // Lets put two cylinders apart from pcbThicknessPlusMargin distance
+            // We'll use these cylinders to draw the bracket
+            rotate([0, 90, 0])
+                union() {
+                    hull() {
+                        translate([0, 0, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        translate([0, sbcHoleSize + wall / 2, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                    }
+                    hull() {
+                        translate([0, 0, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        translate([0, sbcHoleSize + wall / 2, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                    }
+                }
+            // Now we'll draw the bracket
+            // We'll use the difference operation to subtract a hull (representing the hole) from another hull (representing the bracket).
+            // The bracket is created by combining a rounded cube and two cylinders using the hull operation.
+            // The hole is created by combining two cylinders using the hull operation.
+            union() {
+                difference() {
+                    color("red")
+                        hull() {
+                            translate([0, (sbcHoleSize + wall + bracketThickness) / 2, 2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    ,
+                                    $fn =
+                                    100)
+                                        ;
+                            translate([0, (sbcHoleSize + wall + bracketThickness) / 2, -2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    ,
+                                    $fn =
+                                    100)
+                                        ;
+                        }
+                    color("black")
+                        hull() {
+                            translate([0, (sbcHoleSize + wall + bracketThickness) / 2, 2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness * 2, r = centerSupportHoleSize / 2, center = true, $fn
+                                    =
+                                    100);
+                            translate([0, (sbcHoleSize + wall + bracketThickness) / 2, -2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness * 2, r = centerSupportHoleSize / 2, center = true, $fn
+                                    =
+                                    100);
+                        }
+                }
+                color("blue")
+                    hull() {
+                        // one center cylinder
+                        color("green")
+                            rotate([0, 90, 0])
+                                cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true, $fn =
+                                100)
+                                    ;
+                        color("orange")
+                            translate([0, (bracketThickness + sbcHoleSize + wall) / 2, 0])
+                                rotate([90, 0, 0])
+                                    cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2, center
+                                    =
+                                    true,
+                                    $fn = 100)                                ;
+
+                    }
+            }
+        }
+        color("black")
+            union() {
+                // The hole for the SBC screw
+                rotate([0, 90, 0])
+                    cylinder(h = bracketThickness * 4, r = centerSupportHoleSize / 2, center = true, $fn = 100);
+                // The hole for the PCB itself
+                cube([pcbThicknessPlusMargin, sbcHoleSize + wall, bracketThickness * 4], center = true);
+                // The hole to clean-up behind the vertical support (because the ears are bulging)
+                cubeY = (sbcHoleSize + wall + bracketThickness) / 2;
+                cubeYTranslation = cubeY / 2 + (sbcHoleSize + wall + bracketThickness) / 2 + bracketThickness / 2;
+                translate([0, cubeYTranslation, 0])
+                    cube([centerSupportHoleSize + wall*2, cubeY, 4 * (sbcHoleSize + wall)], center = true);
+            }
+    }
+}
+
 include <raspberry-pi-3-b-plus.scad>;
 sbc_model = ["rpi3b+"];
 s = search(sbc_model, sbc_data);
@@ -693,5 +985,7 @@ holes = [
 
 // drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
 // bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3, linkHeight = 6, insertBoss = true) ;
-// exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3);
-interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
+//exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3);
+// interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
+//bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
+smallInteriorBracket();
