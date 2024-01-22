@@ -60,6 +60,9 @@ holes = [
         [sbc_data[s[0]][16], sbc_data[s[0]][17], sbc_data[s[0]][18]]
     ];
 fan_diameter = 140;
+
+usbCableDiameter = 3.5;
+
 // cube([pcbsize_x, pcbsize_y, sbc_topmax_component_z + pcbsize_z]);
 echo("pcbsize_x: ", pcbsize_x);
 echo("pcbsize_y: ", pcbsize_y);
