@@ -1,9 +1,10 @@
 include <NopSCADlib/vitamins/inserts.scad>
-use <../Booth Display/inserts.scad>;
-include <utils.scad>;
-include <base-fan.scad>;
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
+include <utils.scad>;
+include <base-fan.scad>;
+use <../Booth Display/inserts.scad>;
+include <../Booth Display/fake top board dimensions.scad>
 
 /**
  * This module draws "ears" around the torus.
@@ -186,7 +187,7 @@ function calculateAngle(outerRadius) = atan(((getTorusSize() - getFanDiameter())
  *
  * The function works by translating the torus down by the height of the base, then calling the buildTorus module to build the torus.
  */
-module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan = false) {
+module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan = false, drawFanEars = true, reverse=false) {
     earTranslation = (getTorusSize() - getFanDiameter()) / 2 - (getBoardSize().z);
     echo("buildBase: earTranslation = ", earTranslation);
     echo("earTranslation / outerRadius = ", earTranslation / (outerRadius / 1));
@@ -201,10 +202,9 @@ module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan
                     if (showFan)
                     base_fan();
                     //buildTorusEarsForFan();
+                    if (drawFanEars)
                     drawEarsForFan(outerRadius = getDiagonalDistance(), earSize = getTorusInnerRadius() * 2, numEars = 4
-                    ,
-                    hole =
-                    true);
+                    , hole = true);
                 }
 
                 color("black")
@@ -221,6 +221,23 @@ module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan
     }
 }
 
-//buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight);
-//drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize)
-drawEarWithAdapterShim(outerRadius = getTorusSize(), earSize = earSize, adapterHeight = 10, hole = true, holeSize = 4);
+module buildCenterCover() {
+    outerRadius = getTorusSize();
+    innerRadius = baseHeight;
+    numEars = numberOfBoards;
+    difference() {
+
+        cylinder(r = (getTorusSize() / 2 - getBoardSize().y) / 2, h = innerRadius * 2, center = true, $fn = 100);
+        //buildBase(outerRadius = getTorusSize(), innerRadius = baseHeight, earSize, numEars = numberOfBoards, baseHeight)        ;
+        cylinder(r = innerRadius, h = innerRadius * 2 + .1, center = true, $fn = 100);
+        buildTorus(outerRadius, innerRadius, earSize, numEars, finThickness = getFinThickness());
+        translate([0, 0, -innerRadius - .1])
+            cylinder(r = (getTorusSize() / 2 - getBoardSize().y) / 2 + .1, h = innerRadius * 2, center = true, $fn = 100
+            );
+    }
+}
+
+buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false, reverse=true);
+// drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize)
+// drawEarWithAdapterShim(outerRadius = getTorusSize(), earSize = earSize, adapterHeight = 10, hole = true, holeSize = 4);
+// buildCenterCover();
