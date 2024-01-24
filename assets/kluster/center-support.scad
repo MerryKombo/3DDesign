@@ -1,4 +1,5 @@
 include <utils.scad>;
+include <torus.scad>;
 include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
@@ -272,6 +273,9 @@ module createCenterSupport(radius, board_width, num_boards, cylinder_height = 10
         // color("white")
         //    cylinder(r = screwRadius, h = (cylinder_height + pedestal) * 2, center = true, $fn = 100);
     }
+    // adding the base
+    translate([0, 0, -getTorusInnerRadius()])
+        buildCenterCover();
 }
 
 /**
