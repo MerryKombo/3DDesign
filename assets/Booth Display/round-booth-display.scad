@@ -555,3 +555,5 @@ module torusToDisplayBracketAdapter(torus, board) {
     // Should we use it?
     // include <../parts/boards adapter.scad>
 }
+
+// buildBoards();
