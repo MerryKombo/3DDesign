@@ -724,7 +724,7 @@ module verticalSupportEar(baseHeight, baseSize, holeSize, hullWithCylinder = tru
                     cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
                     translate([0, baseHeight, 0])
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
-                    translate([0, baseHeight * 2, 0])
+                    translate([0, baseHeight * 3, 0])
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
                     if (hullWithCylinder)
                         rotate([-90, 0, 0])
@@ -737,7 +737,7 @@ module verticalSupportEar(baseHeight, baseSize, holeSize, hullWithCylinder = tru
                         cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
                     translate([0, baseHeight, -baseHeight / 5])
                         cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
-                    translate([0, baseHeight * 2, -baseHeight / 5])
+                    translate([0, baseHeight * 3, -baseHeight / 5])
                         cylinder(h = baseHeight * 2, r = holeSize / 2, center = true, $fn = 100);
                 }
         }
@@ -751,7 +751,7 @@ module verticalSupportEarCleanup(baseHeight, baseSize, holeSize) {
                     cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
                     translate([0, baseHeight, 0])
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
-                    translate([0, baseHeight * 2, 0])
+                    translate([0, baseHeight * 3, 0])
                         cylinder(h = baseHeight / 2, r = baseSize / 2, center = true, $fn = 100);
                 }
     }
@@ -790,7 +790,8 @@ module verticalSupportFoot(size = [6, 20, 6], zPosition = 43, holeSize = 3) {
     }
 }
 
-module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHeight = 6, holeSize = 3) {
+module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHeight = 6, holeSize = 3, shaveBaseEar =
+false) {
     // The support will be vertical, based on a cylinder and connected to the two "twin" feet on the left of the bracket
     // bytwo links. Each of these links will be a simple cylinder, with a hole in the middle to allow for a screw to go
     // through. The support will be connected to the feet by a screw and a nut.
@@ -810,10 +811,14 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
             // The support will be vertical, based on a cylinder
             cylinder(h = supportHeight, r = holeSize, center = true, $fn = 100);
 
-            // Base ear
-            translate(baseEarTranslation)
-                verticalSupportEar(baseHeight, baseSize, holeSize);
-
+            if (!shaveBaseEar) {
+                // Base ear
+                translate(baseEarTranslation)
+                    verticalSupportEar(baseHeight, baseSize, holeSize);
+            } else {
+                echo("Shaving base ear");
+                // The micro USB plug is 6.16mm thick, so we need to shave the cylinder itself after centering the plug
+            }
             // top ear
             translate(topEarTranslation)
                 verticalSupportEar(baseHeight, baseSize, holeSize);
@@ -821,17 +826,20 @@ module exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize, baseHe
             echo("feet: ", feet);
             echo("feet[0]: ", feet[0]);
             echo("feet[0][0].z: ", feet[0].x);
-            difference() {
-                translate([-holeSize * 2, 0, -supportHeight / 2 + feet[0].x])
-                    verticalSupportEar(baseHeight, baseSize, holeSize);
 
-                color("black")
-                    translate(baseEarTranslation)
-                        verticalSupportEarCleanup(baseHeight, baseSize, holeSize);
-                color("black")
-                    translate(baseEarTranslation)
-                        translate([0, -baseHeight, 0])
+            if (!shaveBaseEar) {
+                difference() {
+                    translate([-holeSize * 2, 0, -supportHeight / 2 + feet[0].x])
+                        verticalSupportEar(baseHeight, baseSize, holeSize);
+
+                    color("black")
+                        translate(baseEarTranslation)
                             verticalSupportEarCleanup(baseHeight, baseSize, holeSize);
+                    color("black")
+                        translate(baseEarTranslation)
+                            translate([0, -baseHeight, 0])
+                                verticalSupportEarCleanup(baseHeight, baseSize, holeSize);
+                }
             }
 
             // Cable guides
@@ -967,7 +975,7 @@ module cableGuide(diameter = 1) {
 
 // Let's draw a bracket as small as possible for the Raspberry Pi 3 B+
 module smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2,
-holeDistanceFromEdge = 3.5) {
+holeDistanceFromEdge = 3.5, half = false) {
     pcbThicknessPlusMargin = pcbsize_z * 2;
     echo("pcbThicknessPlusMargin: ", pcbThicknessPlusMargin);
     // The center of the hole has to correspond to the center of the PCB hole.
@@ -992,6 +1000,25 @@ holeDistanceFromEdge = 3.5) {
                         // A small cylinder on the side of the red vertical part of the support
                         translate([0, verticalPartYTranslation, -(pcbThicknessPlusMargin + bracketThickness) / 2])
                             cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
                     }
                     hull() {
                         // The main cylinder
@@ -1000,6 +1027,25 @@ holeDistanceFromEdge = 3.5) {
                         // A small cylinder on the side of the red vertical part of the support
                         translate([0, verticalPartYTranslation, (pcbThicknessPlusMargin + bracketThickness) / 2])
                             cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
                     }
                 }
             // Now we'll draw the bracket
@@ -1031,40 +1077,52 @@ holeDistanceFromEdge = 3.5) {
                                     = 100);
                         }
                 }
-                color("blue")
-                    hull() {
-                        // one center cylinder
-                        color("green")
-                            rotate([0, 90, 0])
-                                cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true, $fn =
-                                100)
-                                    ;
-                        color("orange")
-                            translate([0, verticalPartYTranslation, 0])
-                                rotate([90, 0, 0])
-                                    cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2, center
-                                    =
-                                    true,
-                                    $fn = 100)                                ;
-
-                    }
             }
         }
         color("black")
             union() {
                 // The hole for the SBC screw
                 rotate([0, 90, 0])
-                    cylinder(h = bracketThickness * 4, r = centerSupportHoleSize / 2, center = true, $fn = 100);
+                    cylinder(h = bracketThickness * 4, r = sbcHoleSize / 2, center = true, $fn = 100);
                 // The hole for the PCB itself
-                cube([pcbThicknessPlusMargin, verticalPartYTranslation * 2 - bracketThickness , wall + sbcHoleSize],
+                cube([pcbThicknessPlusMargin, verticalPartYTranslation * 2 - bracketThickness, wall * 2 + sbcHoleSize],
                 center = true);
                 // The hole to clean-up behind the vertical support (because the ears are bulging)
                 cubeY = bracketThickness;
                 cubeYTranslation = cubeY / 2 + verticalPartYTranslation + bracketThickness / 2;
                 translate([0, cubeYTranslation, 0])
                     cube([centerSupportHoleSize + wall * 2, cubeY, 4 * (sbcHoleSize + wall)], center = true);
+                if (half) {
+                    color("blue")
+                        difference() {
+                            hull() {
+                                translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                        true, $fn = 100)
+                                            ;
+                                translate([0, verticalPartYTranslation, 0])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                        true, $fn = 100)
+                                            ;
+                            }
+                            //translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                            translate([0, verticalPartYTranslation, 0])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    , $fn = 100);
+                        }
+                }
             }
     }
+}
+
+
+module microUSBCableMalePlug(thickness = 6.16, width = 9.95, length = 26) {
+    size = [width, thickness, length];
+
+    rounded_cube_xy(size, r = size.x / 6, xy_center = true, z_center = true);
 }
 
 include <raspberry-pi-3-b-plus.scad>;
@@ -1079,8 +1137,105 @@ holes = [
 
 // drawAllFeet(feet = createFeet(holes), baseSize = 9, baseHeight = 6, topHeight = 3, totalHeight = 9, holeSize = 3);
 // bracket_bracket(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9, linkThickness = 3, linkHeight = 6, insertBoss = true) ;
-// exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3);
+// exteriorVerticalSupport(feet = createFeet(holes), supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3, shaveBaseEar = true);
+
+module assembly(showSBC = true, showAdapter = true) {
+    holeSize = 3;
+    echo("holeSize: ", holeSize);
+    feet = createFeet(holes);
+    echo("feet: ", feet);
+    supportHeight = pcbsize_x;
+    echo("supportHeight: ", supportHeight);
+    baseEarTranslation = [-holeSize * 2, 0, -supportHeight / 2 + feet[0].x];
+    echo("baseEarTranslation: ", baseEarTranslation);
+    topEarTranslation = [-holeSize * 2, 0, -supportHeight / 2 + feet[2].x];
+    echo("topEarTranslation: ", topEarTranslation);
+    baseSize = 9;
+    baseHeight = 6;
+    holeSize = 3;
+    shaveBaseEar = true;
+
+
+    sbcHoleSize = 2.5;
+    centerSupportHoleSize = 3;
+    wall = 2;
+    bracketThickness = 2;
+    holeDistanceFromEdge = 3.5;
+    verticalPartYTranslation = bracketThickness / 2 + holeDistanceFromEdge + screw_head_height(M2_cap_screw) +
+            bracketThickness / 2;
+    echo("verticalPartYTranslation: ", verticalPartYTranslation);
+    if (showAdapter)
+        translate([0, -baseHeight / 2, 0])
+            translate([0, -verticalPartYTranslation, holeSize * 2])
+                translate(topEarTranslation)
+                    smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2,
+                    holeDistanceFromEdge = 3.5);
+    thickness = 6.16;
+    width = 9.95;
+    length = 26;
+    /* // MANUFACTURER: RasberryPi Foundation
+                // NAME: RPi 3B+
+                // SOURCE: OEM Mechanical drawings
+                // TODO: Add SOC data
+                // STATUS: yellow, unverified
+                ["rpi3b+",85,56,1,3.5,16,6,                             // sbc model, pcb size and component height
+                3.5,3.5,3,3.5,52.5,3,                                   // pcb holes 1 and 2
+                61.5,3.5,3,61.5,52.5,3,                                 // pcb holes 3 and 4
+                0,0,0,0,0,0,                                            // pcb holes 5 and 6
+                0,0,0,0,0,0,                                            // pcb holes 7 and 8
+                0,0,0,0,0,0,                                            // pcb holes 9 and 10
+                13,13,1.25,23,23,0,0,"top",                             // soc1 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc2 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc3 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc4 size, location, rotation and side
+                1,21.7,270,"bottom","storage","microsdcard",            // sdcard
+                6.8,-1,0,"top","usb2","micro",                          // usb2 otg
+                24.5,-1,0,"top","video","hdmi_a",                       // hdmi
+                65,2.25,270,"top","network","rj45_single",              // ethernet
+                69.61,39.6,270,"top","usb2","double_stacked_a",         // usb2
+                69.61,21.6,270,"top","usb2","double_stacked_a",         // usb1
+                7,50,0,"top","gpio","header_40",                        // gpio
+                6.5,36,0,"top","ic","ic_11x13",                         // wifi
+                53,30,0,"top","ic","ic_7x7",                            // usbhub 5mm
+                1.1,17.5,90,"top","video", "mipi_csi",                  // display
+                43.5,1,270,"top","video", "mipi_csi",                   // camera
+                50.25,0,0,"top","audio", "jack_3.5",                    // audio port
+                1.1, 43.2, 90, "top", "misc", "led_3x1.5",              // activity led
+                1.1, 47, 90, "top", "misc", "led_3x1.5"],               // power led*/
+    // usb micro is at 6.8, right?
+    usbMicroZTranslation = 6.8;
+    sbcZTranslation = -pcbsize_x / 2 + holeSize * 2;
+    // The width of the micro usb female plug is 7, hardcoded :shrug:
+    currentZTranslation = sbcZTranslation + usbMicroZTranslation + 7 / 2 + .5;
+    echo("currentZTranslation: ", currentZTranslation);
+    // The height of the micro usb female plug is 4.5, hardcoded :shrug:
+    // The pcb thickness is 1mm
+    currentXTranslation = -(holeSize + 4.5 / 2) + 1;
+    echo("currentXTranslation: ", currentXTranslation);
+    currentYTranslation = length / 2 - verticalPartYTranslation;
+    difference() {
+        exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize
+        = 3, shaveBaseEar = false);
+        hull() {
+            translate([currentXTranslation, currentYTranslation, currentZTranslation])
+                rotate([90, 90, 0])
+                    scale([1.2, 1.2, 1.2])
+                        microUSBCableMalePlug();
+            translate([currentXTranslation, currentYTranslation, currentZTranslation])
+                rotate([90, 90, 0])
+                    scale([1.2, 1.2, 1.2])
+                        microUSBCableMalePlug();
+        }
+    }
+    if (showSBC)
+        translate([-3 - 9 / 2, -holeSize - verticalPartYTranslation + feet[0].x, sbcZTranslation])
+            rotate([0, -90, 180])
+                sbc("rpi3b+");
+}
 // interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
 // bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
-smallInteriorBracket();
+smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge
+= 3.5, half = true);
+// smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5);
 // cableGuide(diameter = usbCableDiameter);
+// assembly(showSBC = false, showAdapter = false);
