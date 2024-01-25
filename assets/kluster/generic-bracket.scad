@@ -1234,8 +1234,8 @@ module assembly(showSBC = true, showAdapter = true) {
 }
 // interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
 // bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
-smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge
-= 3.5, half = true);
+// smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5, half = true);
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5);
 // cableGuide(diameter = usbCableDiameter);
-// assembly(showSBC = false, showAdapter = false);
+assembly(showSBC = false, showAdapter = false);
+// exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3, shaveBaseEar = false);
