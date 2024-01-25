@@ -2,6 +2,7 @@ include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
 include <utils.scad>;
+include <round-lcd.scad>;
 include <base-fan.scad>;
 use <../Booth Display/inserts.scad>;
 include <../Booth Display/fake top board dimensions.scad>
@@ -99,12 +100,19 @@ module reinforcementUnit(length, width, thickness) {
         cylinder(r = width / 2, h = length, center = true, $fn = 100);
 }
 
-module createReinforcement(outerRadius, innerRadius, finThickness, numEars) {
+module createReinforcement(outerRadius, innerRadius, finThickness, numEars, missingFins = []) {
     if (outerRadius != 0) {
         for (i = [0 : numEars - 1]) {
-            rotate([0, 0, i * 360 / numEars])
-                translate([outerRadius / 4, 0, 0])
-                    reinforcementUnit(outerRadius / 2, finThickness, finThickness);
+            if (search(i, missingFins) == []) {
+                echo("Creating reinforcement for ear ", i);
+                echo("Didn't find ", i, " in ", missingFins);
+                rotate([0, 0, i * 360 / numEars])
+                    translate([outerRadius / 4, 0, 0])
+                        reinforcementUnit(length = outerRadius / 2, width = finThickness, thickness = finThickness);
+            } else {
+                echo("Not creating reinforcement for ear ", i);
+                echo("Found ", i, " in ", missingFins);
+            }
         }
     }
 }
@@ -123,7 +131,8 @@ module createReinforcement(outerRadius, innerRadius, finThickness, numEars) {
  * After that, it draws the "ears" on the torus using the drawEars module.
  * Finally, it creates the internal reinforcements using the createReinforcement module.
  */
-module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickness = 5) {
+module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickness = 5, missingFins = [], reverse =
+false) {
     echo("Building torus with outer radius = ", outerRadius, ", inner radius = ", innerRadius, ", earSize = ", earSize,
     ", and number of ears = ", numEars);
     // Draw the main body of the torus
@@ -142,9 +151,11 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
                 // Draw the ears
                 drawEars(outerRadius, earSize, numEars, hole = true);
                 // Create the reinforcements
+                echo("Will now create reinforcements");
+                echo("Missing fins are: ", missingFins);
                 for (i = [0 : numEars - 1]) {
                     rotate([0, 0, i * 360 / numEars])
-                        createReinforcement(outerRadius, innerRadius, finThickness, numEars);
+                        createReinforcement(outerRadius, innerRadius, finThickness, numEars, missingFins);
                 }
             }
             color("red")
@@ -153,6 +164,11 @@ module buildTorus(outerRadius, innerRadius, earSize = 10, numEars = 8, finThickn
 
             translate([0, 0, innerRadius])
                 screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+            if (reverse) {
+                rotate([0, 0, i * 360 / numEars])
+                    translate([outerRadius / 4, 0, 0])
+                        reinforcementUnit(length = outerRadius / 2, width = finThickness, thickness = finThickness);
+            }
         }
         difference() {
             // translate([0, 0, -innerRadius])
@@ -187,37 +203,59 @@ function calculateAngle(outerRadius) = atan(((getTorusSize() - getFanDiameter())
  *
  * The function works by translating the torus down by the height of the base, then calling the buildTorus module to build the torus.
  */
-module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan = false, drawFanEars = true, reverse=false) {
+module buildBase(outerRadius, innerRadius, earSize, numEars, baseHeight, showFan = false, drawFanEars = true, reverse =
+false) {
     earTranslation = (getTorusSize() - getFanDiameter()) / 2 - (getBoardSize().z);
     echo("buildBase: earTranslation = ", earTranslation);
     echo("earTranslation / outerRadius = ", earTranslation / (outerRadius / 1));
-    angle = atan(earTranslation / (outerRadius / 2));// already in degrees * (180 / PI);
+    angle = 0;//atan(earTranslation / (outerRadius / 2));// already in degrees * (180 / PI);
     echo("angle = ", angle);
     union() {
-        rotate([0, 0, angle])
-            difference() {
-                union() {
-                    translate([0, 0, 25 - baseHeight])
-                        buildTorus(outerRadius, innerRadius, earSize, numEars, finThickness = getFinThickness());
-                    if (showFan)
-                    base_fan();
-                    //buildTorusEarsForFan();
-                    if (drawFanEars)
-                    drawEarsForFan(outerRadius = getDiagonalDistance(), earSize = getTorusInnerRadius() * 2, numEars = 4
-                    , hole = true);
-                }
+        difference() {
+            union() {
+                rotate([0, 0, angle])
+                    difference() {
+                        union() {
+                            translate([0, 0, 25 - baseHeight])
+                                buildTorus(outerRadius, innerRadius, earSize, numEars, finThickness = getFinThickness(),
+                                missingFins = [3], reverse = reverse)
+                                ;
+                            if (showFan)
+                            base_fan();
+                            //buildTorusEarsForFan();
+                            if (drawFanEars)
+                            drawEarsForFan(outerRadius = getDiagonalDistance(), earSize = getTorusInnerRadius() * 2,
+                            numEars
+                            = 4
+                            , hole = true);
+                        }
 
-                color("black")
-                    for (i = [0 : numEars - 1]) {
-                        rotate([0, 0, i * 360 / numEars])
-                            translate([outerRadius / 2, 0, 0])
-                                cylinder(r = getHoleSize() / 2, h = 100, center = true, $fn = 100);
+                        color("black")
+                            for (i = [0 : numEars - 1]) {
+                                rotate([0, 0, i * 360 / numEars])
+                                    translate([outerRadius / 2, 0, 0])
+                                        cylinder(r = getHoleSize() / 2, h = 100, center = true, $fn = 100);
+                            }
+                        // couper en dessous pour être sûr
+                        color("red")
+                            translate([0, 0, getFanHeight() - getTorusInnerRadius() * 3])
+                                cylinder(r = outerRadius, h = innerRadius, center = false, $fn = 100);
                     }
-                // couper en dessous pour être sûr
-                color("red")
-                    translate([0, 0, getFanHeight() - getTorusInnerRadius() * 3])
-                        cylinder(r = outerRadius, h = innerRadius, center = false, $fn = 100);
             }
+            /*if (reverse) {
+                insertHeight = insert_length(insertName(roundLCDFeetHoleSize)) * 2;
+                translate([roundLCDTotalHeight / 2, 0, 25 - baseHeight - insertHeight + getFinThickness() / 3])
+                    rotate([180, 0, 0])
+                        hull() {roundLCD(showHarness = true, showLCD = false);}
+            }*/
+        }
+
+        if (reverse) {
+            insertHeight = insert_length(insertName(roundLCDFeetHoleSize)) * 2;
+            translate([roundLCDTotalHeight / 2, 0, 25 - baseHeight - insertHeight + getFinThickness() / 3])
+                rotate([180, 0, 0])
+                    roundLCD(showHarness = true, showLCD = false, showHeader = false);
+        }
     }
 }
 
@@ -237,7 +275,21 @@ module buildCenterCover() {
     }
 }
 
-buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false, reverse=true);
+// TODO: Make some kind of horizontal rounded ears outside of the torus, and put an insert on top of the exterior bracket, and connect the two with a screw.
+// The distance between the exterior of the bracket and the cubic insert is about 4.6mm if that helps crafting a slot for the screw.
+
+module centerWithLEDHarness() {
+    intersection() {
+        buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars =
+        false, reverse = true);
+        translate([0, 0, 25 - baseHeight])
+            cylinder(r = getTorusSize() / 6, h = baseHeight * 4, center = true, $fn = 100);
+    }
+}
+
+m
+buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false,
+reverse = true);
 // drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize)
 // drawEarWithAdapterShim(outerRadius = getTorusSize(), earSize = earSize, adapterHeight = 10, hole = true, holeSize = 4);
 // buildCenterCover();
