@@ -1,6 +1,7 @@
 include <NopSCADlib/vitamins/inserts.scad>
 include <NopSCADlib/vitamins/screw.scad>
 include <NopSCADlib/vitamins/screws.scad>
+include <NopSCADlib/utils/sector.scad>
 include <utils.scad>;
 include <round-lcd.scad>;
 include <base-fan.scad>;
@@ -191,6 +192,34 @@ false) {
 function calculateAngle(outerRadius) = atan(((getTorusSize() - getFanDiameter()) / 2 - (getBoardSize().z)) / (
     outerRadius / 2));
 
+module buildEarForExteriorBracket(size = [6, 20, 6], zPosition, holeSize = 3) {
+    echo("buildEarForExteriorBracket: zPosition = ", zPosition);
+    echo("buildEarForExteriorBracket: holeSize = ", holeSize);
+    echo("buildEarForExteriorBracket: size = ", size);
+    difference() {
+        translate([0, -10, zPosition])
+            color("green")
+                hull() {
+                    rounded_cube_xz(size, r = size.x / 6, xy_center = true, z_center = true);
+                    translate([0, size.y / 2, 0])
+                        cylinder(h = size.z, r = size.x / 2, center = true, $fn = 100);
+                    translate([0, -size.y / 2, 0])
+                        cylinder(h = size.z, r = size.x / 2, center = true, $fn = 100);
+
+                    translate([0, size.y / 2, 0])
+                        rotate([0, 90, 0])
+                            cylinder(r = getTorusInnerRadius(), h = getTorusInnerRadius() * 2, center = true, $fn = 100)
+                                ;
+                }
+        color("black")
+            hull() {
+                translate([0, -size.y, zPosition])
+                    cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
+                translate([0, -size.z, zPosition])
+                    cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
+            }
+    }
+}
 
 /**
  * This module builds the base of the torus.
@@ -255,6 +284,21 @@ false) {
             translate([roundLCDTotalHeight / 2, 0, 25 - baseHeight - insertHeight + getFinThickness() / 3])
                 rotate([180, 0, 0])
                     roundLCD(showHarness = true, showLCD = false, showHeader = false);
+            halfAngle = (360 / numEars) / 2;
+            echo("halfAngle = ", halfAngle);
+            for (i = [0 : numEars - 1]) {
+                standardAngle = i * 360 / numEars;
+                echo("standardAngle = ", standardAngle);
+                newAngle = standardAngle + halfAngle;
+                echo("newAngle = ", newAngle);
+                rotate([0, 0, newAngle])
+                    translate([outerRadius / 2, 0, 0]) {
+                        rotate([0, 0, 90])
+                            buildEarForExteriorBracket(size = [6, 20, innerRadius * 2], zPosition = 25 - baseHeight,
+                            holeSize
+                            = 3);
+                    }
+            }
         }
     }
 }
@@ -287,9 +331,21 @@ module centerWithLEDHarness() {
     }
 }
 
-m
-buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false,
-reverse = true);
+module sliceOf() {
+    intersection() {
+        buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars =
+        false, reverse = true);
+        translate([-getTorusInnerRadius()*.8, -getTorusInnerRadius() * 1.8, 0])
+            rotate([0, 0, 360 / (numberOfBoards + 1)])
+            linear_extrude(height = 100, center = true)
+                sector(r = getTorusSize(), start_angle = 0, end_angle = 360 / (numberOfBoards - 2));
+    }
+}
+
+sliceOf();
+// centerWithLEDHarness();
+// buildEarForExteriorBracket(size = [6, 20, 6], zPosition = 25 - baseHeight, holeSize = 3);
+// buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false, reverse = true);
 // drawEarWithAdapterShim(outerRadius, earSize, adapterHeight, hole, holeSize)
 // drawEarWithAdapterShim(outerRadius = getTorusSize(), earSize = earSize, adapterHeight = 10, hole = true, holeSize = 4);
 // buildCenterCover();
