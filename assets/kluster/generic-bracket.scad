@@ -1232,10 +1232,149 @@ module assembly(showSBC = true, showAdapter = true) {
             rotate([0, -90, 180])
                 sbc("rpi3b+");
 }
+
+module createHull(holeSize, baseEarTranslation, baseHeight) {
+    translate([holeSize, 0, baseEarTranslation.z + 3 * baseHeight + holeSize])
+        hull() {
+            translate([0, 0, holeSize * 2])
+                rotate([90, 0, 0])
+                    cylinder(h = holeSize, r = holeSize / 2, center = true, $fn = 100);
+            translate([holeSize, 0, 0])
+                rotate([90, 0, 0])
+                    cylinder(h = holeSize, r = holeSize, center = true, $fn = 100);
+        }
+}
+
+module newAssembly(showSBC = true, showAdapter = true) {
+    holeSize = 3;
+    echo("holeSize: ", holeSize);
+    feet = createFeet(holes);
+    echo("feet: ", feet);
+    supportHeight = pcbsize_x;
+    echo("supportHeight: ", supportHeight);
+    baseEarTranslation = [-holeSize * 2, 0, -supportHeight / 2 + feet[0].x];
+    echo("baseEarTranslation: ", baseEarTranslation);
+    topEarTranslation = [-holeSize * 2, 0, -supportHeight / 2 + feet[2].x];
+    echo("topEarTranslation: ", topEarTranslation);
+    baseSize = 9;
+    baseHeight = 6;
+    holeSize = 3;
+    shaveBaseEar = true;
+
+
+    sbcHoleSize = 2.5;
+    centerSupportHoleSize = 3;
+    wall = 2;
+    bracketThickness = 2;
+    holeDistanceFromEdge = 3.5;
+    verticalPartYTranslation = bracketThickness / 2 + holeDistanceFromEdge + screw_head_height(M2_cap_screw) +
+            bracketThickness / 2;
+    echo("verticalPartYTranslation: ", verticalPartYTranslation);
+    if (showAdapter)
+        translate([0, -baseHeight / 2, 0])
+            translate([0, -verticalPartYTranslation, holeSize * 2])
+                translate(topEarTranslation)
+                    smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2,
+                    holeDistanceFromEdge = 3.5);
+    thickness = 6.16;
+    width = 9.95;
+    length = 26;
+    /* // MANUFACTURER: RasberryPi Foundation
+                // NAME: RPi 3B+
+                // SOURCE: OEM Mechanical drawings
+                // TODO: Add SOC data
+                // STATUS: yellow, unverified
+                ["rpi3b+",85,56,1,3.5,16,6,                             // sbc model, pcb size and component height
+                3.5,3.5,3,3.5,52.5,3,                                   // pcb holes 1 and 2
+                61.5,3.5,3,61.5,52.5,3,                                 // pcb holes 3 and 4
+                0,0,0,0,0,0,                                            // pcb holes 5 and 6
+                0,0,0,0,0,0,                                            // pcb holes 7 and 8
+                0,0,0,0,0,0,                                            // pcb holes 9 and 10
+                13,13,1.25,23,23,0,0,"top",                             // soc1 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc2 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc3 size, location, rotation and side
+                0,0,0,0,0,0,0,"",                                       // soc4 size, location, rotation and side
+                1,21.7,270,"bottom","storage","microsdcard",            // sdcard
+                6.8,-1,0,"top","usb2","micro",                          // usb2 otg
+                24.5,-1,0,"top","video","hdmi_a",                       // hdmi
+                65,2.25,270,"top","network","rj45_single",              // ethernet
+                69.61,39.6,270,"top","usb2","double_stacked_a",         // usb2
+                69.61,21.6,270,"top","usb2","double_stacked_a",         // usb1
+                7,50,0,"top","gpio","header_40",                        // gpio
+                6.5,36,0,"top","ic","ic_11x13",                         // wifi
+                53,30,0,"top","ic","ic_7x7",                            // usbhub 5mm
+                1.1,17.5,90,"top","video", "mipi_csi",                  // display
+                43.5,1,270,"top","video", "mipi_csi",                   // camera
+                50.25,0,0,"top","audio", "jack_3.5",                    // audio port
+                1.1, 43.2, 90, "top", "misc", "led_3x1.5",              // activity led
+                1.1, 47, 90, "top", "misc", "led_3x1.5"],               // power led*/
+    // usb micro is at 6.8, right?
+    usbMicroZTranslation = 6.8;
+    sbcZTranslation = -pcbsize_x / 2 + holeSize * 2;
+    // The width of the micro usb female plug is 7, hardcoded :shrug:
+    currentZTranslation = sbcZTranslation + usbMicroZTranslation + 7 / 2 + .5;
+    echo("currentZTranslation: ", currentZTranslation);
+    // The height of the micro usb female plug is 4.5, hardcoded :shrug:
+    // The pcb thickness is 1mm
+    currentXTranslation = -(holeSize + 4.5 / 2) + 1;
+    echo("currentXTranslation: ", currentXTranslation);
+    currentYTranslation = length / 2 - verticalPartYTranslation;
+    shaveHeight = baseHeight * 4;
+    echo("shaveHeight: ", shaveHeight);
+    difference() {
+        union() {
+            mirror([1, 0, 0])
+                exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3,
+                shaveBaseEar = false);
+            exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3,
+            shaveBaseEar = false);
+            createHull(holeSize, baseEarTranslation, baseHeight);
+            mirror([1, 0, 0])
+                createHull(holeSize, baseEarTranslation, baseHeight);
+        }
+        union() {
+            translate([0, holeSize, topEarTranslation.z + (shaveHeight - baseHeight) / 2])
+                cube(size = [holeSize * 2, holeSize, shaveHeight], center = true);
+            mirror([0, 1, 0])
+                translate([0, holeSize, topEarTranslation.z + (shaveHeight - baseHeight) / 2])
+                    cube(size = [holeSize * 2, holeSize, shaveHeight], center = true);
+        }
+        hull() {
+            supportHeight = pcbsize_x;
+            echo("supportHeight: ", supportHeight);
+            topEarTranslation = [0, 0, -supportHeight / 2 + feet[2].x];
+            translate(topEarTranslation)
+                rotate([0, 90, 90])
+                    cylinder(h = pcbsize_x, r = holeSize / 2, center = true, $fn = 100);
+            translate([0, 0, baseHeight * 3])
+                translate(topEarTranslation)
+                    rotate([0, 90, 90])
+                        cylinder(h = pcbsize_x, r = holeSize / 2, center = true, $fn = 100);
+        }
+        hull() {
+            translate([0, currentYTranslation, currentZTranslation])
+                rotate([90, 90, 0])
+                    scale([1.4, 2.4, 1.2])
+                        microUSBCableMalePlug();
+            translate([0, currentYTranslation, currentZTranslation])
+                rotate([90, 90, 0])
+                    scale([1.4, 2.4, 1.2])
+                        microUSBCableMalePlug();
+        }
+        // TODO: Remove cable guide at the ears level
+        // TODO: Remove thin vertical part of the bottom ears around the USB plug
+        // DONE: Shave the center cylinder surface front and rear along the ears
+        // DONE: Add a reinforcement on top of the bottom ears
+    }
+    if (showSBC)
+        translate([-3 - 9 / 2, -holeSize - verticalPartYTranslation + feet[0].x, sbcZTranslation])
+            rotate([0, -90, 180])
+                sbc("rpi3b+");
+}
 // interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
 // bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5, half = true);
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5);
 // cableGuide(diameter = usbCableDiameter);
-assembly(showSBC = false, showAdapter = false);
+newAssembly(showSBC = false, showAdapter = false);
 // exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3, shaveBaseEar = false);
