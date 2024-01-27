@@ -810,6 +810,10 @@ false) {
         union() {
             // The support will be vertical, based on a cylinder
             cylinder(h = supportHeight, r = holeSize, center = true, $fn = 100);
+            // DONE: add 20mm on top, with an insert boss
+            supportTopHeight = 20;
+            translate([0, 0, supportHeight / 2])
+                insert_boss(insertName(holeSize), z = supportTopHeight);
 
             if (!shaveBaseEar) {
                 // Base ear
@@ -851,13 +855,14 @@ false) {
 
 
             // Number of cable guides
-            numCableGuides = 8;
+            numCableGuides = 3;
 
             // Diameter of the cable guides
             cableGuideYTranslation = usbCableDiameter + holeSize - usbCableDiameter;
 
             // Spacing between each cable guide
-            cableGuideSpacing = supportHeight / (numCableGuides + 1);
+            cableGuideAreaLength = (supportHeight / 2.5);
+            cableGuideSpacing = cableGuideAreaLength / (numCableGuides + 1);
 
             // Create each cable guide
             for (i = [1 : numCableGuides]) {
@@ -865,7 +870,19 @@ false) {
                 cableGuidePosition = i * cableGuideSpacing - supportHeight / 2;
 
                 // Translate the cable guide to its position
-                translate([0, cableGuideYTranslation, cableGuidePosition])
+                translate([0, cableGuideYTranslation, cableGuidePosition + baseHeight * 4 + holeSize])
+                    rotate([-90, 90, 0])
+                        cableGuide(diameter = usbCableDiameter);
+            }
+            // We also need cable guide on the base part
+
+            // Create each cable guide
+            for (i = [1 : 2]) {
+                // Calculate the position of the cable guide
+                cableGuidePosition = i * cableGuideSpacing - supportHeight / 2;
+
+                // Translate the cable guide to its position
+                translate([0, cableGuideYTranslation, cableGuidePosition - baseHeight])
                     rotate([-90, 90, 0])
                         cableGuide(diameter = usbCableDiameter);
             }
@@ -1118,6 +1135,168 @@ holeDistanceFromEdge = 3.5, half = false) {
     }
 }
 
+module smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2,
+holeDistanceFromEdge = 3.5, drawShims = false, shimsThickness = 0, shimCenterRecessDiameter = 3) {
+    pcbThicknessPlusMargin = pcbsize_z * 2;
+    echo("pcbThicknessPlusMargin: ", pcbThicknessPlusMargin);
+    // The center of the hole has to correspond to the center of the PCB hole.
+    // holeDistanceFromEdge is the distance between the edge of the board and the center of the hole.
+    // The vertical part of the support is bracketThickness thick, centered on the system.
+    // It should be separated from the horizontal part of the support at least by the distance between the edge of the
+    // board and the center of the hole plus the size of a screw head.
+    verticalPartYTranslation = bracketThickness / 2 + holeDistanceFromEdge + screw_head_height(M2_cap_screw) +
+            bracketThickness / 2;
+    //verticalPartYTranslation = (sbcHoleSize + wall + bracketThickness) / 2 + holeDistanceFromEdge;
+    echo("verticalPartYTranslation: ", verticalPartYTranslation);
+    difference() {
+        union() {
+            // Lets put two cylinders apart from pcbThicknessPlusMargin distance
+            // We'll use these cylinders to draw the bracket
+            rotate([0, 90, 0])
+                union() {
+                    hull() {
+                        // The main cylinder
+                        translate([0, 0, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        // A small cylinder on the side of the red vertical part of the support
+                        translate([0, verticalPartYTranslation, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation+shimsThickness, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
+                    }
+                    hull() {
+                        // The main cylinder
+                        translate([0, 0, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        // A small cylinder on the side of the red vertical part of the support
+                        translate([0, verticalPartYTranslation, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
+                    }
+                }
+            // Now we'll draw the bracket
+            // We'll use the difference operation to subtract a hull (representing the hole) from another hull (representing the bracket).
+            // The bracket is created by combining a rounded cube and two cylinders using the hull operation.
+            // The hole is created by combining two cylinders using the hull operation.
+            rotate([0, 90, 0])
+                union() {
+                    difference() {
+                        color("red")
+                            hull() {
+                                translate([0, verticalPartYTranslation + shimsThickness / 2, 2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness + shimsThickness, r = (centerSupportHoleSize +
+                                            wall) / 2, center = true, $fn = 100);
+                                translate([0, verticalPartYTranslation + shimsThickness / 2, -2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness + shimsThickness, r = (centerSupportHoleSize +
+                                            wall) / 2, center = true, $fn = 100);
+                            }
+                        color("black")
+                            hull() {
+                                translate([0, verticalPartYTranslation + shimsThickness / 2, 2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = (bracketThickness + shimsThickness) * 2, r = centerSupportHoleSize
+                                            / 2, center = true, $fn = 100);
+                                translate([0, verticalPartYTranslation + shimsThickness / 2, -2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = (bracketThickness + +shimsThickness) * 2, r = centerSupportHoleSize
+                                            / 2, center = true, $fn = 100);
+                            }
+                    }
+                }
+        }
+        color("purple")
+            union() {
+                // The hole for the SBC screw
+                rotate([0, 90, 0])
+                    cylinder(h = bracketThickness * 4, r = sbcHoleSize / 2, center = true, $fn = 100);
+                // The hole for the PCB itself
+                cube([pcbThicknessPlusMargin, verticalPartYTranslation * 2 - bracketThickness, wall * 2 + sbcHoleSize],
+                center = true);
+                // The hole to clean-up behind the vertical support (because the ears are bulging)
+                cubeY = bracketThickness;
+                cubeYTranslation = cubeY / 2 + verticalPartYTranslation + bracketThickness / 2 + shimsThickness ;
+                translate([0, cubeYTranslation, 0])
+                    cube([centerSupportHoleSize + wall * 2, cubeY, 4 * (sbcHoleSize + wall)], center = true);
+                /*
+                 * This block of code performs a difference operation on a hull and a cylinder.
+                 * The hull is created by combining two cylinders that are translated and rotated.
+                 * The cylinder is also translated and rotated.
+                 * The color of the hull is set to blue.
+                 *
+                 * @param verticalPartYTranslation: The Y-axis translation for the hull and the cylinder.
+                 * @param sbcHoleSize: The size of the hole in the Single Board Computer (SBC).
+                 * @param wall: The thickness of the wall of the cylinder.
+                 * @param bracketThickness: The thickness of the bracket.
+                 * @param centerSupportHoleSize: The size of the hole in the center support.
+                *//*
+                color("blue")
+                    difference() {
+                        hull() {
+                            // Translate and rotate a cylinder, then add it to the hull
+                            translate([0, verticalPartYTranslation + shimsThickness, 2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                    true, $fn = 100)
+                                        ;
+                            // Translate and rotate another cylinder, then add it to the hull
+                            translate([0, verticalPartYTranslation + shimsThickness, 0])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                    true, $fn = 100)
+                                        ;
+                        }
+                        // Translate and rotate a cylinder, then subtract it from the hull
+                        translate([0, verticalPartYTranslation + shimsThickness, 0])
+                            rotate([90, 0, 0])
+                                cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                , $fn = 100);
+                    }*/
+                // We'll now remove the main exterior support shape, which happens to be a half cylinder
+                color("white")
+                    translate([0, verticalPartYTranslation + (shimsThickness + shimCenterRecessDiameter +
+                        shimCenterRecessDiameter) / 2, 0])
+                        cylinder(h = bracketThickness * 4, r = shimCenterRecessDiameter / 2, center = true, $fn = 100);
+            }
+    }
+}
+
 
 module microUSBCableMalePlug(thickness = 6.16, width = 9.95, length = 26) {
     size = [width, thickness, length];
@@ -1234,12 +1413,22 @@ module assembly(showSBC = true, showAdapter = true) {
 }
 
 module createHull(holeSize, baseEarTranslation, baseHeight) {
-    translate([holeSize, 0, baseEarTranslation.z + 3 * baseHeight + holeSize])
+    translate([holeSize * 1.5, 0, baseEarTranslation.z + 3 * baseHeight + holeSize])
         hull() {
+            // The small cylinder
             translate([0, 0, holeSize * 2])
                 rotate([90, 0, 0])
                     cylinder(h = holeSize, r = holeSize / 2, center = true, $fn = 100);
-            translate([holeSize, 0, 0])
+            // Another small cylinder higher
+            translate([-holeSize / 2, 0, holeSize * 3])
+                rotate([90, 0, 0])
+                    cylinder(h = holeSize, r = holeSize / 2, center = true, $fn = 100);
+            // A third small cylinder in the middle
+            translate([holeSize, 0, holeSize * 2])
+                rotate([90, 0, 0])
+                    cylinder(h = holeSize, r = holeSize / 2, center = true, $fn = 100);
+            // Da big cylinder
+            translate([holeSize, 0, -holeSize / 2])
                 rotate([90, 0, 0])
                     cylinder(h = holeSize, r = holeSize, center = true, $fn = 100);
         }
@@ -1328,10 +1517,12 @@ module newAssembly(showSBC = true, showAdapter = true) {
                 shaveBaseEar = false);
             exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3,
             shaveBaseEar = false);
+            // Reinforce the big hole made for the micro USB plug
             createHull(holeSize, baseEarTranslation, baseHeight);
             mirror([1, 0, 0])
                 createHull(holeSize, baseEarTranslation, baseHeight);
         }
+        // Shaves the main cylinder
         union() {
             translate([0, holeSize, topEarTranslation.z + (shaveHeight - baseHeight) / 2])
                 cube(size = [holeSize * 2, holeSize, shaveHeight], center = true);
@@ -1351,18 +1542,19 @@ module newAssembly(showSBC = true, showAdapter = true) {
                     rotate([0, 90, 90])
                         cylinder(h = pcbsize_x, r = holeSize / 2, center = true, $fn = 100);
         }
+        // Removes as much as what is needed to slide a micro USB plug in
         hull() {
-            translate([0, currentYTranslation, currentZTranslation])
+            translate([0, currentYTranslation, currentZTranslation + 7])
                 rotate([90, 90, 0])
                     scale([1.4, 2.4, 1.2])
                         microUSBCableMalePlug();
-            translate([0, currentYTranslation, currentZTranslation])
+            translate([0, currentYTranslation, currentZTranslation + 7])
                 rotate([90, 90, 0])
                     scale([1.4, 2.4, 1.2])
                         microUSBCableMalePlug();
         }
         // TODO: Remove cable guide at the ears level
-        // TODO: Remove thin vertical part of the bottom ears around the USB plug
+        // DONE: Remove thin vertical part of the bottom ears around the USB plug
         // DONE: Shave the center cylinder surface front and rear along the ears
         // DONE: Add a reinforcement on top of the bottom ears
     }
@@ -1374,7 +1566,19 @@ module newAssembly(showSBC = true, showAdapter = true) {
 // interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
 // bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5, half = true);
+translate([0, -12, pcbsize_x / 3])
+    smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2, holeDistanceFromEdge
+    = 3.5, drawShims = false, shimsThickness = 8.8, shimCenterRecessDiameter = 6);
+translate([0, -12, -pcbsize_x / 3])
+    smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2, holeDistanceFromEdge
+    = 3.5, drawShims = false, shimsThickness = 8.8, shimCenterRecessDiameter = 6);
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5);
 // cableGuide(diameter = usbCableDiameter);
-newAssembly(showSBC = false, showAdapter = false);
+ newAssembly(showSBC = false, showAdapter = false);
 // exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3, shaveBaseEar = false);
+
+/*intersection() {
+    newAssembly(showSBC = false, showAdapter = false);
+    translate([0, 0, -pcbsize_x / 2+11])
+        cube([pcbsize_x, pcbsize_y, pcbsize_x / 2], center = true);
+}*/
