@@ -2,7 +2,7 @@
 import ezdxf
 
 # Load the DXF document.
-doc = ezdxf.readfile("SL-7200-6810800-clamp-hole-surround.dxf")
+doc = ezdxf.readfile("SL-7200-6810800-boss-cover-internal-square-hole.dxf") # was SL-7200-6810800-clamp-hole-surround.dxf")
 
 # Access the modelspace.
 modelspace = doc.modelspace()

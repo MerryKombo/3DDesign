@@ -146,11 +146,15 @@ false) {
                         translate([outerRadius / 2, 0, 0])
                             circle(r = innerRadius, $fn = 100);
 
-                    // Remove the ears
-                    drawEars(outerRadius, earSize, numEars);
+                    if (!reverse) {
+                        // Remove the ears
+                        drawEars(outerRadius, earSize, numEars);
+                    }
                 }
                 // Draw the ears
-                drawEars(outerRadius, earSize, numEars, hole = true);
+                if (!reverse) {
+                    drawEars(outerRadius, earSize, numEars, hole = true);
+                }
                 // Create the reinforcements
                 echo("Will now create reinforcements");
                 echo("Missing fins are: ", missingFins);
@@ -159,12 +163,15 @@ false) {
                         createReinforcement(outerRadius, innerRadius, finThickness, numEars, missingFins);
                 }
             }
-            color("red")
-                translate([0, 0, innerRadius])
-                    insert(insertName(3));
+            if (!reverse) {
+                color("red")
+                    translate([0, 0, innerRadius])
+                        insert(insertName(3));
 
-            translate([0, 0, innerRadius])
-                screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+                translate([0, 0, innerRadius])
+                    screw(type = M3_cap_screw, length = 30, hob_point = 0, nylon = false);
+
+            }
             if (reverse) {
                 rotate([0, 0, i * 360 / numEars])
                     translate([outerRadius / 4, 0, 0])
@@ -215,7 +222,7 @@ module buildEarForExteriorBracket(size = [6, 20, 6], zPosition, holeSize = 3) {
             hull() {
                 translate([0, -size.y, zPosition])
                     cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
-                translate([0, -size.z, zPosition])
+                translate([0, +size.y, zPosition])
                     cylinder(h = 2 * size.z, r = holeSize / 2, center = true, $fn = 100);
             }
     }
@@ -258,13 +265,14 @@ false) {
                             = 4
                             , hole = true);
                         }
-
-                        color("black")
-                            for (i = [0 : numEars - 1]) {
-                                rotate([0, 0, i * 360 / numEars])
-                                    translate([outerRadius / 2, 0, 0])
-                                        cylinder(r = getHoleSize() / 2, h = 100, center = true, $fn = 100);
-                            }
+                        if (!reverse) {
+                            color("black")
+                                for (i = [0 : numEars - 1]) {
+                                    rotate([0, 0, i * 360 / numEars])
+                                        translate([outerRadius / 2, 0, 0])
+                                            cylinder(r = getHoleSize() / 2, h = 100, center = true, $fn = 100);
+                                }
+                        }
                         // couper en dessous pour être sûr
                         color("red")
                             translate([0, 0, getFanHeight() - getTorusInnerRadius() * 3])
@@ -335,14 +343,16 @@ module sliceOf() {
     intersection() {
         buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars =
         false, reverse = true);
-        translate([-getTorusInnerRadius()*.8, -getTorusInnerRadius() * 1.8, 0])
+        translate([-getTorusInnerRadius() * .8, -getTorusInnerRadius() * 1.8, 0])
             rotate([0, 0, 360 / (numberOfBoards + 1)])
-            linear_extrude(height = 100, center = true)
-                sector(r = getTorusSize(), start_angle = 0, end_angle = 360 / (numberOfBoards - 2));
+                linear_extrude(height = 100, center = true)
+                    sector(r = getTorusSize(), start_angle = 0, end_angle = 360 / (numberOfBoards - 2));
     }
 }
 
-sliceOf();
+buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false,
+reverse = true);
+// sliceOf();
 // centerWithLEDHarness();
 // buildEarForExteriorBracket(size = [6, 20, 6], zPosition = 25 - baseHeight, holeSize = 3);
 // buildBase(outerRadius = getTorusSize(), baseHeight, earSize, numEars = numberOfBoards, baseHeight, drawFanEars = false, reverse = true);

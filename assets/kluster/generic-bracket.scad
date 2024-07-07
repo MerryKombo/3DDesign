@@ -1135,8 +1135,185 @@ holeDistanceFromEdge = 3.5, half = false) {
     }
 }
 
+module smallElongatedInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2,
+holeDistanceFromEdge = 3.5, half = false, armAddedLength = 10, writeSize = false) {
+    pcbThicknessPlusMargin = pcbsize_z * 2;
+    echo("pcbThicknessPlusMargin: ", pcbThicknessPlusMargin);
+    // The center of the hole has to correspond to the center of the PCB hole.
+    // holeDistanceFromEdge is the distance between the edge of the board and the center of the hole.
+    // The vertical part of the support is bracketThickness thick, centered on the system.
+    // It should be separated from the horizontal part of the support at least by the distance between the edge of the
+    // board and the center of the hole plus the size of a screw head.
+    verticalPartYTranslation = bracketThickness / 2 + holeDistanceFromEdge + screw_head_height(M2_cap_screw) +
+            bracketThickness / 2 + armAddedLength;
+    //verticalPartYTranslation = (sbcHoleSize + wall + bracketThickness) / 2 + holeDistanceFromEdge;
+    echo("verticalPartYTranslation: ", verticalPartYTranslation);
+    difference() {
+        union() {
+            // Lets put two cylinders apart from pcbThicknessPlusMargin distance
+            // We'll use these cylinders to draw the bracket
+            rotate([0, 90, 0])
+                union() {
+                    hull() {
+                        // The main cylinder
+                        translate([0, 0, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        // A small cylinder on the side of the red vertical part of the support
+                        translate([0, verticalPartYTranslation, -(pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
+                    }
+
+                    // Write the value of armAddedLength on top of the bracket
+                    if (writeSize) {
+                        echo("text_position: ", text_position);
+                        font = "Isonorm 3098";
+                        echo("font: ", font);
+                        custom_font_size = 3;
+                        // The size of the text
+                        text_size = custom_font_size;
+                        // The thickness of the text
+                        custom_plate_thickness = 0.4;
+                        custom_text_thickness = 0.8;
+                        text_thickness = custom_text_thickness;
+                        echo("text_thickness: ", text_thickness);
+                        text = str(armAddedLength + bracketThickness);
+                        //Size from text
+                        tm = textmetrics(text, size = text_size, font = font);
+                        echo("tm: ", tm);
+                        textsize = tm.size; //array
+                        // The position of the text
+                        // text_position = [-(centerSupportHoleSize + wall) / 2, verticalPartYTranslation * 2 - bracketThickness * 2 - 2, 0];
+                        // x is z, y is y, z is x
+                        text_position = [0, (sbcHoleSize + textsize.y) / 2, -(pcbThicknessPlusMargin / 2 +
+                            bracketThickness)
+                            ];
+                        echo("textsize: ", textsize);
+                        color("white")
+                            translate(text_position)
+                                rotate([0, 180, 180])
+                                    linear_extrude(height = text_thickness)
+                                        text(text = text, size = text_size, halign = "center",
+                                        valign = "center", font = font);
+                    }
+                    hull() {
+                        // The main cylinder
+                        translate([0, 0, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = bracketThickness, r = (sbcHoleSize + wall) / 2, center = true, $fn = 100);
+                        // A small cylinder on the side of the red vertical part of the support
+                        translate([0, verticalPartYTranslation, (pcbThicknessPlusMargin + bracketThickness) / 2])
+                            cylinder(h = wall, r = bracketThickness / 2, center = true, $fn = 100);
+                        color("blue")
+                            hull() {
+                                // one center cylinder
+                                color("green")
+                                    rotate([0, 90, 0])
+                                        cylinder(h = pcbThicknessPlusMargin, r = (sbcHoleSize + wall) / 2, center = true
+                                        , $fn =
+                                        100)
+                                            ;
+                                color("orange")
+                                    translate([0, verticalPartYTranslation, 0])
+                                        rotate([90, 0, 0])
+                                            cylinder(h = pcbThicknessPlusMargin, r = (centerSupportHoleSize + wall) / 2,
+                                            center
+                                            =
+                                            true,
+                                            $fn = 100)                                ;
+
+                            }
+                    }
+                }
+            // Now we'll draw the bracket
+            // We'll use the difference operation to subtract a hull (representing the hole) from another hull (representing the bracket).
+            // The bracket is created by combining a rounded cube and two cylinders using the hull operation.
+            // The hole is created by combining two cylinders using the hull operation.
+            union() {
+                difference() {
+                    color("red")
+                        hull() {
+                            translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    , $fn = 100);
+                            translate([0, verticalPartYTranslation, -2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    , $fn = 100);
+                        }
+                    color("black")
+                        hull() {
+                            translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness * 2, r = centerSupportHoleSize / 2, center = true, $fn
+                                    = 100);
+                            translate([0, verticalPartYTranslation, -2 * (sbcHoleSize + wall)])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness * 2, r = centerSupportHoleSize / 2, center = true, $fn
+                                    = 100);
+                        }
+                }
+            }
+        }
+        color("black")
+            union() {
+                // The hole for the SBC screw
+                rotate([0, 90, 0])
+                    cylinder(h = bracketThickness * 4, r = sbcHoleSize / 2, center = true, $fn = 100);
+                // The hole for the PCB itself
+                cube([pcbThicknessPlusMargin, verticalPartYTranslation * 2 - bracketThickness, wall * 2 + sbcHoleSize],
+                center = true);
+                // The hole to clean-up behind the vertical support (because the ears are bulging)
+                cubeY = bracketThickness;
+                cubeYTranslation = cubeY / 2 + verticalPartYTranslation + bracketThickness / 2;
+                translate([0, cubeYTranslation, 0])
+                    cube([centerSupportHoleSize + wall * 2, cubeY, 4 * (sbcHoleSize + wall)], center = true);
+                if (half) {
+                    color("blue")
+                        difference() {
+                            hull() {
+                                translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                        true, $fn = 100)
+                                            ;
+                                translate([0, verticalPartYTranslation, 0])
+                                    rotate([90, 0, 0])
+                                        cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center =
+                                        true, $fn = 100)
+                                            ;
+                            }
+                            //translate([0, verticalPartYTranslation, 2 * (sbcHoleSize + wall)])
+                            translate([0, verticalPartYTranslation, 0])
+                                rotate([90, 0, 0])
+                                    cylinder(h = bracketThickness, r = (centerSupportHoleSize + wall) / 2, center = true
+                                    , $fn = 100);
+                        }
+                }
+            }
+    }
+}
+
 module smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2,
-holeDistanceFromEdge = 3.5, drawShims = false, shimsThickness = 0, shimCenterRecessDiameter = 3) {
+holeDistanceFromEdge = 3.5, drawShims = false, shimsThickness = 0, shimCenterRecessDiameter = 3, writeSize = false) {
     pcbThicknessPlusMargin = pcbsize_z * 2;
     echo("pcbThicknessPlusMargin: ", pcbThicknessPlusMargin);
     // The center of the hole has to correspond to the center of the PCB hole.
@@ -1218,34 +1395,38 @@ holeDistanceFromEdge = 3.5, drawShims = false, shimsThickness = 0, shimCenterRec
                     difference() {
                         color("red")
                             union() {
-                                // Write the value of shimsThickness on top of the bracket
-
-                                echo("text_position: ", text_position);
-                                font = "Isonorm 3098";
-                                echo("font: ", font);
-                                custom_font_size = 5;
-                                // The size of the text
-                                text_size = custom_font_size;
-                                // The thickness of the text
-                                custom_plate_thickness = 0.4;
-                                custom_text_thickness = 0.8;
-                                text_thickness = custom_text_thickness;
-                                echo("text_thickness: ", text_thickness);
-                                //Size from text
-                                tm = textmetrics(str(shimsThickness), size = text_size, font = font);
-                                echo("tm: ", tm);
-                                textsize = tm.size; //array
-                                // The position of the text
-                                // text_position = [-tm.size.x, verticalPartYTranslation * 2 - bracketThickness + shimsThickness, centerSupportHoleSize + wall+10];
-                                text_position = [-(centerSupportHoleSize + wall) / 2, verticalPartYTranslation * 2 -
-                                        bracketThickness * 2, 0];
-                                echo("textsize: ", textsize);
-                                color("white")
-                                    translate(text_position)
-                                        rotate([0, 90, 180])
-                                            linear_extrude(height = text_thickness)
-                                                text(text = str(shimsThickness), size = text_size, halign = "center",
-                                                valign = "center", font = font);
+                                if (writeSize) {
+                                    // Write the value of shimsThickness on top of the bracket
+                                    echo("text_position: ", text_position);
+                                    font = "Isonorm 3098";
+                                    echo("font: ", font);
+                                    // custom_font_size = 3;
+                                    custom_font_size = ((shimsThickness + bracketThickness) >= 4) ? 3 : 2;
+                                    echo("custom_font_size: ", custom_font_size);
+                                    // The size of the text
+                                    text_size = custom_font_size;
+                                    // The thickness of the text
+                                    custom_plate_thickness = 0.4;
+                                    custom_text_thickness = 0.8;
+                                    text_thickness = custom_text_thickness;
+                                    echo("text_thickness: ", text_thickness);
+                                    text = str(shimsThickness + bracketThickness);
+                                    //Size from text
+                                    tm = textmetrics(text, size = text_size, font = font);
+                                    echo("tm: ", tm);
+                                    textsize = tm.size; //array
+                                    // The position of the text
+                                    // text_position = [-tm.size.x, verticalPartYTranslation * 2 - bracketThickness + shimsThickness, centerSupportHoleSize + wall+10];
+                                    text_position = [-(centerSupportHoleSize + wall) / 2, verticalPartYTranslation * 2 -
+                                            bracketThickness * 2 - 3, 0];
+                                    echo("textsize: ", textsize);
+                                    color("white")
+                                        translate(text_position)
+                                            rotate([0, 90, 180])
+                                                linear_extrude(height = text_thickness)
+                                                    text(text = text, size = text_size, halign = "center",
+                                                    valign = "center", font = font);
+                                }
                                 hull() {
 
                                     translate([0, verticalPartYTranslation + shimsThickness / 2, 2 * (sbcHoleSize + wall
@@ -1604,15 +1785,16 @@ module newAssembly(showSBC = true, showAdapter = true) {
 // interiorSupport(baseHeight = 6, holeSize = 3, baseSize = 9);
 // bracketWithHollowEars(feet = createFeet(holes), holeSize = 3, baseSize = 9, baseHeight = 6, totalHeight = 9,linkThickness = 3, linkHeight = 6, insertBoss = true) ;
 // smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5, half = true);
-// TODO: make a loop with various values of shimsThickness, to adapt to various situations.
-// TODO: make a raised text that indicates the thickness of the shims on the shim itself.
+// DONE: make a loop with various values of shimsThickness, to adapt to various situations.
+// DONE: make a raised text that indicates the thickness of the shims on the shim itself.
+// TODO: make an elongated version of the interior bracket, so we can move the board away from the center support, because the USB ports are too close to the next board.
 /*translate([0, -19, pcbsize_x / 3])
     smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2, holeDistanceFromEdge
     = 3.5, drawShims = false, shimsThickness = 8.8, shimCenterRecessDiameter = 6);*/
 //translate([0, -19, -pcbsize_x / 3])
-smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2, holeDistanceFromEdge =
-3.5, drawShims = false, shimsThickness = 6, shimCenterRecessDiameter = 6);
-// smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge= 3.5);
+// smallHalfBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 3, wall = 2, bracketThickness = 2, holeDistanceFromEdge = 3.5, drawShims = false, shimsThickness = 2, shimCenterRecessDiameter = 5, writeSize = false);
+// smallInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge = 3.5);
+smallElongatedInteriorBracket(sbcHoleSize = 2.5, centerSupportHoleSize = 2, wall = 2, bracketThickness = 2, holeDistanceFromEdge = 3.5, armAddedLength = 3, writeSize = false);
 // cableGuide(diameter = usbCableDiameter);
 // newAssembly(showSBC = false, showAdapter = false);
 // exteriorVerticalSupport(feet, supportHeight = pcbsize_x, baseSize = 9, baseHeight = 6, holeSize = 3, shaveBaseEar = false);
