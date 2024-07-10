@@ -1,47 +1,55 @@
-h = 12;
-c = 28;
+// Définition des variables
+h = 12; // Hauteur de l'arc
+c = 28; // Longueur de la corde
+thickness = 1; // Épaisseur de l'arc en mm
+height = 30; // Hauteur de l'extrusion en mm
+
+// Calcul du rayon du cercle
 r = (h / 2) + (c^2 / (8 * h));
 
-echo(str("Le rayon du cercle est approximativement : ", r, " unités."));
+// Calcul de l'angle de l'arc
+angle = 2 * asin(c / (2 * r));
 
-// Arc de cercle
+// Création de l'arc avec épaisseur
 difference() {
-    circle(r = r);
-    translate([0, -r])
-        square(r * 2, center = true);
+    difference() {
+        circle(r = r, $fn=200);
+        circle(r = r - thickness, $fn=200);
+    }
+    translate([-r, -r])
+        square([2*r, r]);
+    rotate([0, 0, -angle/2])
+        translate([0, -r])
+            square([r, 2*r]);
+    rotate([0, 0, angle/2])
+        translate([-r, -r])
+            square([r, 2*r]);
 }
 
-// Corde
-color("red")
-    translate([-c/2, 0])
-        line([0, 0], [c, 0]);
+// Extrusion de l'arc
+linear_extrude(height = height)
+    difference() {
+        difference() {
+            circle(r = r, $fn=200);
+            circle(r = r - thickness, $fn=200);
+        }
+        translate([-r, -r])
+            square([2*r, r]);
+        rotate([0, 0, -angle/2])
+            translate([0, -r])
+                square([r, 2*r]);
+        rotate([0, 0, angle/2])
+            translate([-r, -r])
+                square([r, 2*r]);
+    }
 
-// Hauteur (ajustée pour s'arrêter au sommet de l'arc)
-color("blue")
-    line([0, 0], [0, h]);
-
-// Repères de mesure
-color("green") {
-    translate([-c/2, -1])
-        line([0, 0], [c, 0]);
-    translate([-c/2-1, 0])
-        line([0, 0], [0, h]);
-}
-
-// Annotations
-color("black") {
-    translate([0, -2])
+// Annotations (optionnelles, à commenter pour l'impression 3D)
+/*color("black") {
+    translate([0, -r-2])
         text(str("Corde: ", c, " mm"), size = 2, halign = "center");
-    translate([-c/2-3, h/2])
+    translate([-r-3, h/2])
         rotate([0,0,90])
             text(str("Hauteur: ", h, " mm"), size = 2, halign = "center");
     translate([0, r+2])
         text(str("Rayon: ", round(r*100)/100, " mm"), size = 2, halign = "center");
-}
-
-module line(start, end, thickness = 0.1) {
-    hull() {
-        translate(start) circle(d = thickness);
-        translate(end) circle(d = thickness);
-    }
-}
+}*/
