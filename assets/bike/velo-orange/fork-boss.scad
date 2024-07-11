@@ -11,36 +11,20 @@ r = (h / 2) + (c^2 / (8 * h));
 angle = 2 * asin(c / (2 * r));
 
 // Création de l'arc avec épaisseur
-difference() {
-    difference() {
-        circle(r = r, $fn=200);
-        circle(r = r - thickness, $fn=200);
-    }
-    translate([-r, -r])
-        square([2*r, r]);
-    rotate([0, 0, -angle/2])
-        translate([0, -r])
-            square([r, 2*r]);
-    rotate([0, 0, angle/2])
-        translate([-r, -r])
-            square([r, 2*r]);
-}
-
-// Extrusion de l'arc
 linear_extrude(height = height)
     difference() {
         difference() {
-            circle(r = r, $fn=200);
-            circle(r = r - thickness, $fn=200);
+            circle(r = r, $fn = 200);
+            circle(r = r - thickness, $fn = 200);
         }
         translate([-r, -r])
-            square([2*r, r]);
-        rotate([0, 0, -angle/2])
+            square([2 * r, r]);
+        rotate([0, 0, -angle / 2])
             translate([0, -r])
-                square([r, 2*r]);
-        rotate([0, 0, angle/2])
+                square([r, 2 * r]);
+        rotate([0, 0, angle / 2])
             translate([-r, -r])
-                square([r, 2*r]);
+                square([r, 2 * r]);
     }
 
 // Annotations (optionnelles, à commenter pour l'impression 3D)
