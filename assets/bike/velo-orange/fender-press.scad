@@ -175,4 +175,4 @@ module female_part() {
 // The female part is translated to sit next to the male part for visualization.
 translate([0, 0, 30]) male_part();
 //translate([width + 5, 0, 0])
-//female_part();
+female_part();

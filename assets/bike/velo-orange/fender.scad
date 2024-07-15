@@ -47,7 +47,7 @@ module rearFender() {
 
 module frontFender() {
     // Create and color the front fender in blue, translated to avoid overlap with the rear fender
-    color("blue")
+    //color("blue")
         translate([0, fenderDiameter + 50, 0])
             create_fender(frontFenderLength, frontFenderAngle);
 }
@@ -61,9 +61,9 @@ angle = arcAngle(arcLength, fenderDiameter);
 // Output the angle
 echo(str("Angle for a 4.5cm subsection of the fender: ", angle, " degrees"));
 
-color("silver")
-    translate([0, fenderDiameter + 270, 0])
-        create_fender(arcLength, angle);
+//color("silver")
+  //  translate([0, fenderDiameter + 270, 0])
+    //    create_fender(arcLength, angle);
 
 // Given values
 sectionRadius = fenderDepth / 2; // Rayon de la section transversale du garde-boue
@@ -79,4 +79,28 @@ correctedArcLength = sectionRadius * theta;
 // Afficher la longueur d'arc corrigée
 echo(str("Longueur d'arc corrigée pour une sous-section s'inscrivant dans une boîte de 35 mm de large : ",
 correctedArcLength, " mm"));
+
+module create_wedge(length, start_width, end_width, start_thickness, end_thickness) {
+    hull() {
+        translate([0, 0, 0])
+            rotate([0, 90, 0])
+                scale([start_width / fenderWidth, start_thickness / fenderDepth, 0.1])
+                    cylinder(d = fenderWidth, h = 0.1, $fn = 200);
+
+        translate([length, 0, 0])
+            rotate([0, 90, 0])
+                scale([end_width / fenderWidth, end_thickness / fenderDepth, 0.1])
+                    cylinder(d = fenderWidth, h = 0.1, $fn = 200);
+    }
+}
+
+// Après avoir défini le module create_wedge
+
+// Placer le wedge à l'endroit approprié
+color("yellow")
+    translate([0, fenderDiameter/2 - fenderWidth/2, 0])
+        create_wedge(150, 30, 38, 5, 15);
+//cube([100, 100, 100]);
+// Afficher le garde-boue pour référence
+//frontFender();
 
