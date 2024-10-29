@@ -59,7 +59,7 @@ jobs:
         id: extract_branch
       -
         name: Build and push openscad image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: dockerfiles
           platforms: linux/amd64, linux/arm64
