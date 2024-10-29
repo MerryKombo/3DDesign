@@ -1,3 +1,5 @@
+# Dockerfile for setting up an OpenSCAD environment on a slim version of Debian Bookworm
+
 # Use the slim version of Debian Bookworm as the base image
 FROM debian:bookworm-20241016-slim
 
@@ -26,7 +28,6 @@ RUN groupadd -g ${gid} ${group} \
 # Install necessary packages and libraries, and create symbolic links for python and pip
 # Install the GitHub CLI
 # Clean up the apt cache to reduce the image size
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     coreutils \
@@ -48,6 +49,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
     && apt update \
     && apt install gh -y
+
+# Clone the OpenSCAD repository, update submodules, and install dependencies
+# Build and install OpenSCAD, then clean up
 RUN git clone https://github.com/openscad/openscad.git \
     && cd openscad && git submodule update --init --recursive \
     && ./scripts/uni-get-dependencies.sh && ./scripts/check-dependencies.sh \
@@ -57,7 +61,6 @@ RUN git clone https://github.com/openscad/openscad.git \
     && cd .. && rm -rf openscad \
     && apt-get remove -y --purge cmake build-essential \
     && apt-get autoremove -y --purge \
-    && which openscad \
     && rm -rf /var/lib/apt/lists/*
 
 # Define volumes for the OpenSCAD agent home directory and other necessary directories
@@ -94,14 +97,12 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
     && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git
 
-# TODO
-# Create a entrypoint script to start the default parsing/rendering process
-
-# And then... \
-    # find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png
-    # and
-    # find . -type f -name "*scad" -print0 | xargs -I{} --null openscad {} -o {}.stl
-    # create a new branch (or check if exists) thanks to gh cli, and move only the binary files while keeping the same directory structure
-    # rsync -rv --include '*/' --include '*.js' --exclude '*' --prune-empty-dirs Source/ Target/
-    # found there: https://unix.stackexchange.com/a/230536/488327
-    # to create the branch with gh, get inspiration from MyFirstAndroidAppBuiltWithJenkins
+# TODO: Create an entrypoint script to start the default parsing/rendering process
+# And then...
+# find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad {} -o {}.png
+# and
+# find . -type f -name "*scad" -print0 | xargs -I{} --null openscad {} -o {}.stl
+# create a new branch (or check if exists) thanks to gh cli, and move only the binary files while keeping the same directory structure
+# rsync -rv --include '*/' --include '*.js' --exclude '*' --prune-empty-dirs Source/ Target/
+# found there: https://unix.stackexchange.com/a/230536/488327
+# to create the branch with gh, get inspiration from MyFirstAndroidAppBuiltWithJenkins
