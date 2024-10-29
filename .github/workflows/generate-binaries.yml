@@ -19,19 +19,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed -e 's#/#-#g')"
+        run: |
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed -e 's#/#-#g')" >> $GITHUB_ENV
         id: extract_branch
-    outputs:
-      branch-name: ${{ steps.extract_branch.outputs.branch }}
+
   generate-binaries:
     needs: generate-branch-name
     runs-on: ubuntu-latest
     env:
-      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.branch-name }}
+      BRANCH_NAME: ${{ env.BRANCH_NAME }}
       GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
       GIT_URL: echo ${env.GIT_URL}
     container:
-      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
+      image: gounthar/openscad:${{ env.BRANCH_NAME }}
       volumes:
         - ${{ github.workspace }}:/home/openscad/projects/
     steps:
