@@ -1,0 +1,18 @@
+name: "Dependabot Docker Updates"
+on:
+  schedule:
+    - cron: "0 0 * * 1" # Runs every Monday at midnight
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Dependabot
+        uses: dependabot/dependabot-core@v0.156.0
+        with:
+          package-manager: "docker"
+          directory: "/"
+          open-pull-requests-limit: 10
