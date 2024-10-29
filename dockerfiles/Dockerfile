@@ -92,9 +92,7 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
     && cd .. && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && for dir in *; do [ "$dir" = "src" ] \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
-    && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git \
-    && apt-get remove -y --purge git \
-    && apt-get autoremove -y --purge
+    && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git
 
 # TODO
 # Create a entrypoint script to start the default parsing/rendering process
