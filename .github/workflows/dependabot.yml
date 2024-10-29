@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Run Dependabot
-        uses: dependabot/dependabot-core@v0.156.0
+        uses: dependabot/dependabot-core@v0.282.0
         with:
           package-manager: "docker"
           directory: "/"
