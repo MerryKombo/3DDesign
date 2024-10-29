@@ -62,6 +62,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: dockerfiles
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64, linux/arm64, linux/riscv64
           push: true
           tags: gounthar/openscad:${{ steps.extract_branch.outputs.branch }}
