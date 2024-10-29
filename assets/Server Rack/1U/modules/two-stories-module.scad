@@ -1,8 +1,8 @@
 // Found there: https://openhome.cc/eGossip/OpenSCAD/SectorArc.html
-use <hull_polyline3d.scad>;
-use <polyhedron_hull.scad>;
-use <bezier_curve.scad>;
-use <polyline3d.scad>;
+use <dotSCAD/hull_polyline3d.scad>;
+use <dotSCAD/polyhedron_hull.scad>;
+use <dotSCAD/bezier_curve.scad>;
+use <dotSCAD/polyline3d.scad>;
 
 radius = 8;
 firstArcAngles = [0, 45];

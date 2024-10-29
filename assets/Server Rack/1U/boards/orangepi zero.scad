@@ -5,6 +5,7 @@ use <../parts/generic drilling templates.scad>
 use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
+include <orangepi zero label.scad>
 
 /*
 orangepi_zero_feet();
@@ -12,16 +13,27 @@ translate(size) orangepi_zero_bracket();
 translate(size) translate(size) orangepi_zero_drilling_template();
 translate(size) translate(size) translate(size) orangepi_zero_dimensions_verifier();
 translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) orangepi_zero_hotShoe_adapters();*/
-translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) translate(size)
-    orangepi_zero_screw_on_plank();
+/*translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) translate(size)
+    orangepi_zero_screw_on_plank();*/
 /*translate([- size.x, size.y, size.z]) orangepi_zero_vertical_bracket();*/
+
+orangepi_zero_bracket();
 
 module orangepi_zero_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
 module orangepi_zero_bracket() {
+    union() {
     bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+    tanOppositeAngle=(feet[1].x-feet[0].x)/(feet[3].y-feet[1].y);
+    echo("Tan is", tanOppositeAngle);
+    oppositeAngle=90 - atan(tanOppositeAngle);
+    echo("Angle is", oppositeAngle);
+    //rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
+    //    drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+
+    }
 }
 
 module orangepi_zero_drilling_template() {

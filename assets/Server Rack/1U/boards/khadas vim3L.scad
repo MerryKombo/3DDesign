@@ -6,22 +6,31 @@ use <../parts/dimensions verifier.scad>
 use <../../../Mobile Studio/hot shoe/files/hotshoe_adapter_v2.scad>
 use <../utils/intersection.scad>
 include <../../../Mobile Studio/15mm rod mount/rod mount.scad>
+include <khadas vim3L label.scad>
 
-
-khadas_vim3L_feet();
-translate(size) khadas_vim3L_bracket();
-translate(size) translate(size) khadas_vim3L_drilling_template();
+/*khadas_vim3L_feet();
+translate(size)*/ khadas_vim3L_bracket();
+/*translate(size) translate(size) khadas_vim3L_drilling_template();
 translate(size) translate(size) translate(size) khadas_vim3L_dimensions_verifier();
 translate([- size.x, size.y, size.z]) translate(size) translate(size) translate(size) khadas_vim3L_hotShoe_adapters();
 translate([- size.x, size.y, size.z]) khadas_vim3L_vertical_bracket();
 translate([- size.x, - size.y, - size.z]) khadas_vim3L_rod_module();
+*/
 
 module khadas_vim3L_feet() {
     feet_feet(feet, holeSize, baseSize, baseHeight, totalHeight) ;
 }
 
 module khadas_vim3L_bracket() {
+    union() {
     bracket_bracket(feet, holeSize, baseSize, baseHeight, totalHeight, linkThickness, linkHeight);
+    echo("Tan is", tanOppositeAngle);
+    oppositeAngle=90 - atan(tanOppositeAngle);
+    echo("Angle is", oppositeAngle);
+    rotate([0,0,oppositeAngle]) translate([0,0,baseHeight-plateHeight])
+        drawLabel(label, baseSize, plateHeight, linkHeight, feet); 
+
+    }
 }
 
 module khadas_vim3L_drilling_template() {

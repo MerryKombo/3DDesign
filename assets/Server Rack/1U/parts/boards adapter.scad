@@ -63,8 +63,8 @@ module bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
         color("red") translate([0,0,-0.5]) cylinder(r=holeSize/2, h=totalHeight+1, $fn=100);
     }
  }
- 
- 
+
+
 module base_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
     translate([0,0,totalHeight]) rotate([0,180,0]) difference() {
       union()  {
@@ -77,19 +77,19 @@ module base_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
         color("red") translate([0,0,-0.5]) cylinder(r=holeSize/2, h=totalHeight+1, $fn=100);
     }
  }
- 
+
  module bracket_feet(points,holeSize, baseSize, baseHeight, totalHeight) {
      for (point = points) {
          translate (point) bracket_foot(point, holeSize, baseSize, baseHeight, totalHeight);
      }
  }
- 
+
  module base_feet(points,holeSize, baseSize, baseHeight, totalHeight) {
      for (point = points) {
          translate (point) base_foot(point, holeSize, baseSize, baseHeight, totalHeight);
      }
  }
- 
+
  module bracket_link(points, thickness, height) {
      // original
      firstSide = points[1][0] - points[0][0];
@@ -109,7 +109,7 @@ module base_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
         color("OliveDrab") translate([points[0].x + firstSide + gap,points[0].y,height*2]) rotate([270,0,atan]) translate([0,0, holeSize/2]) cylinder(h=length, r=thickness/2, center=false, $fn=100);
      }
  }
- 
+
  module base_link(feet, feet2, thickness, height) {
      // original
      firstSide = feet2[1][0] - feet2[0][0];
@@ -130,18 +130,18 @@ module base_foot(point, holeSize, baseSize, baseHeight, totalHeight) {
      }
      topToBottomSupports(feet, feet2, firstSide, gap, height, thickness);
  }
- 
+
 module topToBottomSupports(feet, feet2, firstSide, gap, height, thickness) {
    topToBottomSupport1(feet, feet2, firstSide, gap, height, thickness);
    topToBottomSupport2(feet, feet2, firstSide, gap, height, thickness);
    topToBottomSupport3(feet, feet2, firstSide, gap, height, thickness);
    topToBottomSupport4(feet, feet2, firstSide, gap, height, thickness);
-} 
+}
 
 module topToBottomSupport1(feet, feet2, firstSide, gap, height, thickness) {
     echo (feet2[1][0], feet[1][0],feet2[1][0] - feet[1][0]);
      if (feet2[1][0] - feet[0][0]  > feet2[1][0] - feet[1][0]) {
-         color("black") translate([firstSide + gap,0,totalHeight2-thickness/2]) triangleRotation([feet2[1],feet[1]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=feet2[1][0] - (feet[1][0]+holeSize), r=thickness/2, center=false, $fn=100); 
+         color("black") translate([firstSide + gap,0,totalHeight2-thickness/2]) triangleRotation([feet2[1],feet[1]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=feet2[1][0] - (feet[1][0]+holeSize), r=thickness/2, center=false, $fn=100);
      } else {
          color("red") translate([firstSide + gap,0,totalHeight2-thickness/2])  rotate([270,0,90])  translate([0,0, holeSize/2]) cylinder(h=feet2[1][0] - feet[0][0], r=thickness/2, center=false, $fn=100);
      }
@@ -153,7 +153,7 @@ module topToBottomSupport2(feet, feet2, firstSide, gap, height, thickness) {
         linkSize = abs(feet2[3][0] - (feet[3][0]+holeSize));
         echo ("rotation angle is", rotationAngle([feet2[3],feet[3]]));
         //color("purple") translate([feet[3][0]+linkSize+holeSize,feet[3][1]+thickness+holeSize,feet[3][2]+height*2])  rotate([0,0,90+rotationAngle([feet2[3],feet[3]])]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
-          color("purple") translate([feet[3][0]+linkSize+holeSize,feet[3][1]+thickness+holeSize,feet[3][2]+totalHeight2-thickness/2])  triangleRotation([feet2[3],feet[3]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
+          color("purple") translate([feet[3][0]+linkSize+holeSize,feet[3][1]+thickness+holeSize,feet[3][2]+totalHeight2-thickness/2])  triangleRotation([feet2[3],feet[3]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100);
      } else {
          color("red") translate([firstSide + gap,0,totalHeight2-thickness/2])  rotate([270,0,90])  translate([0,0, holeSize/2]) cylinder(h=feet2[3][0] - feet[2][0], r=thickness/2, center=false, $fn=100);
      }
@@ -165,15 +165,15 @@ module topToBottomSupport3(feet, feet2, firstSide, gap, height, thickness) {
     if (feet2[2][0] - feet[2][0]  > feet2[3][0] - feet[2][0]) {
         linkSize = abs(feet2[2][0] - (feet[2][0]+holeSize));
         echo ("rotation angle is", rotationAngle([feet2[2],feet[2]]));
-        color("silver") translate([feet[2][0]+linkSize+holeSize,feet[2][1]+thickness+holeSize,feet[2][2]+totalHeight2-thickness/2])  rotate([0,0,90+rotationAngle([feet2[2],feet[2]])]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
+        color("silver") translate([feet[2][0]+linkSize+holeSize,feet[2][1]+thickness+holeSize,feet[2][2]+totalHeight2-thickness/2])  rotate([0,0,90+rotationAngle([feet2[2],feet[2]])]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100);
      } else {
          linkSize = abs(feet2[2][0] - (feet[2][0]+holeSize));
-         
+
          rotationAngle = getTriangleAngle([feet[2],feet2[2]]);
          echo("Function says :", getTriangleAngle([feet[2],feet2[2]]));
          echo ("rotation angle is", rotationAngle);
          //rotationAngle = 21.0567;
-         color("BurlyWood") translate([feet[2][0]+linkSize+holeSize,feet[2][1]+thickness+holeSize,feet[2][2]+totalHeight2-thickness/2]) triangleRotation([feet[2],feet2[2]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
+         color("BurlyWood") translate([feet[2][0]+linkSize+holeSize,feet[2][1]+thickness+holeSize,feet[2][2]+totalHeight2-thickness/2]) triangleRotation([feet[2],feet2[2]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100);
      }
 }
 
@@ -183,15 +183,15 @@ module topToBottomSupport4(feet, feet2, firstSide, gap, height, thickness) {
     if (feet2[2][0] - feet[3][0]  > feet2[3][0] - feet[3][0]) {
         linkSize = abs(feet2[2][0] - (feet[3][0]+holeSize));
         echo ("rotation angle is", rotationAngle([feet2[2],feet[3]]));
-        color("DodgerBlue") translate([feet[3][0]+linkSize,feet[3][1]+thickness+holeSize,feet[3][2]+totalHeight2-thickness/2])  rotate([0,0,90+rotationAngle([feet2[2],feet[3]])]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
+        color("DodgerBlue") translate([feet[3][0]+linkSize,feet[3][1]+thickness+holeSize,feet[3][2]+totalHeight2-thickness/2])  rotate([0,0,90+rotationAngle([feet2[2],feet[3]])]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100);
      } else {
          linkSize = abs(feet2[2][0] - (feet[3][0]+holeSize)) - 2*holeSize;
-         
+
          rotationAngle = getTriangleAngle([feet[3],feet2[2]]);
          echo("Function says :", getTriangleAngle([feet[3],feet2[2]]));
          echo ("rotation angle is", rotationAngle);
          //rotationAngle = 21.0567;
-         color("Seashell") translate([feet[3][0],feet[3][1],feet[3][2]+totalHeight2-thickness/2]) triangleRotation([feet[3],feet2[2]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100); 
+         color("Seashell") translate([feet[3][0],feet[3][1],feet[3][2]+totalHeight2-thickness/2]) triangleRotation([feet[3],feet2[2]]) rotate([270,0,90]) translate([0,0, holeSize/2]) cylinder(h=linkSize, r=thickness/2, center=false, $fn=100);
      }
 }
 
@@ -220,7 +220,7 @@ echo(point_to_line(   [150,50,0],   [0,0,0],   [100,0,0]  ));
 function point_to_line(p,a,b)=
 
 let(
-pa = p - a, 
+pa = p - a,
 ba = b - a,
 h = clamp( (pa*ba)/ (ba*ba)))
 norm( pa - ba*h ) ;
