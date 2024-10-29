@@ -27,14 +27,15 @@ jobs:
     needs: generate-branch-name
     runs-on: ubuntu-latest
     env:
-      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
       GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
       GIT_URL: echo ${env.GIT_URL}
     container:
-      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
+      image: gounthar/openscad:${{ env.BRANCH_NAME }}
       volumes:
         - ${{ github.workspace }}:/home/openscad/projects/
     steps:
+      - name: Set branch name
+        run: echo "BRANCH_NAME=${{ needs.generate-branch-name.outputs.BRANCH_NAME }}" >> $GITHUB_ENV
       - name: generate-binaries
         shell: bash
         run: |
