@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Run Dependabot
-        uses: dependabot/dependabot-core@v0.282.0
+        uses: dependabot/dependabot-core@2.59
         with:
           package-manager: "docker"
           directory: "/"
