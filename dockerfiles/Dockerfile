@@ -26,6 +26,7 @@ RUN groupadd -g ${gid} ${group} \
 # Install necessary packages and libraries, and create symbolic links for python and pip
 # Install the GitHub CLI
 # Clean up the apt cache to reduce the image size
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     coreutils \
@@ -33,7 +34,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gnupg \
     imagemagick \
-    openscad \
     python3 \
     python3-pip \
     rsync \
@@ -47,7 +47,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
     && apt update \
-    && apt install gh -y  \
+    && apt install gh -y
+RUN git clone https://github.com/openscad/openscad.git \
+    && cd openscad && git submodule update --init --recursive \
+    && ./scripts/uni-get-dependencies.sh && ./scripts/check-dependencies.sh \
+    && cmake -B build -DEXPERIMENTAL=1 \
+    && cmake --build build -j$(nproc) \
+    && cmake --install build --prefix /usr/local \
+    && cd .. && rm -rf openscad \
+    && apt-get remove -y --purge cmake build-essential \
+    && apt-get autoremove -y --purge \
+    && which openscad \
     && rm -rf /var/lib/apt/lists/*
 
 # Define volumes for the OpenSCAD agent home directory and other necessary directories
@@ -82,7 +92,9 @@ RUN cd "${OPENSCAD_AGENT_HOME}"/.local/share/OpenSCAD/libraries/ \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
     && cd .. && git clone https://github.com/chrisspen/openscad-extra.git && cd openscad-extra && for dir in *; do [ "$dir" = "src" ] \
     && continue; rm -rf "$dir"; done; mv src/* . && rm -rf src \
-    && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git
+    && cd .. && git clone https://github.com/hominoids/SBC_Model_Framework.git \
+    && apt-get remove -y --purge git \
+    && apt-get autoremove -y --purge \
 
 # TODO
 # Create a entrypoint script to start the default parsing/rendering process
