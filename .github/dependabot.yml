@@ -11,8 +11,6 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/"
-    file-filters:
-      - name: ".gitpod.Dockerfile"
     schedule:
       interval: "weekly"
     commit-message:
