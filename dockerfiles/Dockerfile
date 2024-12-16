@@ -1,3 +1,5 @@
+#  docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix openscad openscad
+# QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-openscad'
 # Use the slim version of Debian Bookworm as the base image
 FROM debian:bookworm-20241016-slim
 
