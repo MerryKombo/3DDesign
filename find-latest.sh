@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Check if a file name parameter is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <file_name>"
+    exit 1
+fi
+
+file_name=$1
+
 # Remember the current branch
 original_branch=$(git branch --show-current)
 
@@ -18,7 +26,7 @@ for branch in $branches; do
     git checkout ${branch#origin/}
 
     # Get the latest commit for the file in the current branch
-    commit=$(git log -1 --format="%H %cd" --date=iso -- assets/square.scad)
+    commit=$(git log -1 --format="%H %cd" --date=iso -- $file_name)
 
     if [ -n "$commit" ]; then
         commit_date=$(echo $commit | awk '{print $2" "$3}')
@@ -33,10 +41,10 @@ done
 
 # Output the latest commit information
 if [ -n "$latest_commit" ]; then
-    echo "Latest commit for assets/square.scad:"
+    echo "Latest commit for $file_name:"
     echo $latest_commit
 else
-    echo "File assets/square.scad not found in any branch."
+    echo "File $file_name not found in any branch."
 fi
 
 # Checkout back to the original branch
