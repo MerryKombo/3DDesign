@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Remember the current branch
+original_branch=$(git branch --show-current)
+
 # Fetch all branches from the remote repository
 git fetch --all
 
@@ -37,4 +40,4 @@ else
 fi
 
 # Checkout back to the original branch
-git checkout -
+git checkout $original_branch
