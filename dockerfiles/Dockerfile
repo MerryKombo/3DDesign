@@ -65,7 +65,7 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
 # Install fonts
-RUN cd /tmp && curl -O "https://media.fontsgeek.com/download/zip/i/s/isonorm-3098-regular_QiedT.zipp" && unzip iso*zip && \
+RUN cd /tmp && curl -O "https://media.fontsgeek.com/download/zip/i/s/isonorm-3098-regular_QiedT.zip" && unzip iso*zip && \
     rm iso*.zip && find . -name Isonorm\ 3098\ Regular.otf -exec cp {} /usr/local/share/fonts \; && \
     rm -fr Isonorm\ 3098\ Regular/Isonorm
 
