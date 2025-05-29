@@ -14,13 +14,17 @@ on:
 jobs:
   generate-branch-name:
     runs-on: ubuntu-latest
+    outputs:
+      BRANCH_NAME: ${{ steps.extract_branch.outputs.BRANCH_NAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Extract branch name
         shell: bash
         run: |
-          echo "BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed -e 's#/#-#g')" >> "$GITHUB_ENV"
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed -e 's#/#-#g')
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
         id: extract_branch
 
   generate-binaries:
@@ -30,12 +34,12 @@ jobs:
       GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
       GIT_URL: echo ${env.GIT_URL}
     container:
-      image: gounthar/openscad:${{ env.BRANCH_NAME }}
+      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
       volumes:
         - ${{ github.workspace }}:/home/openscad/projects/
     steps:
       - name: Set branch name
-        run: echo "BRANCH_NAME=${{ needs.generate-branch-name.outputs.BRANCH_NAME }}" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=${{ needs.generate-branch-name.outputs.BRANCH_NAME }}" >> "$GITHUB_ENV"
       - name: generate-binaries
         shell: bash
         run: |
