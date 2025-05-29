@@ -65,8 +65,8 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
 # Install fonts
-RUN cd /tmp && curl -O "https://freefonts.co/downloadfiles/zippedfontstyles/i/s/isonorm-3098-regular.zip?st=_izJg7jd9uG4OYFMrOja8w&e=1748540428" && unzip iso*zip && \
-    rm iso*.zip && find . -name Isonorm\ 3098\ Regular.otf -exec cp {} /usr/local/share/fonts \; && \
+RUN cd /tmp && curl -L -o isonorm.zip "https://freefonts.co/downloadfiles/zippedfontstyles/i/s/isonorm-3098-regular.zip?st=_izJg7jd9uG4OYFMrOja8w&e=1748540428" && unzip isonorm.zip && \
+    rm isonorm.zip && find . -name Isonorm\ 3098\ Regular.otf -exec cp {} /usr/local/share/fonts \; && \
     rm -fr Isonorm\ 3098\ Regular/Isonorm
 
 # Switch to the openscad user
