@@ -4,6 +4,7 @@ base_height = 50;        // Height for visibility
 base_width = 80;         // Width for stability
 base_length = 100;       // Length for stability
 support_thickness = 3;   // Support thickness
+connector_width = 1;     // Width of the connectors between logo parts
 
 // Support gusset dimensions
 gusset_height = 20;
@@ -41,6 +42,26 @@ module vertical_support() {
             gusset();
 }
 
+// Logo with connectors
+module connected_logo() {
+    difference() {
+        union() {
+            // Original logo
+            import("roudnernetes-logo.svg", center=true);
+
+            // Add thin connectors at strategic points
+            // These coordinates are approximate and may need adjustment
+            translate([-5, 0, 0])
+                square([connector_width, 20]);
+            translate([5, -10, 0])
+                square([connector_width, 20]);
+            translate([0, -5, 0])
+                rotate([0, 0, 90])
+                    square([connector_width, 20]);
+        }
+    }
+}
+
 // Complete assembly
 union() {
     // Base
@@ -57,12 +78,11 @@ union() {
             translate([-support_thickness/2, 0, 0])
                 cube([support_thickness, support_thickness, 20]);
 
-        // Logo itself
+        // Connected logo
         translate([0, 0, 0])
             rotate([0, -45, 0])
-                translate([0, 0, 20])  // Offset from bracket
-                    linear_extrude(height = logo_thickness) {
-                        import("roudnernetes-logo.svg", center=true);
-                    }
+                translate([0, 0, 20])
+                    linear_extrude(height = logo_thickness)
+                        connected_logo();
     }
 }
