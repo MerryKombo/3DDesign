@@ -30,17 +30,18 @@ jobs:
   generate-binaries:
     needs: generate-branch-name
     runs-on: ubuntu-latest
-    env:
-      GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
-      GIT_URL: echo ${env.GIT_URL}
-      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
-    container:
-      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
-      volumes:
-        - ${{ github.workspace }}:/home/openscad/projects/
     steps:
-      - name: generate-binaries
-        shell: bash
-        run: |
-          echo $BRANCH_NAME
-          cd /home/openscad/projects/ && generate-binaries.sh
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker container
+        uses: docker://gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
+        env:
+          GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
+          GIT_URL: ${{ github.server_url }}/${{ github.repository }}.git
+          BRANCH_NAME: ${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          entrypoint: /bin/bash
+          args: -c "mkdir -p /home/openscad/binaries && cd ${{ github.workspace }} && generate-binaries.sh"
