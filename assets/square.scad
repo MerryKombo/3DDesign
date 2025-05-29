@@ -104,7 +104,7 @@ module bitsForTesting() {
             }
     }
 }
-module wholeAssembly(body = true, insert = true, top = false) {
+module wholeAssembly(body = true, insert = true, add_top = false) {
     union() {
         if (body) {
             bracketSides();
@@ -116,7 +116,7 @@ module wholeAssembly(body = true, insert = true, top = false) {
         if (insert) {
             translate([bracketLength, offset, offset]) connector();
         }
-        if (top) {
+        if (add_top) {
             top();
         }
     }
