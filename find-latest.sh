@@ -22,12 +22,8 @@ latest_date=""
 
 # Loop through each branch to find the latest commit for the file
 for branch in $branches; do
-    # Checkout the branch
-    git checkout ${branch#origin/}
-
-    # Get the latest commit for the file in the current branch
-    commit=$(git log -1 --format="%H %cd" --date=iso -- $file_name)
-
+    # Get the latest commit for the file in the remote branch
+    commit=$(git log -1 --format="%H %cd" --date=iso origin/${branch#origin/} -- $file_name)
     if [ -n "$commit" ]; then
         commit_date=$(echo $commit | awk '{print $2" "$3}')
 
