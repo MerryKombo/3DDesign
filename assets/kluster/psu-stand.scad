@@ -155,5 +155,7 @@ difference() {
     echo("yTranslation", yTranslation);
     echo("standFeetThickness", standFeetThickness());
     feetCutout(x, y, getStandHeight());
-  //kubernetesLogo();
+    // The `kubernetesLogo()` function is currently disabled because it is not required for the PSU stand design.
+    // Uncomment this line if the Kubernetes logo needs to be added to the stand in the future.
+    //kubernetesLogo();
 }

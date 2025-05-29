@@ -62,7 +62,7 @@ union() {
             rotate([0, -45, 0])
                 translate([0, 0, 20])  // Offset from bracket
                     linear_extrude(height = logo_thickness) {
-                        import("roudnernetes-logo.svg", center=true);
+                        import("roundernetes-logo.svg", center=true);
                     }
     }
 }
