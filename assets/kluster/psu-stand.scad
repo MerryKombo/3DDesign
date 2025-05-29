@@ -140,10 +140,10 @@ module stand(length, width, height) {
 
 }
 
-union() {
+difference() {
     // translate([0, 0, getStandHeight()])
     //     psu();
-   // stand(squarePSULength(), squarePSULength(), getStandHeight());
+    stand(squarePSULength(), squarePSULength(), getStandHeight());
     length = squarePSULength();
     width = squarePSULength();
     x = length + standMargins() * 2 + standWallThickness() * 2;
@@ -154,6 +154,6 @@ union() {
     yTranslation = (x - width) / 2;
     echo("yTranslation", yTranslation);
     echo("standFeetThickness", standFeetThickness());
-    // feetCutout(x, y, getStandHeight());
-  kubernetesLogo();
+    feetCutout(x, y, getStandHeight());
+  //kubernetesLogo();
 }
