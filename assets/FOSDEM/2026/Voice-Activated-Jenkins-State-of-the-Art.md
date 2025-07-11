@@ -45,8 +45,3 @@ This document synthesizes the current state of the art in developing a voice-con
 
 The integration of retro telephony with voice-controlled Jenkins systems is both feasible and impactful. It showcases a compelling blend of speech tech, embedded design, and automation through open-source tooling. Modernizing legacy hardware to support modern interaction paradigms reflects a strong community ethos and sparks interest across tech disciplines.
 
-## References
-
-1. Voice-Controlled Jenkins Interface Using Retro Hardware
-2. Modernizing Audio Components for SBC-Compatible Vintage Telephone Interface
-3. Audio Component Replacement Guide for Vintage Telephone SBC Integration
