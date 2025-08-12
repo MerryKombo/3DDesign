@@ -18,7 +18,7 @@ jobs:
       BRANCH_NAME: ${{ steps.extract_branch.outputs.BRANCH_NAME }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Extract branch name
         shell: bash
         run: |
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Set up Docker container
         uses: docker://gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
