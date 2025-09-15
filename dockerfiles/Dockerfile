@@ -1,5 +1,5 @@
-# Use the slim version of Debian Bookworm as the base image
-FROM debian:bookworm-20241016-slim
+# Use the slim version of Debian Trixie as the base image
+FROM debian:trixie-20250908-slim
 
 # Define arguments for user, group, uid, and gid
 ARG user=openscad
