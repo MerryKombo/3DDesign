@@ -55,7 +55,12 @@ process_files() {
     log "Starting $file_type generation${img_size:+ ($img_size resolution)} with ${timeout_sec}s timeout..."
 
     local current=0
-    find . -type f -name "*scad" -print0 | while IFS= read -r -d '' file; do
+    find . -type f -iname "*.scad" \
+        -not -path "./vendor/*" \
+        -not -path "./node_modules/*" \
+        -not -path "./third_party/*" \
+        -not -path "./.git/*" \
+        -print0 | while IFS= read -r -d '' file; do
         current=$((current + 1))
         START_TIME=$(date +%s)
         FILE_SIZE=$(get_file_size "$file")
@@ -94,9 +99,14 @@ process_files() {
 log "Creating branch..."
 "${SCRIPT_DIR}/create-branch.sh"
 
-# Count total SCAD files
+# Count total SCAD files (excluding vendor directories)
 log "Counting SCAD files..."
-TOTAL_FILES=$(find . -type f -name "*scad" | wc -l)
+TOTAL_FILES=$(find . -type f -iname "*.scad" \
+    -not -path "./vendor/*" \
+    -not -path "./node_modules/*" \
+    -not -path "./third_party/*" \
+    -not -path "./.git/*" \
+    -print0 | tr -cd '\0' | wc -c)
 log "Found $TOTAL_FILES SCAD files to process"
 
 # Process PNG and STL files using consolidated function
