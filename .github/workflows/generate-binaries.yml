@@ -1,15 +1,19 @@
 name: Generate PNG images and STL files from 3D models
 
 on:
-  # Only run on pull_request to avoid duplicate runs
-  # (push to PR branch triggers pull_request event)
-  pull_request:
-    branches: [ '*' ]
-  # Run on push only to main/master branches (no PR)
+  # Run automatically when code is merged to master
   push:
     branches:
       - master
       - main
+  # Allow manual trigger on any branch for testing
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to generate binaries for'
+        required: false
+        default: ''
+  # Run on schedule for regular updates
   schedule:
     # * is a special character in YAML so you have to quote this string
     # Will build everyday at 4:30 and 16:30
