@@ -44,21 +44,19 @@ module vertical_support() {
 
 // Logo with connectors
 module connected_logo() {
-    difference() {
-        union() {
-            // Original logo - FIXED: corrected filename spelling
-            import("roundernetes-logo.svg", center=true);
+    union() {
+        // Original logo - FIXED: corrected filename spelling
+        import("roundernetes-logo.svg", center=true);
 
-            // Add thin connectors at strategic points
-            // These coordinates are approximate and may need adjustment
-            translate([-5, 0, 0])
+        // Add thin connectors at strategic points
+        // These coordinates are approximate and may need adjustment
+        translate([-5, 0, 0])
+            square([connector_width, 20]);
+        translate([5, -10, 0])
+            square([connector_width, 20]);
+        translate([0, -5, 0])
+            rotate([0, 0, 90])
                 square([connector_width, 20]);
-            translate([5, -10, 0])
-                square([connector_width, 20]);
-            translate([0, -5, 0])
-                rotate([0, 0, 90])
-                    square([connector_width, 20]);
-        }
     }
 }
 
