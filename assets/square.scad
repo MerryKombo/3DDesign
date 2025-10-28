@@ -19,50 +19,45 @@ topSquareSize = bracketWidth * 1.5;
 //halfSquare();
 //translate([0, - 2 * bracketWidth, 0]) plasticClip();
 //topSquare();
-// Generic helper module for square components
-module squareCore(include_middle_halfSquare = true);
+backSquare();
 
-// Generic helper module for square components
-module squareCore(include_middle_halfSquare = true) {
+module backSquare() {
     difference() {
         intersection() {
             color("black") translate([0, - topSquareSize, - topSquareSize / 3]) cube(size = [topSquareSize,
                 topSquareSize,
                 topSquareSize]);
             union() {
-                if (include_middle_halfSquare) {
-                    translate([0, 0, bracketWidth]) rotate([180, 0, 0]) halfSquare();
-                }
-                if (include_middle_halfSquare) {
-                    translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare will be provided as children
-            children();
-                }
-               squareCore(include_middle_halfSquare = false) {
-        // The screw holes
-      translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - translate([0, 0,- 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90 90, 27180]();
-      }
-bolt();
+                translate([0, 0, bracketWidth]) rotate([180, 0, 0]) halfSquare();
+                //translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare();
+                translate([0, 0, bracketWidth]) rotate([- 90, 90, - 180]) halfSquare();
+            }
+        }
+        union() {
+            // The screw holes
+            translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - bracketWidth]) rotate([90, 0, 0]) bolt();
+            translate([0, - 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90, 0, - 270]) bolt();
+        }
     }
 }
 
 module topSquare() {
-    squareCore(include_middle_halfSquare = true) {
-        // The screw holes will be provided as children
-                }
-}
-
-module backSquare() {
-    squareCore(include_middle_halfSquare = false) {
-        // The screw holes
-    translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - bracketWidth]) rotate([90, 0, 0]) bolt();
-        translate([0, - 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90, 0, - 270]) bolt();
-}
-
-module topSquare() {
-    squareCore(include_middle_halfSquare = true) {
-        // The screw holes
-        translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - bracketWidth]) rotate([90, 0, 0]) bolt();
-        translate([0, - 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90, 0, - 270]) bolt();
+    difference() {
+        intersection() {
+            color("black") translate([0, - topSquareSize, - topSquareSize / 3]) cube(size = [topSquareSize,
+                topSquareSize,
+                topSquareSize]);
+            union() {
+                translate([0, 0, bracketWidth]) rotate([180, 0, 0]) halfSquare();
+                translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare();
+                translate([0, 0, bracketWidth]) rotate([- 90, 90, - 180]) halfSquare();
+            }
+        }
+        union() {
+            // The screw holes
+            translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - bracketWidth]) rotate([90, 0, 0]) bolt();
+            translate([0, - 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90, 0, - 270]) bolt();
+        }
     }
 }
 
@@ -109,7 +104,7 @@ module bitsForTesting() {
             }
     }
 }
-module wholeAssembly(body = true, insert = true, add_top = false) {
+module wholeAssembly(body = true, insert = true, top = false) {
     union() {
         if (body) {
             bracketSides();
@@ -121,7 +116,7 @@ module wholeAssembly(body = true, insert = true, add_top = false) {
         if (insert) {
             translate([bracketLength, offset, offset]) connector();
         }
-        if (add_top) {
+        if (top) {
             top();
         }
     }

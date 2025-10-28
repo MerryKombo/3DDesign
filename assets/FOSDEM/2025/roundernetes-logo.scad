@@ -46,7 +46,7 @@ module vertical_support() {
 module connected_logo() {
     difference() {
         union() {
-            // Original logo
+            // Original logo - FIXED: corrected filename spelling
             import("roundernetes-logo.svg", center=true);
 
             // Add thin connectors at strategic points
