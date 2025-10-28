@@ -36,7 +36,8 @@ get_file_size() {
     # Try macOS stat first, then Linux stat
     size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
 
-    if [ $? -ne 0 ] || [ -z "$size" ]; then
+    # Check if we got a valid size
+    if [ -z "$size" ]; then
         log "Warning: Failed to get size for: $file"
         echo "unknown"
     else
@@ -49,8 +50,9 @@ process_files() {
     local file_type=$1      # "PNG" or "STL"
     local output_ext=$2     # ".png" or ".stl"
     local img_size=$3       # Image size for PNG (empty for STL)
+    local timeout_sec=$4    # Timeout in seconds
 
-    log "Starting $file_type generation${img_size:+ ($img_size resolution)}..."
+    log "Starting $file_type generation${img_size:+ ($img_size resolution)} with ${timeout_sec}s timeout..."
 
     local current=0
     find . -type f -name "*scad" -print0 | while IFS= read -r -d '' file; do
@@ -63,9 +65,9 @@ process_files() {
         # Build the command based on file type
         local cmd
         if [ "$file_type" = "PNG" ]; then
-            cmd="xvfb-run -a openscad --imgsize=$img_size \"$file\" -o \"${file}${output_ext}\""
+            cmd="timeout $timeout_sec xvfb-run -a openscad --imgsize=$img_size \"$file\" -o \"${file}${output_ext}\""
         else
-            cmd="openscad \"$file\" -o \"${file}${output_ext}\""
+            cmd="timeout $timeout_sec openscad \"$file\" -o \"${file}${output_ext}\""
         fi
 
         if eval "$cmd"; then
@@ -74,9 +76,15 @@ process_files() {
             OUTPUT_SIZE=$(get_file_size "${file}${output_ext}")
             log "[$current/$TOTAL_FILES] ✓ $file_type completed in ${ELAPSED}s (output: $(format_size $OUTPUT_SIZE))"
         else
+            EXIT_CODE=$?
             END_TIME=$(date +%s)
             ELAPSED=$((END_TIME - START_TIME))
-            log "[$current/$TOTAL_FILES] ✗ $file_type failed after ${ELAPSED}s for: $file"
+
+            if [ $EXIT_CODE -eq 124 ]; then
+                log "[$current/$TOTAL_FILES] ⏱ $file_type TIMEOUT after ${timeout_sec}s for: $file"
+            else
+                log "[$current/$TOTAL_FILES] ✗ $file_type failed after ${ELAPSED}s for: $file"
+            fi
         fi
     done
 }
@@ -92,8 +100,10 @@ TOTAL_FILES=$(find . -type f -name "*scad" | wc -l)
 log "Found $TOTAL_FILES SCAD files to process"
 
 # Process PNG and STL files using consolidated function
-process_files "PNG" ".png" "4096,2160"
-process_files "STL" ".stl"
+# Using 1920x1080 resolution for reasonable processing time (~30s/file vs 10min/file at 4K)
+# PNG: 180s (3 min) timeout, STL: 300s (5 min) timeout
+process_files "PNG" ".png" "1920,1080" 180
+process_files "STL" ".stl" "" 300
 
 log "Filtering binaries..."
 "${SCRIPT_DIR}/keep-only-binaries.sh"
