@@ -49,14 +49,18 @@ module connected_logo() {
         import("roundernetes-logo.svg", center=true);
 
         // Add thin connectors at strategic points
+        // FIXED: Wrapped square() in linear_extrude() for proper 3D geometry
         // These coordinates are approximate and may need adjustment
         translate([-5, 0, 0])
-            square([connector_width, 20]);
+            linear_extrude(height = logo_thickness)
+                square([connector_width, 20]);
         translate([5, -10, 0])
-            square([connector_width, 20]);
+            linear_extrude(height = logo_thickness)
+                square([connector_width, 20]);
         translate([0, -5, 0])
             rotate([0, 0, 90])
-                square([connector_width, 20]);
+                linear_extrude(height = logo_thickness)
+                    square([connector_width, 20]);
     }
 }
 
