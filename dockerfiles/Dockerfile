@@ -64,16 +64,14 @@ ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scri
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
-# Install fonts (optional - will fall back to system fonts if unavailable)
-# Note: Isonorm 3098 is used in labels but OpenSCAD will use fallback fonts if not found
-RUN cd /tmp && \
-    (curl -L -o isonorm.zip "https://freefonts.co/downloadfiles/zippedfontstyles/i/s/isonorm-3098-regular.zip" && \
-     unzip isonorm.zip && \
-     find . -name "Isonorm*.otf" -exec cp {} /usr/local/share/fonts \; && \
-     fc-cache -f -v && \
-     echo "Isonorm font installed successfully") || \
-    echo "Warning: Isonorm font installation failed - will use system fallback fonts" && \
-    rm -rf isonorm.zip "Isonorm 3098 Regular" 2>/dev/null || true
+# Install fonts for technical labels
+# Note: Isonorm 3098 is a commercial font - using Liberation Sans as free alternative
+# Liberation Sans provides excellent technical appearance and is already in Debian repos
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-liberation2 \
+    fonts-inconsolata \
+    && fc-cache -f -v \
+    && rm -rf /var/lib/apt/lists/*
 
 # Switch to the openscad user
 USER ${user}
