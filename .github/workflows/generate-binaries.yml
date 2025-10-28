@@ -1,11 +1,15 @@
 name: Generate PNG images and STL files from 3D models
 
 on:
-  push:
-    branches:
-      - '*'
+  # Only run on pull_request to avoid duplicate runs
+  # (push to PR branch triggers pull_request event)
   pull_request:
     branches: [ '*' ]
+  # Run on push only to main/master branches (no PR)
+  push:
+    branches:
+      - master
+      - main
   schedule:
     # * is a special character in YAML so you have to quote this string
     # Will build everyday at 4:30 and 16:30
