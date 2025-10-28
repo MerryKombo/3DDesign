@@ -65,3 +65,12 @@ jobs:
           platforms: linux/amd64, linux/arm64
           push: true
           tags: gounthar/openscad:${{ steps.extract_branch.outputs.branch }}
+      -
+        name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v4
+        if: steps.extract_branch.outputs.branch == 'master'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: gounthar/openscad
+          readme-filepath: ./dockerfiles/README.md
