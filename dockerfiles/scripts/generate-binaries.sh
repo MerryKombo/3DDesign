@@ -8,12 +8,117 @@ echo "Starting the generate-binaries.sh script"
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Helper function to log with timestamp
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+# Helper function to format file size with decimal precision
+format_size() {
+    local size=$1
+    if [ "$size" = "unknown" ]; then
+        echo "unknown"
+    elif [ $size -lt 1024 ]; then
+        echo "${size}B"
+    elif [ $size -lt 1048576 ]; then
+        # Use awk for floating point division
+        awk -v s="$size" 'BEGIN {printf "%.1fKB", s/1024}'
+    else
+        awk -v s="$size" 'BEGIN {printf "%.1fMB", s/1048576}'
+    fi
+}
+
+# Helper function to get file size with error handling
+get_file_size() {
+    local file=$1
+    local size
+
+    # Try macOS stat first, then Linux stat
+    size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+
+    # Check if we got a valid size
+    if [ -z "$size" ]; then
+        log "Warning: Failed to get size for: $file"
+        echo "unknown"
+    else
+        echo "$size"
+    fi
+}
+
+# Helper function to process SCAD files (consolidates PNG and STL processing)
+process_files() {
+    local file_type=$1      # "PNG" or "STL"
+    local output_ext=$2     # ".png" or ".stl"
+    local img_size=$3       # Image size for PNG (empty for STL)
+    local timeout_sec=$4    # Timeout in seconds
+
+    log "Starting $file_type generation${img_size:+ ($img_size resolution)} with ${timeout_sec}s timeout..."
+
+    local current=0
+    find . -type f -iname "*.scad" \
+        -not -path "./vendor/*" \
+        -not -path "./node_modules/*" \
+        -not -path "./third_party/*" \
+        -not -path "./.git/*" \
+        -print0 | while IFS= read -r -d '' file; do
+        current=$((current + 1))
+        START_TIME=$(date +%s)
+        FILE_SIZE=$(get_file_size "$file")
+
+        log "[$current/$TOTAL_FILES] Processing $file_type: $file ($(format_size $FILE_SIZE))"
+
+        # Build the command based on file type
+        local cmd
+        if [ "$file_type" = "PNG" ]; then
+            cmd="timeout $timeout_sec xvfb-run -a openscad --imgsize=$img_size \"$file\" -o \"${file}${output_ext}\""
+        else
+            cmd="timeout $timeout_sec openscad \"$file\" -o \"${file}${output_ext}\""
+        fi
+
+        if eval "$cmd"; then
+            END_TIME=$(date +%s)
+            ELAPSED=$((END_TIME - START_TIME))
+            OUTPUT_SIZE=$(get_file_size "${file}${output_ext}")
+            log "[$current/$TOTAL_FILES] ✓ $file_type completed in ${ELAPSED}s (output: $(format_size $OUTPUT_SIZE))"
+        else
+            EXIT_CODE=$?
+            END_TIME=$(date +%s)
+            ELAPSED=$((END_TIME - START_TIME))
+
+            if [ $EXIT_CODE -eq 124 ]; then
+                log "[$current/$TOTAL_FILES] ⏱ $file_type TIMEOUT after ${timeout_sec}s for: $file"
+            else
+                log "[$current/$TOTAL_FILES] ✗ $file_type failed after ${ELAPSED}s for: $file"
+            fi
+        fi
+    done
+}
+
 # Call helper scripts with full paths
 # set -e ensures the script exits on any error
+log "Creating branch..."
 "${SCRIPT_DIR}/create-branch.sh"
-find . -type f -name "*scad" -print0 | xargs -I{} --null xvfb-run -a openscad --imgsize=4096,2160 {} -o {}.png
-find . -type f -name "*scad" -print0 | xargs -I{} --null openscad {} -o {}.stl
+
+# Count total SCAD files (excluding vendor directories)
+log "Counting SCAD files..."
+TOTAL_FILES=$(find . -type f -iname "*.scad" \
+    -not -path "./vendor/*" \
+    -not -path "./node_modules/*" \
+    -not -path "./third_party/*" \
+    -not -path "./.git/*" \
+    -print0 | tr -cd '\0' | wc -c)
+log "Found $TOTAL_FILES SCAD files to process"
+
+# Process PNG and STL files using consolidated function
+# Using 1920x1080 resolution for reasonable processing time (~30s/file vs 10min/file at 4K)
+# PNG: 180s (3 min) timeout, STL: 300s (5 min) timeout
+process_files "PNG" ".png" "1920,1080" 180
+process_files "STL" ".stl" "" 300
+
+log "Filtering binaries..."
 "${SCRIPT_DIR}/keep-only-binaries.sh"
+
+log "Pushing to repository..."
 "${SCRIPT_DIR}/push-to-repo.sh"
 
-echo "Ending the generate-binaries.sh script"
+log "Ending the generate-binaries.sh script"
