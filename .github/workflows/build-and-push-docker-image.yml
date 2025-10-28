@@ -76,7 +76,7 @@ jobs:
           echo "✓ Docker Hub README found"
       -
         name: Update Docker Hub description
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@v5.0.0
         if: steps.extract_branch.outputs.branch == 'master'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
