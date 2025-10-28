@@ -4,7 +4,10 @@
 echo "Starting the create-branch.sh script"
 
 # Authenticate with GitHub using GITHUB_TOKEN
+# Temporarily disable xtrace to prevent token from appearing in logs
+set +x
 echo "$GITHUB_TOKEN" | gh auth login --with-token
+set -x
 
 # Get current branch name
 branch_name=$BRANCH_NAME
