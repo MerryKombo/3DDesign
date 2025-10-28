@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 # NOTE: The -x flag (xtrace) can expose sensitive tokens in logs.
 # TODO: Wrap token-sensitive commands with set +x / set -x guards
-# See issue for comprehensive fix across all scripts.
+# See issue #50 for comprehensive fix across all scripts.
 
 echo "Starting the generate-binaries.sh script"
 
