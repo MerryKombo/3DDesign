@@ -47,7 +47,7 @@ module connected_logo() {
     difference() {
         union() {
             // Original logo
-            import("roudnernetes-logo.svg", center=true);
+            import("roundernetes-logo.svg", center=true);
 
             // Add thin connectors at strategic points
             // These coordinates are approximate and may need adjustment
