@@ -65,11 +65,15 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
 # Install fonts for technical labels
-# Note: Isonorm 3098 is a commercial font - using Liberation Sans as free alternative
-# Liberation Sans provides excellent technical appearance and is already in Debian repos
+# Osifont: Open-source ISO 3098 / DIN 3098 compliant font for technical drawings
+# - Specifically designed to conform to ISO 3098 specification
+# - GPL v3/v2/LGPL v3 with font exception (documents don't inherit GPL)
+# - Direct replacement for commercial Isonorm 3098
+# Also includes Liberation Sans and Routed Gothic as fallbacks
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-osifont \
     fonts-liberation2 \
-    fonts-inconsolata \
+    fonts-routed-gothic \
     && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 

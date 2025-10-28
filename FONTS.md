@@ -4,17 +4,40 @@
 
 This project previously used **Isonorm 3098**, a commercial technical font designed for ISO/DIN 3098 standard technical drawings. However, as a commercial font, it cannot be freely distributed in open-source Docker images.
 
-## Current Font Solution
+## Current Font Solution: Osifont
 
-The Docker image now uses **Liberation Sans** and **Inconsolata** as free, open-source alternatives:
+The Docker image now uses **Osifont** as the primary font - an open-source ISO 3098 / DIN 3098 compliant alternative:
 
-- **Liberation Sans**: Excellent for general technical labels, clean appearance
-- **Inconsolata**: Monospaced font, ideal for technical text and codes
+### Osifont - Primary Font
 
-Both fonts are:
-- Freely licensed (SIL Open Font License)
+**Osifont** is specifically designed to conform to the ISO 3098 technical drawing specification:
+
+- **Standard Compliance**: Explicitly conforms to ISO 3098 / DIN 3098
+- **License**: GPL v3/v2/LGPL v3 with **font exception**
+  - Documents created using Osifont don't inherit GPL restrictions
+  - Safe for commercial and open-source projects
+- **Package**: `fonts-osifont` in Debian/Ubuntu repositories
+- **Format**: TrueType (TTF)
+- **Language Support**: 39 languages including English, German, French, Spanish
+- **Development**: Actively maintained on GitHub
+- **Purpose**: Created specifically to provide free CAD software with standards-compliant fonts
+
+### Additional Fonts Included
+
+**Routed Gothic** - Technical drawing fallback:
+- Based on Leroy Lettering templates (mid-20th century technical drawings)
+- SIL Open Font License 1.1
+- Authentic technical drawing appearance
+- Available in multiple widths and styles
+
+**Liberation Sans** - General fallback:
+- SIL Open Font License
+- Excellent for general technical labels
+- Professional, clean appearance
+
+All fonts are:
+- Freely licensed and open-source
 - Included in Debian repositories (no external downloads needed)
-- Professionally designed with excellent readability
 - Well-supported in OpenSCAD
 
 ## Font Fallback in OpenSCAD
@@ -35,19 +58,24 @@ font = "Isonorm 3098";
 
 ### Recommended replacements:
 
+**For ISO 3098 compliant technical labels (BEST CHOICE):**
+```openscad
+font = "osifont:style=Regular";
+```
+
+**For vintage technical drawing style:**
+```openscad
+font = "Routed Gothic:style=Regular";
+```
+
 **For general labels:**
 ```openscad
 font = "Liberation Sans:style=Regular";
 ```
 
-**For monospaced/technical labels:**
+**With automatic fallback chain:**
 ```openscad
-font = "Inconsolata:style=Regular";
-```
-
-**With automatic fallback:**
-```openscad
-font = "Liberation Sans:style=Regular,Inconsolata:style=Regular";
+font = "osifont:style=Regular,Routed Gothic:style=Regular,Liberation Sans:style=Regular";
 ```
 
 ## Files Using Font Rendering
@@ -57,31 +85,54 @@ The following files currently specify "Isonorm 3098":
 - `assets/kluster/raspberry-pi-3-b-plus.scad`
 - `assets/Server Rack/1U/parts/label.scad`
 
-These files will continue to work without modification due to OpenSCAD's font fallback mechanism. The rendered labels will use Liberation Sans automatically.
+These files will continue to work without modification due to OpenSCAD's font fallback mechanism. When "Isonorm 3098" is not found, OpenSCAD will automatically use available system fonts. With Osifont installed, labels will now render with ISO 3098 compliant lettering.
 
 ## Alternative Technical Fonts
 
 If you need different font characteristics, consider these other free alternatives:
 
-| Font | Characteristics | Installation |
-|------|-----------------|--------------|
-| **Source Code Pro** | Adobe's technical font, professional | `apt-get install fonts-source-code-pro` |
-| **Hack** | Clear distinction between similar chars | `apt-get install fonts-hack` |
-| **DejaVu Sans** | Excellent Unicode coverage | `apt-get install fonts-dejavu` |
-| **Roboto Mono** | Modern, clean technical appearance | `apt-get install fonts-roboto` |
+| Font | Characteristics | ISO 3098 Compliance | Installation |
+|------|-----------------|---------------------|--------------|
+| **Osifont** | ISO 3098 compliant technical drawing | ✅ YES | `apt-get install fonts-osifont` |
+| **Routed Gothic** | Leroy Lettering, vintage technical | Authentic style | `apt-get install fonts-routed-gothic` |
+| **Relief SingleLine** | Single-line for CNC/engraving | Special purpose | Manual install from GitHub |
+| **Liberation Sans** | Clean, professional appearance | No | `apt-get install fonts-liberation2` |
+| **Source Code Pro** | Adobe's technical font | No | `apt-get install fonts-source-code-pro` |
+| **Hack** | Clear distinction between chars | No | `apt-get install fonts-hack` |
+| **DejaVu Sans** | Excellent Unicode coverage | No | `apt-get install fonts-dejavu` |
+
+### Relief SingleLine (For CNC/Engraving)
+If your technical drawings need to be machine-engraved or processed by CNC equipment:
+- **License**: Open Font License (OFL)
+- **Format**: OpenType-SVG for Adobe apps, TTF for CAD software
+- **Design**: Based on Adrian Frutiger's Vectora typeface
+- **Use Case**: Single-line/open-path font for CNC, laser engraving, pen plotting
 
 ## Testing Font Rendering
 
 To verify which fonts are available in your OpenSCAD environment:
 
 ```bash
+# Check for Osifont (ISO 3098 compliant)
+fc-list | grep -i osifont
+
+# Check for Routed Gothic
+fc-list | grep -i "routed gothic"
+
+# Check for Liberation Sans
 fc-list | grep -i liberation
-fc-list | grep -i inconsolata
 ```
 
 In OpenSCAD, test font rendering:
 ```openscad
-text("Test Label", font="Liberation Sans:style=Regular");
+// Test ISO 3098 compliant font
+text("Test Label 123", font="osifont:style=Regular");
+
+// Test vintage technical style
+text("Test Label 123", font="Routed Gothic:style=Regular");
+
+// Test general fallback
+text("Test Label 123", font="Liberation Sans:style=Regular");
 ```
 
 ## Commercial Isonorm 3098
