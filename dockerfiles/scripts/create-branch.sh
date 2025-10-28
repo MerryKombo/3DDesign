@@ -19,7 +19,18 @@ new_branch_name="binaries-for-$branch_name"
 git config --local user.email "github-actions@github.com"
 git config --local user.name "GitHub Actions"
 
-# Create a new branch for the binaries
-git checkout -b "${new_branch_name}"
+# Create a new branch for the binaries (or switch to it if it exists)
+# Check if branch exists locally
+if git show-ref --verify --quiet "refs/heads/${new_branch_name}"; then
+    echo "Branch ${new_branch_name} exists locally, switching to it"
+    git checkout "${new_branch_name}"
+# Check if branch exists remotely
+elif git ls-remote --exit-code --heads origin "${new_branch_name}" > /dev/null 2>&1; then
+    echo "Branch ${new_branch_name} exists remotely, checking it out"
+    git checkout -b "${new_branch_name}" "origin/${new_branch_name}"
+else
+    echo "Branch ${new_branch_name} does not exist, creating it"
+    git checkout -b "${new_branch_name}"
+fi
 
 echo "Ending the create-branch.sh script"
