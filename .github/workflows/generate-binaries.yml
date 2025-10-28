@@ -46,6 +46,8 @@ jobs:
 
       - name: Generate binaries
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Workspace: ${{ github.workspace }}"
+          ls -la
           mkdir -p /home/openscad/binaries
-          cd ${{ github.workspace }}
           generate-binaries.sh
