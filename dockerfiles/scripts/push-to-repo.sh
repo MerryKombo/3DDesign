@@ -8,6 +8,13 @@ git add .
 branch_name=$BRANCH_NAME
 new_branch_name="binaries-for-$branch_name"
 
+# Check if there are changes to commit
+if git diff --quiet && git diff --cached --quiet; then
+    echo "No changes to commit - binaries are up to date"
+    echo "Ending the push-to-repo.sh script"
+    exit 0
+fi
+
 git commit -m "chore(binaries) New binaries for $branch_name"
 
 # Temporarily disable xtrace to prevent GITHUB_TOKEN from appearing in logs
