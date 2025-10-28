@@ -1,3 +1,5 @@
+#  docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix openscad openscad
+# QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-openscad'
 # Use the slim version of Debian Trixie as the base image
 FROM debian:trixie-20250908-slim
 
@@ -62,10 +64,18 @@ ENV PATH="${OPENSCAD_AGENT_HOME}/.local/share/OpenSCAD/libraries/NopSCADlib/scri
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN echo "HOME=${HOME}" >> /etc/environment
 
-# Install fonts
-RUN cd /tmp && curl -O "https://media.fontsgeek.com/download/zip/i/s/isonorm-3098_9p5jZ.zip" && unzip iso*zip && \
-    rm iso*.zip && find . -name Isonorm\ 3098\ Regular.otf -exec cp {} /usr/local/share/fonts \; && \
-    rm -fr Isonorm\ 3098\ Regular/Isonorm
+# Install fonts for technical labels
+# Osifont: Open-source ISO 3098 / DIN 3098 compliant font for technical drawings
+# - Specifically designed to conform to ISO 3098 specification
+# - GPL v3/v2/LGPL v3 with font exception (documents don't inherit GPL)
+# - Direct replacement for commercial Isonorm 3098
+# Also includes Liberation Sans and Routed Gothic as fallbacks
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-osifont \
+    fonts-liberation2 \
+    fonts-routed-gothic \
+    && fc-cache -f -v \
+    && rm -rf /var/lib/apt/lists/*
 
 # Switch to the openscad user
 USER ${user}

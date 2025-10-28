@@ -1,11 +1,15 @@
 name: Generate PNG images and STL files from 3D models
 
 on:
-  push:
-    branches:
-      - '*'
+  # Only run on pull_request to avoid duplicate runs
+  # (push to PR branch triggers pull_request event)
   pull_request:
     branches: [ '*' ]
+  # Run on push only to main/master branches (no PR)
+  push:
+    branches:
+      - master
+      - main
   schedule:
     # * is a special character in YAML so you have to quote this string
     # Will build everyday at 4:30 and 16:30
@@ -14,29 +18,39 @@ on:
 jobs:
   generate-branch-name:
     runs-on: ubuntu-latest
+    outputs:
+      BRANCH_NAME: ${{ steps.extract_branch.outputs.BRANCH_NAME }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed -e 's#/#-#g')"
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          BRANCH_NAME="${BRANCH_NAME//\//-}"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
         id: extract_branch
-    outputs:
-      branch-name: ${{ steps.extract_branch.outputs.branch }}
+
   generate-binaries:
     needs: generate-branch-name
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.branch-name }}
-      GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
-      GIT_URL: echo ${env.GIT_URL}
     container:
-      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.branch-name }}
-      volumes:
-        - ${{ github.workspace }}:/home/openscad/projects/
+      image: gounthar/openscad:${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
+      options: --user root
+    env:
+      GH_CREDENTIALS_PSW: ${{ secrets.GH_CREDENTIALS_PSW }}
+      GIT_URL: ${{ github.server_url }}/${{ github.repository }}.git
+      BRANCH_NAME: ${{ needs.generate-branch-name.outputs.BRANCH_NAME }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: generate-binaries
-        shell: bash
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Generate binaries
         run: |
-          echo $BRANCH_NAME
-          cd /home/openscad/projects/ && generate-binaries.sh
+          pwd
+          ls -la
+          mkdir -p /home/openscad/binaries
+          bash dockerfiles/scripts/generate-binaries.sh

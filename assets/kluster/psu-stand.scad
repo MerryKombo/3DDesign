@@ -140,10 +140,10 @@ module stand(length, width, height) {
 
 }
 
-union() {
+difference() {
     // translate([0, 0, getStandHeight()])
     //     psu();
-   // stand(squarePSULength(), squarePSULength(), getStandHeight());
+    stand(squarePSULength(), squarePSULength(), getStandHeight());
     length = squarePSULength();
     width = squarePSULength();
     x = length + standMargins() * 2 + standWallThickness() * 2;
@@ -154,6 +154,8 @@ union() {
     yTranslation = (x - width) / 2;
     echo("yTranslation", yTranslation);
     echo("standFeetThickness", standFeetThickness());
-    // feetCutout(x, y, getStandHeight());
-  kubernetesLogo();
+    feetCutout(x, y, getStandHeight());
+    // The `kubernetesLogo()` function is currently disabled because it is not required for the PSU stand design.
+    // Uncomment this line if the Kubernetes logo needs to be added to the stand in the future.
+    //kubernetesLogo();
 }
