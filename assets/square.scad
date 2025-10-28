@@ -21,7 +21,9 @@ topSquareSize = bracketWidth * 1.5;
 //topSquare();
 backSquare();
 
-module backSquare() {
+// Parameterized square module to avoid code duplication
+// include_middle: if true, includes the middle halfSquare rotation
+module squareBase(include_middle = true) {
     difference() {
         intersection() {
             color("black") translate([0, - topSquareSize, - topSquareSize / 3]) cube(size = [topSquareSize,
@@ -29,7 +31,9 @@ module backSquare() {
                 topSquareSize]);
             union() {
                 translate([0, 0, bracketWidth]) rotate([180, 0, 0]) halfSquare();
-                //translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare();
+                if (include_middle) {
+                    translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare();
+                }
                 translate([0, 0, bracketWidth]) rotate([- 90, 90, - 180]) halfSquare();
             }
         }
@@ -41,24 +45,14 @@ module backSquare() {
     }
 }
 
+// Back square variant (without middle halfSquare)
+module backSquare() {
+    squareBase(include_middle = false);
+}
+
+// Top square variant (with all three halfSquare rotations)
 module topSquare() {
-    difference() {
-        intersection() {
-            color("black") translate([0, - topSquareSize, - topSquareSize / 3]) cube(size = [topSquareSize,
-                topSquareSize,
-                topSquareSize]);
-            union() {
-                translate([0, 0, bracketWidth]) rotate([180, 0, 0]) halfSquare();
-                translate([0, 0, bracketWidth]) rotate([- 90, 0, - 90]) halfSquare();
-                translate([0, 0, bracketWidth]) rotate([- 90, 90, - 180]) halfSquare();
-            }
-        }
-        union() {
-            // The screw holes
-            translate([2 * topSquareSize / 3 - bracketWidth / 4, 0, - bracketWidth]) rotate([90, 0, 0]) bolt();
-            translate([0, - 2 * topSquareSize / 3 + bracketWidth / 4, - bracketWidth]) rotate([90, 0, - 270]) bolt();
-        }
-    }
+    squareBase(include_middle = true);
 }
 
 module halfSquare() {
