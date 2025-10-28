@@ -85,13 +85,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gounthar/openscad:master
-      options: --user root
+      options: --user root  # Required for git operations and file permissions in Actions
     steps:
       - uses: actions/checkout@v5
       - name: Render models
         run: |
           find . -name "*.scad" -exec openscad -o {}.stl {} \;
 ```
+
+**Note on `--user root`**: This is required in GitHub Actions when using `actions/checkout` because the action needs write permissions to the workspace. For standalone Docker usage without git operations, you can omit this option and run as the default `openscad` user for better security.
 
 ## Build Information
 

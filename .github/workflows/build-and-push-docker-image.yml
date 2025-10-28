@@ -66,6 +66,15 @@ jobs:
           push: true
           tags: gounthar/openscad:${{ steps.extract_branch.outputs.branch }}
       -
+        name: Verify Docker Hub README exists
+        if: steps.extract_branch.outputs.branch == 'master'
+        run: |
+          if [ ! -f ./dockerfiles/README.md ]; then
+            echo "::error::Docker Hub README not found at ./dockerfiles/README.md"
+            exit 1
+          fi
+          echo "✓ Docker Hub README found"
+      -
         name: Update Docker Hub description
         uses: peter-evans/dockerhub-description@v4
         if: steps.extract_branch.outputs.branch == 'master'
