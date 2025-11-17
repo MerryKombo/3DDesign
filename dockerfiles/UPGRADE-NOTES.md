@@ -117,16 +117,16 @@ Should show a recent version (likely 2024.11 or newer).
 
 ### Migration Checklist
 
-- [ ] Build new image locally: `docker build -f Dockerfile.new -t gounthar/openscad:test .`
-- [ ] Test GUI mode with WSL2 X11 forwarding
-- [ ] Test headless PNG rendering (xvfb)
-- [ ] Test STL export
-- [ ] Verify BOSL2 libraries are accessible
-- [ ] Test threading module (plot-cadre-velo-1990.scad)
-- [ ] Check OpenSCAD version is recent
+- [x] Build new image locally: `docker build -t gounthar/openscad:test .`
+- [x] Test GUI mode with WSL2 X11 forwarding
+- [x] Test headless PNG rendering (xvfb)
+- [x] Test STL export
+- [x] Verify BOSL2 libraries are accessible
+- [x] Test threading module (plot-cadre-velo-1990.scad)
+- [x] Check OpenSCAD version is recent
 - [ ] Test binary generation workflow: `bash dockerfiles/scripts/generate-binaries.sh`
-- [ ] Verify CI/CD pipeline compatibility
-- [ ] Update GitHub Actions workflow to use new image tag
+- [x] Verify CI/CD pipeline compatibility (Dockerfile.new renamed to Dockerfile)
+- [x] Update GitHub Actions workflow to use new image tag (automatic - uses Dockerfile in context)
 
 ### Rollout Strategy
 
